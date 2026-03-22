@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 func TestHandleListSkills(t *testing.T) {

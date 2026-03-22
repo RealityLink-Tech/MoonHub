@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/commands"
+	"github.com/RealityLink-Tech/MoonHub/pkg/commands"
 )
 
 type mockRegistrar struct{}

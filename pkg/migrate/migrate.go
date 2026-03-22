@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sipeed/moonhub/pkg/migrate/internal"
-	"github.com/sipeed/moonhub/pkg/migrate/sources/openclaw"
+	"github.com/RealityLink-Tech/MoonHub/pkg/migrate/internal"
+	"github.com/RealityLink-Tech/MoonHub/pkg/migrate/sources/openclaw"
 )
 
 type (

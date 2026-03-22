@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/migrate/internal"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/migrate/internal"
 )
 
 var providerMapping = map[string]string{

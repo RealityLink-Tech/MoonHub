@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 // --- Compile-time interface check ---

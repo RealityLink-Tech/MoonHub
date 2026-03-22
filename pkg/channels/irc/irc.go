@@ -9,10 +9,10 @@ import (
 	"github.com/ergochat/irc-go/ircevent"
 	"github.com/ergochat/irc-go/ircmsg"
 
-	"github.com/sipeed/moonhub/pkg/bus"
-	"github.com/sipeed/moonhub/pkg/channels"
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/channels"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
 )
 
 // IRCChannel implements the Channel interface for IRC servers.

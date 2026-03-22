@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/commands"
+	"github.com/RealityLink-Tech/MoonHub/pkg/commands"
 )
 
 func TestStartCommandRegistration_DoesNotBlock(t *testing.T) {

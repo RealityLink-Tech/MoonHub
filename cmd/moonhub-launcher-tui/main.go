@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sipeed/moonhub/cmd/moonhub-launcher-tui/internal/ui"
+	"github.com/RealityLink-Tech/MoonHub/cmd/moonhub-launcher-tui/internal/ui"
 )
 
 func main() {

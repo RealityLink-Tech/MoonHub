@@ -18,8 +18,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/bus"
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 // generateTestAESKeyApp generates a valid test AES key for WeCom App

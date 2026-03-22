@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sipeed/moonhub/pkg/adaptive_memory"
-	"github.com/sipeed/moonhub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/adaptive_memory"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
 )
 
 // Integration provides integration helpers for the learning engine

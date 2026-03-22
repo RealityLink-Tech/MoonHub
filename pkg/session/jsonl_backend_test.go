@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/memory"
-	"github.com/sipeed/moonhub/pkg/providers"
-	"github.com/sipeed/moonhub/pkg/session"
+	"github.com/RealityLink-Tech/MoonHub/pkg/memory"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/session"
 )
 
 // Compile-time interface satisfaction checks.

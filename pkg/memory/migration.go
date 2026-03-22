@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
 )
 
 // jsonSession mirrors pkg/session.Session for migration purposes.

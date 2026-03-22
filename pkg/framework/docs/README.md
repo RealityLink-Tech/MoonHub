@@ -1,6 +1,6 @@
 # MoonHub Plugin Framework (`pkg/framework`)
 
-This directory is the **plugin runtime core**: type definitions, global registry, lifecycle management. Implementation code is in the parent directory (`../*.go`), with Go package name `**plugin**` and import path `**github.com/sipeed/moonhub/pkg/framework**`.
+This directory is the **plugin runtime core**: type definitions, global registry, lifecycle management. Implementation code is in the parent directory (`../*.go`), with Go package name `**plugin**` and import path `**github.com/RealityLink-Tech/MoonHub/pkg/framework**`.
 
 ## Recommended Reading Order
 

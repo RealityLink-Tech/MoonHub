@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/sipeed/moonhub/cmd/moonhub/internal"
+	"github.com/RealityLink-Tech/MoonHub/cmd/moonhub/internal"
 )
 
 func NewCronCommand() *cobra.Command {

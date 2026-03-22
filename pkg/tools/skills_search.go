@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sipeed/moonhub/pkg/skills"
+	"github.com/RealityLink-Tech/MoonHub/pkg/skills"
 )
 
 // FindSkillsTool allows the LLM agent to search for installable skills from registries.

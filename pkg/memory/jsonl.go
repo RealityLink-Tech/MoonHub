@@ -14,8 +14,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/fileutil"
-	"github.com/sipeed/moonhub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/fileutil"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
 )
 
 const (

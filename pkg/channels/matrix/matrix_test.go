@@ -14,7 +14,7 @@ import (
 	"maunium.net/go/mautrix/event"
 	"maunium.net/go/mautrix/id"
 
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 func TestMatrixLocalpartMentionRegexp(t *testing.T) {

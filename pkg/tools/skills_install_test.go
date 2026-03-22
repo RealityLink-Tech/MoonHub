@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sipeed/moonhub/pkg/skills"
+	"github.com/RealityLink-Tech/MoonHub/pkg/skills"
 )
 
 func TestInstallSkillToolName(t *testing.T) {

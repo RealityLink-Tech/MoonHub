@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/shield"
+	"github.com/RealityLink-Tech/MoonHub/pkg/shield"
 )
 
 func TestApproveRejectCommands_WiredToApprovalManager(t *testing.T) {

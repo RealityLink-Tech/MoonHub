@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/shield"
+	"github.com/RealityLink-Tech/MoonHub/pkg/shield"
 )
 
 type panicShieldEvaluator struct{}

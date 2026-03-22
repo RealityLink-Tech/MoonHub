@@ -15,8 +15,8 @@ import (
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
 )
 
 // headerTransport is an http.RoundTripper that adds custom headers to requests

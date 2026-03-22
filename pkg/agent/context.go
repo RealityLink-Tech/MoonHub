@@ -12,12 +12,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/learning"
-	"github.com/sipeed/moonhub/pkg/logger"
-	"github.com/sipeed/moonhub/pkg/providers"
-	"github.com/sipeed/moonhub/pkg/skills"
-	"github.com/sipeed/moonhub/pkg/utils"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/learning"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/skills"
+	"github.com/RealityLink-Tech/MoonHub/pkg/utils"
 )
 
 type ContextBuilder struct {

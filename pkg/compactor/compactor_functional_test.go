@@ -6,7 +6,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
 )
 
 type stubSummarizeProvider struct {

@@ -1,4 +1,4 @@
-module github.com/sipeed/moonhub
+module github.com/RealityLink-Tech/MoonHub
 
 go 1.25.5
 

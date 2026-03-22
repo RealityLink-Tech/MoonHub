@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/sipeed/moonhub/pkg/cron"
+	"github.com/RealityLink-Tech/MoonHub/pkg/cron"
 )
 
 func newAddCommand(storePath func() string) *cobra.Command {

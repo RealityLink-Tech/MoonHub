@@ -4,8 +4,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/compactor"
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/compactor"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 func TestNewAgentInstance_CompassorWhenEnabled(t *testing.T) {

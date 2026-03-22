@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 // Ensure GroqTranscriber satisfies the Transcriber interface at compile time.

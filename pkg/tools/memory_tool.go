@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sipeed/moonhub/pkg/adaptive_memory"
+	"github.com/RealityLink-Tech/MoonHub/pkg/adaptive_memory"
 )
 
 // MemoryToolProvider interface for memory tool dependency injection

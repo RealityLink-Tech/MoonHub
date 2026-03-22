@@ -8,7 +8,7 @@ package providers
 import (
 	"fmt"
 
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 // CreateProvider creates a provider based on the configuration.

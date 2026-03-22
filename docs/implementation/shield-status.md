@@ -346,7 +346,7 @@ threats := engine.GetThreats()
 
 ```
 === 所有 33 个测试通过 ===
-ok      github.com/sipeed/moonhub/pkg/shield
+ok      github.com/RealityLink-Tech/MoonHub/pkg/shield
 ```
 
 ## 性能目标

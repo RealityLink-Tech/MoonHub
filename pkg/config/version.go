@@ -8,10 +8,10 @@ import (
 // Build-time variables injected via ldflags during build process.
 // These are set by the Makefile or .goreleaser.yaml using the -X flag:
 //
-//	-X github.com/sipeed/moonhub/pkg/config.Version=<version>
-//	-X github.com/sipeed/moonhub/pkg/config.GitCommit=<commit>
-//	-X github.com/sipeed/moonhub/pkg/config.BuildTime=<timestamp>
-//	-X github.com/sipeed/moonhub/pkg/config.GoVersion=<go-version>
+//	-X github.com/RealityLink-Tech/MoonHub/pkg/config.Version=<version>
+//	-X github.com/RealityLink-Tech/MoonHub/pkg/config.GitCommit=<commit>
+//	-X github.com/RealityLink-Tech/MoonHub/pkg/config.BuildTime=<timestamp>
+//	-X github.com/RealityLink-Tech/MoonHub/pkg/config.GoVersion=<go-version>
 var (
 	Version   = "dev" // Default value when not built with ldflags
 	GitCommit string  // Git commit SHA (short)

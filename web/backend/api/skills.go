@@ -10,8 +10,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/skills"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/skills"
 )
 
 type skillSupportResponse struct {

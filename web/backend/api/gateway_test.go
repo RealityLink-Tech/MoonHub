@@ -14,9 +14,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/auth"
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/web/backend/utils"
+	"github.com/RealityLink-Tech/MoonHub/pkg/auth"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/web/backend/utils"
 )
 
 func startLongRunningProcess(t *testing.T) *exec.Cmd {

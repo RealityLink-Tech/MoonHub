@@ -13,11 +13,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 
-	"github.com/sipeed/moonhub/pkg/bus"
-	"github.com/sipeed/moonhub/pkg/channels"
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/identity"
-	"github.com/sipeed/moonhub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/channels"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/identity"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
 )
 
 // moonhubHTTPPrefix is the gateway HTTP path prefix for the MoonHub native WebSocket

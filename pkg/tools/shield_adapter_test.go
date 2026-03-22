@@ -3,7 +3,7 @@ package tools
 import (
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/shield"
+	"github.com/RealityLink-Tech/MoonHub/pkg/shield"
 )
 
 func TestNewShieldEvaluatorFromEngine_Nil(t *testing.T) {

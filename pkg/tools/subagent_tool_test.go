@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
 )
 
 // MockLLMProvider is a test implementation of LLMProvider

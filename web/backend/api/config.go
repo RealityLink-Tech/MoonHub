@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 // registerConfigRoutes binds configuration management endpoints to the ServeMux.

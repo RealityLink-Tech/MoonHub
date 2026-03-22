@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/providers"
-	"github.com/sipeed/moonhub/pkg/tools"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/tools"
 )
 
 // routingTestProvider routes Chat by message shape: sub-agent system prompts contain

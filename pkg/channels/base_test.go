@@ -3,8 +3,8 @@ package channels
 import (
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/bus"
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 func TestBaseChannelIsAllowed(t *testing.T) {

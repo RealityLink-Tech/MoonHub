@@ -5,9 +5,9 @@ package whatsapp
 import (
 	"fmt"
 
-	"github.com/sipeed/moonhub/pkg/bus"
-	"github.com/sipeed/moonhub/pkg/channels"
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/channels"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 // NewWhatsAppNativeChannel returns an error when the binary was not built with -tags whatsapp_native.

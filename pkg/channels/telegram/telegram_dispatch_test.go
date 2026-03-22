@@ -7,8 +7,8 @@ import (
 
 	"github.com/mymmrac/telego"
 
-	"github.com/sipeed/moonhub/pkg/bus"
-	"github.com/sipeed/moonhub/pkg/channels"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/channels"
 )
 
 func TestHandleMessage_DoesNotConsumeGenericCommandsLocally(t *testing.T) {

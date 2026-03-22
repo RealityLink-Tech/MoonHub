@@ -10,8 +10,8 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
-	configstore "github.com/sipeed/moonhub/cmd/moonhub-launcher-tui/internal/config"
-	moonhubconfig "github.com/sipeed/moonhub/pkg/config"
+	configstore "github.com/RealityLink-Tech/MoonHub/cmd/moonhub-launcher-tui/internal/config"
+	moonhubconfig "github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 type appState struct {

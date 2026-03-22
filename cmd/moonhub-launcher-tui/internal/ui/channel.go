@@ -7,7 +7,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
-	moonhubconfig "github.com/sipeed/moonhub/pkg/config"
+	moonhubconfig "github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 func (s *appState) buildChannelMenuItems() []MenuItem {

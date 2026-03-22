@@ -1,7 +1,7 @@
 package routing
 
 import (
-	"github.com/sipeed/moonhub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
 )
 
 // defaultThreshold is used when the config threshold is zero or negative.

@@ -3,7 +3,7 @@ package skills
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/sipeed/moonhub/pkg/skills"
+	"github.com/RealityLink-Tech/MoonHub/pkg/skills"
 )
 
 func newRemoveCommand(installerFn func() (*skills.SkillInstaller, error)) *cobra.Command {

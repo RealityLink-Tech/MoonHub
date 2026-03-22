@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
 )
 
 const testFetchLimit = int64(10 * 1024 * 1024)

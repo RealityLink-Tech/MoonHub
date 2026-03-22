@@ -6,8 +6,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/logger"
-	"github.com/sipeed/moonhub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
 )
 
 // SubAgentExecutor defines the interface for executing sub-agent tasks

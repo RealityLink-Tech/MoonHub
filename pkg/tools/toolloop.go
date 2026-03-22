@@ -12,9 +12,9 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/sipeed/moonhub/pkg/logger"
-	"github.com/sipeed/moonhub/pkg/providers"
-	"github.com/sipeed/moonhub/pkg/utils"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/utils"
 )
 
 // ToolLoopConfig configures the tool execution loop.

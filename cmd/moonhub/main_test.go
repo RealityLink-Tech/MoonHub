@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sipeed/moonhub/cmd/moonhub/internal"
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/cmd/moonhub/internal"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 func TestNewMoonHubCommand(t *testing.T) {

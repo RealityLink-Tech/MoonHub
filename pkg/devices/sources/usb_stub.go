@@ -5,7 +5,7 @@ package sources
 import (
 	"context"
 
-	"github.com/sipeed/moonhub/pkg/devices/events"
+	"github.com/RealityLink-Tech/MoonHub/pkg/devices/events"
 )
 
 type USBMonitor struct{}

@@ -15,9 +15,9 @@ import (
 
 	"github.com/h2non/filetype"
 
-	"github.com/sipeed/moonhub/pkg/logger"
-	"github.com/sipeed/moonhub/pkg/media"
-	"github.com/sipeed/moonhub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/media"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
 )
 
 // resolveMediaRefs replaces media:// refs in message Media fields with base64 data URLs.

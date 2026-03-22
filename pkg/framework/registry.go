@@ -9,7 +9,7 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/sipeed/moonhub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
 )
 
 // Registry manages all registered plugins

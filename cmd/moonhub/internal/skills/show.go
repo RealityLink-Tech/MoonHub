@@ -3,7 +3,7 @@ package skills
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/sipeed/moonhub/pkg/skills"
+	"github.com/RealityLink-Tech/MoonHub/pkg/skills"
 )
 
 func newShowCommand(loaderFn func() (*skills.SkillsLoader, error)) *cobra.Command {

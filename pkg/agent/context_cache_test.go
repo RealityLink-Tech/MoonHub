@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
 )
 
 // setupWorkspace creates a temporary workspace with standard directories and optional files.

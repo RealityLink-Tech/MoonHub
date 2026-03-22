@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/memory"
-	"github.com/sipeed/moonhub/pkg/providers"
-	"github.com/sipeed/moonhub/pkg/session"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/memory"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/session"
 )
 
 func sessionsTestDir(t *testing.T, configPath string) string {

@@ -7,7 +7,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
 )
 
 func newTestStore(t *testing.T) *JSONLStore {

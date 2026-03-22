@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sipeed/moonhub/pkg/config"
-	anthropicmessages "github.com/sipeed/moonhub/pkg/providers/anthropic_messages"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	anthropicmessages "github.com/RealityLink-Tech/MoonHub/pkg/providers/anthropic_messages"
 )
 
 // ErrSkipProvider is returned by a plugin when it does not handle the given config

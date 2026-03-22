@@ -17,8 +17,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/web/backend/utils"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/web/backend/utils"
 )
 
 // gateway holds the state for the managed gateway process.

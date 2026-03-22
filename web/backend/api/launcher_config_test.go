@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sipeed/moonhub/web/backend/launcherconfig"
+	"github.com/RealityLink-Tech/MoonHub/web/backend/launcherconfig"
 )
 
 func TestGetLauncherConfigUsesRuntimeFallback(t *testing.T) {

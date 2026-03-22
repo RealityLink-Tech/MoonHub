@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 // registerModelRoutes binds model list management endpoints to the ServeMux.

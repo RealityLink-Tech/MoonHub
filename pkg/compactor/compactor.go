@@ -12,8 +12,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/logger"
-	"github.com/sipeed/moonhub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
 )
 
 // CompactorEngine orchestrates the 4-layer compaction pipeline.

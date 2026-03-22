@@ -250,7 +250,7 @@ func (al *AgentLoop) selectCandidates(
 
 ```
 === 所有测试通过 ===
-ok      github.com/sipeed/moonhub/pkg/routing
+ok      github.com/RealityLink-Tech/MoonHub/pkg/routing
 ```
 
 ## 性能目标

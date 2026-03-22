@@ -11,9 +11,9 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/sipeed/moonhub/pkg/logger"
-	"github.com/sipeed/moonhub/pkg/mcp"
-	"github.com/sipeed/moonhub/pkg/tools"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/mcp"
+	"github.com/RealityLink-Tech/MoonHub/pkg/tools"
 )
 
 type mcpRuntime struct {

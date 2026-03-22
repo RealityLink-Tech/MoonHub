@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/sipeed/moonhub/pkg/utils"
+	"github.com/RealityLink-Tech/MoonHub/pkg/utils"
 )
 
 // mockRegistry is a test double implementing SkillRegistry.

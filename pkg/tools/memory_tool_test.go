@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/adaptive_memory"
+	"github.com/RealityLink-Tech/MoonHub/pkg/adaptive_memory"
 )
 
 // MockMemoryStore implements MemoryToolProvider for testing

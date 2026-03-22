@@ -11,8 +11,8 @@ import (
 	"github.com/openai/openai-go/v3/option"
 	"github.com/openai/openai-go/v3/responses"
 
-	"github.com/sipeed/moonhub/pkg/auth"
-	"github.com/sipeed/moonhub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/auth"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
 )
 
 const (

@@ -162,19 +162,19 @@ Using Telegram as an example, the main changes are:
 package channels
 
 import (
-    "github.com/sipeed/moonhub/pkg/bus"
-    "github.com/sipeed/moonhub/pkg/config"
+    "github.com/RealityLink-Tech/MoonHub/pkg/bus"
+    "github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 // New code (refactored branch)
 package telegram
 
 import (
-    "github.com/sipeed/moonhub/pkg/bus"
-    "github.com/sipeed/moonhub/pkg/channels"     // Reference parent package
-    "github.com/sipeed/moonhub/pkg/config"
-    "github.com/sipeed/moonhub/pkg/identity"      // New
-    "github.com/sipeed/moonhub/pkg/media"          // New (if media support needed)
+    "github.com/RealityLink-Tech/MoonHub/pkg/bus"
+    "github.com/RealityLink-Tech/MoonHub/pkg/channels"     // Reference parent package
+    "github.com/RealityLink-Tech/MoonHub/pkg/config"
+    "github.com/RealityLink-Tech/MoonHub/pkg/identity"      // New
+    "github.com/RealityLink-Tech/MoonHub/pkg/media"          // New (if media support needed)
 )
 ```
 
@@ -321,9 +321,9 @@ Create `init.go` for your channel:
 package telegram
 
 import (
-    "github.com/sipeed/moonhub/pkg/bus"
-    "github.com/sipeed/moonhub/pkg/channels"
-    "github.com/sipeed/moonhub/pkg/config"
+    "github.com/RealityLink-Tech/MoonHub/pkg/bus"
+    "github.com/RealityLink-Tech/MoonHub/pkg/channels"
+    "github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 func init() {
@@ -338,9 +338,9 @@ func init() {
 ```go
 // cmd/moonhub/internal/gateway/helpers.go
 import (
-    _ "github.com/sipeed/moonhub/pkg/channels/telegram"   // Triggers init() registration
-    _ "github.com/sipeed/moonhub/pkg/channels/discord"
-    _ "github.com/sipeed/moonhub/pkg/channels/your_new_channel"  // New addition
+    _ "github.com/RealityLink-Tech/MoonHub/pkg/channels/telegram"   // Triggers init() registration
+    _ "github.com/RealityLink-Tech/MoonHub/pkg/channels/discord"
+    _ "github.com/RealityLink-Tech/MoonHub/pkg/channels/your_new_channel"  // New addition
 )
 ```
 
@@ -421,9 +421,9 @@ To add a new chat platform (e.g., `matrix`), you need to:
 package matrix
 
 import (
-    "github.com/sipeed/moonhub/pkg/bus"
-    "github.com/sipeed/moonhub/pkg/channels"
-    "github.com/sipeed/moonhub/pkg/config"
+    "github.com/RealityLink-Tech/MoonHub/pkg/bus"
+    "github.com/RealityLink-Tech/MoonHub/pkg/channels"
+    "github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 func init() {
@@ -442,11 +442,11 @@ import (
     "context"
     "fmt"
 
-    "github.com/sipeed/moonhub/pkg/bus"
-    "github.com/sipeed/moonhub/pkg/channels"
-    "github.com/sipeed/moonhub/pkg/config"
-    "github.com/sipeed/moonhub/pkg/identity"
-    "github.com/sipeed/moonhub/pkg/logger"
+    "github.com/RealityLink-Tech/MoonHub/pkg/bus"
+    "github.com/RealityLink-Tech/MoonHub/pkg/channels"
+    "github.com/RealityLink-Tech/MoonHub/pkg/config"
+    "github.com/RealityLink-Tech/MoonHub/pkg/identity"
+    "github.com/RealityLink-Tech/MoonHub/pkg/logger"
 )
 
 // MatrixChannel implements channels.Channel for the Matrix protocol.
@@ -812,7 +812,7 @@ if m.config.Channels.Matrix.Enabled && m.config.Channels.Matrix.Token != "" {
 ```go
 // cmd/moonhub/internal/gateway/helpers.go
 import (
-    _ "github.com/sipeed/moonhub/pkg/channels/matrix"
+    _ "github.com/RealityLink-Tech/MoonHub/pkg/channels/matrix"
 )
 ```
 

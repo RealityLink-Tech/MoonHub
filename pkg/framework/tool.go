@@ -6,7 +6,7 @@
 package plugin
 
 import (
-	"github.com/sipeed/moonhub/pkg/tools"
+	"github.com/RealityLink-Tech/MoonHub/pkg/tools"
 )
 
 // ToolPlugin extends Plugin with tool-specific functionality.

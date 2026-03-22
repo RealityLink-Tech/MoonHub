@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	anthropicprovider "github.com/sipeed/moonhub/pkg/providers/anthropic"
+	anthropicprovider "github.com/RealityLink-Tech/MoonHub/pkg/providers/anthropic"
 )
 
 type ClaudeProvider struct {

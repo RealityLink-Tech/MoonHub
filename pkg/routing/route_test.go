@@ -3,7 +3,7 @@ package routing
 import (
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 func testConfig(agents []config.AgentConfig, bindings []config.AgentBinding) *config.Config {

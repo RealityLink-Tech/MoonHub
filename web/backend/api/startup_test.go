@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sipeed/moonhub/web/backend/launcherconfig"
+	"github.com/RealityLink-Tech/MoonHub/web/backend/launcherconfig"
 )
 
 func TestResolveLaunchCommandUsesConfigFileDefaults(t *testing.T) {

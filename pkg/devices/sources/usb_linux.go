@@ -10,8 +10,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/sipeed/moonhub/pkg/devices/events"
-	"github.com/sipeed/moonhub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/devices/events"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
 )
 
 var usbClassToCapability = map[string]string{

@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/utils"
+	"github.com/RealityLink-Tech/MoonHub/pkg/utils"
 )
 
 // GitHubContent represents a file or directory in GitHub API response

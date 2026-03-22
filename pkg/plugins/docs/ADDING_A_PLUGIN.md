@@ -3,9 +3,9 @@
 ## General
 
 1. Create `plugin.go` in `pkg/plugins/<channels|providers|tools>/<newname>/`.
-2. In **`init()`**, call `plugin.RegisterPlugin(&YourPlugin{})` (import `github.com/sipeed/moonhub/pkg/framework`, use package prefix **`plugin`** in code).
+2. In **`init()`**, call `plugin.RegisterPlugin(&YourPlugin{})` (import `github.com/RealityLink-Tech/MoonHub/pkg/framework`, use package prefix **`plugin`** in code).
 3. Implement **`Metadata()`**, `Init(*plugin.RuntimeContext)`, `Validate(*config.Config)` and all methods of corresponding sub-interface.
-4. Add a line `_ "github.com/sipeed/moonhub/pkg/plugins/.../newname"` in **`cmd/moonhub/internal/gateway/helpers.go`**, grouped with similar plugins.
+4. Add a line `_ "github.com/RealityLink-Tech/MoonHub/pkg/plugins/.../newname"` in **`cmd/moonhub/internal/gateway/helpers.go`**, grouped with similar plugins.
 5. Run `go build ./...`, add tests if necessary.
 
 ## Channel Plugins

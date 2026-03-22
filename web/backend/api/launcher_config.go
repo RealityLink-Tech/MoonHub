@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/sipeed/moonhub/web/backend/launcherconfig"
+	"github.com/RealityLink-Tech/MoonHub/web/backend/launcherconfig"
 )
 
 type launcherConfigPayload struct {

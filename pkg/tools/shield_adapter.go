@@ -1,6 +1,6 @@
 package tools
 
-import "github.com/sipeed/moonhub/pkg/shield"
+import "github.com/RealityLink-Tech/MoonHub/pkg/shield"
 
 // shieldEngineAdapter bridges *shield.ShieldEngine to ShieldEvaluator without a
 // circular import from pkg/shield to pkg/tools.

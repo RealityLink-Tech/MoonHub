@@ -3,8 +3,8 @@ package channels
 import (
 	"sync"
 
-	"github.com/sipeed/moonhub/pkg/bus"
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 // ChannelFactory is a constructor function that creates a Channel from config and message bus.

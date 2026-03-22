@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/fileutil"
+	"github.com/RealityLink-Tech/MoonHub/pkg/fileutil"
 )
 
 type AuthCredential struct {

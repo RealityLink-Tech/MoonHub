@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	moonhubconfig "github.com/sipeed/moonhub/pkg/config"
+	moonhubconfig "github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 const (

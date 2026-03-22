@@ -8,8 +8,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/sipeed/moonhub/pkg/learning/i18n"
-	"github.com/sipeed/moonhub/pkg/learning/patterns"
+	"github.com/RealityLink-Tech/MoonHub/pkg/learning/i18n"
+	"github.com/RealityLink-Tech/MoonHub/pkg/learning/patterns"
 )
 
 // PatternDetector detects behavioral patterns from conversations

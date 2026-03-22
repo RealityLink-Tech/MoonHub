@@ -8,11 +8,11 @@ package pico
 import (
 	"fmt"
 
-	"github.com/sipeed/moonhub/pkg/bus"
-	"github.com/sipeed/moonhub/pkg/channels"
-	channelspico "github.com/sipeed/moonhub/pkg/channels/pico"
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/framework"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/channels"
+	channelspico "github.com/RealityLink-Tech/MoonHub/pkg/channels/pico"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/framework"
 )
 
 func init() {

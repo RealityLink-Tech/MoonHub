@@ -17,13 +17,13 @@ import (
 
 	"golang.org/x/time/rate"
 
-	"github.com/sipeed/moonhub/pkg/bus"
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/constants"
-	"github.com/sipeed/moonhub/pkg/framework"
-	"github.com/sipeed/moonhub/pkg/health"
-	"github.com/sipeed/moonhub/pkg/logger"
-	"github.com/sipeed/moonhub/pkg/media"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/constants"
+	"github.com/RealityLink-Tech/MoonHub/pkg/framework"
+	"github.com/RealityLink-Tech/MoonHub/pkg/health"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/media"
 )
 
 const (

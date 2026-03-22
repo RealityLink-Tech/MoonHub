@@ -7,7 +7,7 @@ package patterns
 import (
 	"regexp"
 
-	"github.com/sipeed/moonhub/pkg/learning/i18n"
+	"github.com/RealityLink-Tech/MoonHub/pkg/learning/i18n"
 )
 
 // SemanticIndicator represents a set of keywords with associated weight

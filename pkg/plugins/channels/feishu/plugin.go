@@ -6,11 +6,11 @@
 package feishu
 
 import (
-	"github.com/sipeed/moonhub/pkg/bus"
-	"github.com/sipeed/moonhub/pkg/channels"
-	channelsfeishu "github.com/sipeed/moonhub/pkg/channels/feishu"
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/framework"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/channels"
+	channelsfeishu "github.com/RealityLink-Tech/MoonHub/pkg/channels/feishu"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/framework"
 )
 
 func init() {

@@ -6,8 +6,8 @@
 package plugin
 
 import (
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
 )
 
 // ProviderPlugin extends Plugin with provider-specific functionality.

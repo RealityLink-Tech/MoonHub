@@ -9,11 +9,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/fileutil"
-	"github.com/sipeed/moonhub/pkg/logger"
-	"github.com/sipeed/moonhub/pkg/shield"
-	"github.com/sipeed/moonhub/pkg/skills"
-	"github.com/sipeed/moonhub/pkg/utils"
+	"github.com/RealityLink-Tech/MoonHub/pkg/fileutil"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/shield"
+	"github.com/RealityLink-Tech/MoonHub/pkg/skills"
+	"github.com/RealityLink-Tech/MoonHub/pkg/utils"
 )
 
 // InstallSkillTool allows the LLM agent to install skills from registries.

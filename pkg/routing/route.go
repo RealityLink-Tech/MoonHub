@@ -3,7 +3,7 @@ package routing
 import (
 	"strings"
 
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 // RouteInput contains the routing context from an inbound message.

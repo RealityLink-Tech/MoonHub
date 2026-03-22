@@ -8,11 +8,11 @@ package irc
 import (
 	"fmt"
 
-	"github.com/sipeed/moonhub/pkg/bus"
-	"github.com/sipeed/moonhub/pkg/channels"
-	channelsirc "github.com/sipeed/moonhub/pkg/channels/irc"
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/framework"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/channels"
+	channelsirc "github.com/RealityLink-Tech/MoonHub/pkg/channels/irc"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/framework"
 )
 
 func init() {

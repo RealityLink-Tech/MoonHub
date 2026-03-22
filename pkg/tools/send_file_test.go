@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/media"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/media"
 )
 
 func TestSendFileTool_MissingPath(t *testing.T) {

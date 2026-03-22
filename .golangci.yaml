@@ -161,13 +161,13 @@ formatters:
       sections:
         - standard
         - default
-        - prefix(github.com/sipeed/moonhub)
+        - prefix(github.com/RealityLink-Tech/MoonHub)
       custom-order: true
     gofmt:
       simplify: true
     goimports:
       local-prefixes:
-        - github.com/sipeed/moonhub
+        - github.com/RealityLink-Tech/MoonHub
 
 issues:
   max-issues-per-linter: 0

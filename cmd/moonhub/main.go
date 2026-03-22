@@ -12,18 +12,18 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/sipeed/moonhub/cmd/moonhub/internal"
-	"github.com/sipeed/moonhub/cmd/moonhub/internal/agent"
-	"github.com/sipeed/moonhub/cmd/moonhub/internal/auth"
-	"github.com/sipeed/moonhub/cmd/moonhub/internal/cron"
-	"github.com/sipeed/moonhub/cmd/moonhub/internal/gateway"
-	"github.com/sipeed/moonhub/cmd/moonhub/internal/migrate"
-	"github.com/sipeed/moonhub/cmd/moonhub/internal/model"
-	"github.com/sipeed/moonhub/cmd/moonhub/internal/onboard"
-	"github.com/sipeed/moonhub/cmd/moonhub/internal/skills"
-	"github.com/sipeed/moonhub/cmd/moonhub/internal/status"
-	"github.com/sipeed/moonhub/cmd/moonhub/internal/version"
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/cmd/moonhub/internal"
+	"github.com/RealityLink-Tech/MoonHub/cmd/moonhub/internal/agent"
+	"github.com/RealityLink-Tech/MoonHub/cmd/moonhub/internal/auth"
+	"github.com/RealityLink-Tech/MoonHub/cmd/moonhub/internal/cron"
+	"github.com/RealityLink-Tech/MoonHub/cmd/moonhub/internal/gateway"
+	"github.com/RealityLink-Tech/MoonHub/cmd/moonhub/internal/migrate"
+	"github.com/RealityLink-Tech/MoonHub/cmd/moonhub/internal/model"
+	"github.com/RealityLink-Tech/MoonHub/cmd/moonhub/internal/onboard"
+	"github.com/RealityLink-Tech/MoonHub/cmd/moonhub/internal/skills"
+	"github.com/RealityLink-Tech/MoonHub/cmd/moonhub/internal/status"
+	"github.com/RealityLink-Tech/MoonHub/cmd/moonhub/internal/version"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 func NewMoonHubCommand() *cobra.Command {

@@ -6,7 +6,7 @@ package identity
 import (
 	"strings"
 
-	"github.com/sipeed/moonhub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
 )
 
 // BuildCanonicalID constructs a canonical "platform:id" identifier.

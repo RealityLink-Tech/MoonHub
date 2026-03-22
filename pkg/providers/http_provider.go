@@ -10,7 +10,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/providers/openai_compat"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers/openai_compat"
 )
 
 type HTTPProvider struct {

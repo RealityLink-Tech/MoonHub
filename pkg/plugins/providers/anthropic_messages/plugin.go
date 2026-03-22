@@ -8,10 +8,10 @@ package anthropic_messages
 import (
 	"fmt"
 
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/framework"
-	"github.com/sipeed/moonhub/pkg/providers"
-	anthropicmessages "github.com/sipeed/moonhub/pkg/providers/anthropic_messages"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/framework"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
+	anthropicmessages "github.com/RealityLink-Tech/MoonHub/pkg/providers/anthropic_messages"
 )
 
 func init() {

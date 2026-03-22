@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/sipeed/moonhub/cmd/moonhub/internal"
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/cmd/moonhub/internal"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 func NewVersionCommand() *cobra.Command {

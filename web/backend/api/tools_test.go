@@ -8,7 +8,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 func TestHandleListTools(t *testing.T) {

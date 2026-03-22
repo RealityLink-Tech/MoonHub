@@ -6,11 +6,11 @@
 package maixcam
 
 import (
-	"github.com/sipeed/moonhub/pkg/bus"
-	"github.com/sipeed/moonhub/pkg/channels"
-	channelsmaixcam "github.com/sipeed/moonhub/pkg/channels/maixcam"
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/framework"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/channels"
+	channelsmaixcam "github.com/RealityLink-Tech/MoonHub/pkg/channels/maixcam"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/framework"
 )
 
 func init() {

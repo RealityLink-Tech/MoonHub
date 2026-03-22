@@ -8,11 +8,11 @@ package wecom_app
 import (
 	"fmt"
 
-	"github.com/sipeed/moonhub/pkg/bus"
-	"github.com/sipeed/moonhub/pkg/channels"
-	channelswecom "github.com/sipeed/moonhub/pkg/channels/wecom"
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/framework"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/channels"
+	channelswecom "github.com/RealityLink-Tech/MoonHub/pkg/channels/wecom"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/framework"
 )
 
 func init() {

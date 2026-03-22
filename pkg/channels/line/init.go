@@ -1,9 +1,9 @@
 package line
 
 import (
-	"github.com/sipeed/moonhub/pkg/bus"
-	"github.com/sipeed/moonhub/pkg/channels"
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/channels"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 func init() {

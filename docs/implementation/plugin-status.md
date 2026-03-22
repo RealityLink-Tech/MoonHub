@@ -154,8 +154,8 @@ func GlobalRegistry() *Registry
 package telegram
 
 import (
-    "github.com/sipeed/moonhub/pkg/framework"
-    "github.com/sipeed/moonhub/pkg/config"
+    "github.com/RealityLink-Tech/MoonHub/pkg/framework"
+    "github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 func init() {

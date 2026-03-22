@@ -8,11 +8,11 @@ package whatsapp_native
 import (
 	"path/filepath"
 
-	"github.com/sipeed/moonhub/pkg/bus"
-	"github.com/sipeed/moonhub/pkg/channels"
-	channelswhatsappnative "github.com/sipeed/moonhub/pkg/channels/whatsapp_native"
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/framework"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/channels"
+	channelswhatsappnative "github.com/RealityLink-Tech/MoonHub/pkg/channels/whatsapp_native"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/framework"
 )
 
 func init() {

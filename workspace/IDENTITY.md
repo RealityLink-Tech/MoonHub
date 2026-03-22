@@ -41,11 +41,11 @@ Ultra-lightweight personal AI assistant written in Go, inspired by nanobot.
 MIT License - Free and open source
 
 ## Repository
-https://github.com/sipeed/moonhub
+https://github.com/RealityLink-Tech/MoonHub
 
 ## Contact
-Issues: https://github.com/sipeed/moonhub/issues
-Discussions: https://github.com/sipeed/moonhub/discussions
+Issues: https://github.com/RealityLink-Tech/MoonHub/issues
+Discussions: https://github.com/RealityLink-Tech/MoonHub/discussions
 
 ---
 

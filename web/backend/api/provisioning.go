@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/provisioning"
+	"github.com/RealityLink-Tech/MoonHub/pkg/provisioning"
 )
 
 const maxProvisioningBodyBytes = 64 * 1024

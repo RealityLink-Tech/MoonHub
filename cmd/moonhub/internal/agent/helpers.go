@@ -11,11 +11,11 @@ import (
 
 	"github.com/ergochat/readline"
 
-	"github.com/sipeed/moonhub/cmd/moonhub/internal"
-	"github.com/sipeed/moonhub/pkg/agent"
-	"github.com/sipeed/moonhub/pkg/bus"
-	"github.com/sipeed/moonhub/pkg/logger"
-	"github.com/sipeed/moonhub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/cmd/moonhub/internal"
+	"github.com/RealityLink-Tech/MoonHub/pkg/agent"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
 )
 
 func agentCmd(message, sessionKey, model string, debug bool) error {

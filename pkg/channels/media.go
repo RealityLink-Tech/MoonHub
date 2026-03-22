@@ -3,7 +3,7 @@ package channels
 import (
 	"context"
 
-	"github.com/sipeed/moonhub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
 )
 
 // MediaSender is an optional interface for channels that can send

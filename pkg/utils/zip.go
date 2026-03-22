@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sipeed/moonhub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
 )
 
 // ExtractZipFile extracts a ZIP archive from disk to targetDir.

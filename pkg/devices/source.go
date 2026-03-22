@@ -1,5 +1,5 @@
 package devices
 
-import "github.com/sipeed/moonhub/pkg/devices/events"
+import "github.com/RealityLink-Tech/MoonHub/pkg/devices/events"
 
 type EventSource = events.EventSource

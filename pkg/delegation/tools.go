@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/providers"
-	"github.com/sipeed/moonhub/pkg/tools"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/tools"
 )
 
 // DelegationSystem is the main facade for the delegation system

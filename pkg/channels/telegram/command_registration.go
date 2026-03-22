@@ -8,8 +8,8 @@ import (
 
 	"github.com/mymmrac/telego"
 
-	"github.com/sipeed/moonhub/pkg/commands"
-	"github.com/sipeed/moonhub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/commands"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
 )
 
 var commandRegistrationBackoff = []time.Duration{

@@ -3,8 +3,8 @@ package agent
 import (
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/routing"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/routing"
 )
 
 func TestConvertTierBoundaries_explicitZeroSimpleModerate(t *testing.T) {

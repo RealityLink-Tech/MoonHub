@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 // TestAgentInstance_delegationEnabled_wiresTools verifies runtime integration:

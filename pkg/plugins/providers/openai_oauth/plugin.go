@@ -6,9 +6,9 @@
 package openai_oauth
 
 import (
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/framework"
-	"github.com/sipeed/moonhub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/framework"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
 )
 
 func init() {

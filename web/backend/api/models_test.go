@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/auth"
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/auth"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 func resetModelProbeHooks(t *testing.T) {

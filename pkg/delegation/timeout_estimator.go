@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
 )
 
 // TimeoutEstimator provides adaptive timeout estimation based on historical data

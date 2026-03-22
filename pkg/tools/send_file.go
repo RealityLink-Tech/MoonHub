@@ -10,8 +10,8 @@ import (
 
 	"github.com/h2non/filetype"
 
-	"github.com/sipeed/moonhub/pkg/config"
-	"github.com/sipeed/moonhub/pkg/media"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/media"
 )
 
 // SendFileTool allows the LLM to send a local file (image, document, etc.)

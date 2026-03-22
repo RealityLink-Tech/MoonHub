@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/fileutil"
-	"github.com/sipeed/moonhub/pkg/logger"
+	"github.com/RealityLink-Tech/MoonHub/pkg/fileutil"
+	"github.com/RealityLink-Tech/MoonHub/pkg/logger"
 )
 
 const MaxReadFileSize = 64 * 1024 // 64KB limit to avoid context overflow

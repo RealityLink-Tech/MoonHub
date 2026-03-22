@@ -3,7 +3,7 @@ package channels
 import (
 	"context"
 
-	"github.com/sipeed/moonhub/pkg/commands"
+	"github.com/RealityLink-Tech/MoonHub/pkg/commands"
 )
 
 // TypingCapable — channels that can show a typing/thinking indicator.

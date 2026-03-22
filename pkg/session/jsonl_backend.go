@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/sipeed/moonhub/pkg/memory"
-	"github.com/sipeed/moonhub/pkg/providers"
+	"github.com/RealityLink-Tech/MoonHub/pkg/memory"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
 )
 
 // JSONLBackend adapts a memory.Store into the SessionStore interface.

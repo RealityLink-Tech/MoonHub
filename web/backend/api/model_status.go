@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 )
 
 const modelProbeTimeout = 800 * time.Millisecond

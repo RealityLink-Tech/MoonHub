@@ -1,6 +1,6 @@
 [Unit]
 Description=MoonHub AI Assistant
-Documentation=https://github.com/sipeed/moonhub
+Documentation=https://github.com/RealityLink-Tech/MoonHub
 After=network-online.target NetworkManager.service
 Wants=network-online.target
 
