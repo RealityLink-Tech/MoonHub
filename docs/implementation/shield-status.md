@@ -4,7 +4,7 @@
 
 ## 实现概述
 
-MoonHub 的 SHIELD.md 反恶意软件系统已成功实现，该系统借鉴了 TinyClaw 的设计理念，为 MoonHub 添加了运行时威胁评估引擎。通过解析 YAML 格式的威胁定义，在工具执行前进行模式匹配，实现安全策略的实时执行。
+MoonHub 的 SHIELD.md 反恶意软件系统已成功实现，为 MoonHub 添加了运行时威胁评估引擎。通过解析 YAML 格式的威胁定义，在工具执行前进行模式匹配，实现安全策略的实时执行。
 
 ## 已完成的工作
 
@@ -400,6 +400,5 @@ ok      github.com/sipeed/moonhub/pkg/shield
 
 ## 参考资料
 
-- TinyClaw SHIELD.md 实现 (原始灵感来源)
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [MITRE ATT&CK Framework](https://attack.mitre.org/)

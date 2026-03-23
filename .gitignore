@@ -12,9 +12,7 @@ build/
 /moonhub-test
 cmd/**/workspace
 
-# Picoclaw specific
-
-# MoonHub
+# MoonHub specific
 .moonhub/
 config.json
 sessions/

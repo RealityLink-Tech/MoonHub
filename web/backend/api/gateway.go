@@ -253,7 +253,7 @@ func (h *Handler) startGatewayLocked(initialStatus string) (int, error) {
 	defaultModelName := strings.TrimSpace(cfg.Agents.Defaults.GetModelName())
 
 	// Locate the moonhub executable
-	execPath := utils.FindPicoclawBinary()
+	execPath := utils.FindMoonHubBinary()
 
 	cmd := exec.Command(execPath, "gateway")
 	cmd.Env = os.Environ()

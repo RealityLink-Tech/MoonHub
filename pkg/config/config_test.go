@@ -495,7 +495,7 @@ func TestDefaultConfig_WorkspacePath_Default(t *testing.T) {
 	}
 }
 
-func TestDefaultConfig_WorkspacePath_WithPicoclawHome(t *testing.T) {
+func TestDefaultConfig_WorkspacePath_WithMoonHubHome(t *testing.T) {
 	t.Setenv("MOONHUB_HOME", "/custom/moonhub/home")
 
 	cfg := DefaultConfig()

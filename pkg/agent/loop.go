@@ -1641,7 +1641,7 @@ func (al *AgentLoop) runLLMIteration(
 // turn — tool follow-up iterations use the same tier as the initial call so
 // that a multi-step tool chain doesn't switch models mid-way.
 //
-// V2 4-tier routing (TinyClaw style):
+// V2 4-tier routing:
 // When agent.RouterV2 is configured and TierCandidates is populated, uses 4-tier
 // routing (simple/moderate/complex/reasoning) instead of 2-tier (light/heavy).
 func (al *AgentLoop) selectCandidates(
@@ -1649,7 +1649,7 @@ func (al *AgentLoop) selectCandidates(
 	userMsg string,
 	history []providers.Message,
 ) (candidates []providers.FallbackCandidate, model string) {
-	// V2 4-tier routing (TinyClaw style)
+	// V2 4-tier routing
 	if agent.RouterV2 != nil && agent.RouterV2.IsV2Enabled() && len(agent.TierCandidates) > 0 {
 		selectedModel, tier, result := agent.RouterV2.SelectModel(userMsg, history, agent.Model)
 

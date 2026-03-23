@@ -4,7 +4,7 @@
 
 ## 概述
 
-Delegation System 是一个为 MoonHub 设计的子 Agent 编排系统，灵感来自 TinyClaw。它实现了：
+Delegation System 是一个为 MoonHub 设计的子 Agent 编排系统。它实现了：
 
 - **非阻塞委托**：主 Agent 可以将任务委托给子 Agent 后继续工作
 - **角色模板复用**：自动学习和复用成功的任务配置
@@ -86,7 +86,7 @@ pkg/agent/
 
 ### Intercom Topics
 
-Intercom 事件系统支持以下 Topics（与 TinyClaw 兼容）：
+Intercom 事件系统支持以下 Topics：
 
 | Topic | 说明 | 触发时机 |
 |-------|------|---------|
@@ -368,11 +368,9 @@ go test ./pkg/delegation/... -bench=. -benchmem
 
 ## 参考
 
-基于 TinyClaw 的 Delegation System：`/TinyClaw/tinyclaw/packages/delegation/`
-
-关键差异和改进：
-1. 纯 Go 实现（而非 TypeScript）
-2. SQLite 持久化（而非内存存储）
+技术特点：
+1. 纯 Go 实现
+2. SQLite 持久化
 3. 自适应超时估算
 4. 角色模板自动学习和复用
 5. 黑板协作模式
@@ -413,7 +411,7 @@ go test ./pkg/delegation/... -bench=. -benchmem
   - 工具上下文新增 `DelegationUserID`；同步委托经 `SessionQueue` 按分区串行化
 
 - **2026-03-21**: Intercom 事件系统完善
-  - 添加完整的 Intercom Topics（与 TinyClaw 兼容）
+  - 添加完整的 Intercom Topics
   - 新增 `task:queued` 任务入队事件
   - 新增 `memory:updated/consolidated` 内存事件
   - 新增 `blackboard:resolved` 黑板决议事件

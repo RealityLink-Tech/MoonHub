@@ -1,5 +1,5 @@
 // MoonHub - Ultra-lightweight personal AI agent
-// Adaptive Memory System - Inspired by TinyClaw
+// Adaptive Memory System
 // License: MIT
 
 package adaptive_memory

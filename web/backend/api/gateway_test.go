@@ -848,7 +848,7 @@ func TestGatewayClearLogsResetsBufferedHistory(t *testing.T) {
 	}
 }
 
-func TestFindPicoclawBinary_EnvOverride(t *testing.T) {
+func TestFindMoonHubBinary_EnvOverride(t *testing.T) {
 	// Create a temporary file to act as the mock binary
 	tmpDir := t.TempDir()
 	mockBinary := filepath.Join(tmpDir, "moonhub-mock")
@@ -858,19 +858,19 @@ func TestFindPicoclawBinary_EnvOverride(t *testing.T) {
 
 	t.Setenv("MOONHUB_BINARY", mockBinary)
 
-	got := utils.FindPicoclawBinary()
+	got := utils.FindMoonHubBinary()
 	if got != mockBinary {
-		t.Errorf("FindPicoclawBinary() = %q, want %q", got, mockBinary)
+		t.Errorf("FindMoonHubBinary() = %q, want %q", got, mockBinary)
 	}
 }
 
-func TestFindPicoclawBinary_EnvOverride_InvalidPath(t *testing.T) {
+func TestFindMoonHubBinary_EnvOverride_InvalidPath(t *testing.T) {
 	// When MOONHUB_BINARY points to a non-existent path, fall through to next strategy
 	t.Setenv("MOONHUB_BINARY", "/nonexistent/moonhub-binary")
 
-	got := utils.FindPicoclawBinary()
+	got := utils.FindMoonHubBinary()
 	// Should not return the invalid path; falls back to "moonhub" or another found path
 	if got == "/nonexistent/moonhub-binary" {
-		t.Errorf("FindPicoclawBinary() returned invalid env path %q, expected fallback", got)
+		t.Errorf("FindMoonHubBinary() returned invalid env path %q, expected fallback", got)
 	}
 }

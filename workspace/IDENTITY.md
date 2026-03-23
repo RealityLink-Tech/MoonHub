@@ -50,4 +50,4 @@ Discussions: https://github.com/sipeed/moonhub/discussions
 ---
 
 "Every bit helps, every bit matters."
-- Picoclaw
+- MoonHub

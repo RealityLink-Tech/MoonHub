@@ -309,7 +309,7 @@ type SessionConfig struct {
 // agent's primary model. This reduces cost and latency for simple tasks without
 // requiring any keyword matching — all scoring is language-agnostic.
 //
-// V2 4-tier routing (TinyClaw style):
+// V2 4-tier routing:
 // When TierMapping is configured, the router uses 4 tiers instead of 2:
 // - simple: greetings, trivial Q&A
 // - moderate: short questions, simple tasks
@@ -320,7 +320,7 @@ type RoutingConfig struct {
 	LightModel string  `json:"light_model"` // model_name from model_list to use for simple tasks
 	Threshold  float64 `json:"threshold"`   // complexity score in [0,1]; score >= threshold → primary model
 
-	// V2 4-tier routing (TinyClaw style)
+	// V2 4-tier routing
 	TierMapping    map[string]string     `json:"tier_mapping,omitempty"`    // tier -> model_name (e.g., {"simple": "gpt-3.5", "complex": "gpt-4"})
 	TierBoundaries *TierBoundariesConfig `json:"tier_boundaries,omitempty"` // custom tier boundaries
 }

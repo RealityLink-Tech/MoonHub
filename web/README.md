@@ -1,4 +1,4 @@
-# Picoclaw Web
+# MoonHub Web
 
 This directory contains the standalone web service for `moonhub`.
 It provides a complete unified web interface, acting as a dashboard, configuration center, and interactive console (channel client) for the core `moonhub` engine.

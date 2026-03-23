@@ -16,7 +16,7 @@ Sub-agent orchestration: delegate tasks (sync, batch, background), role template
 pkg/delegation/
 ├── types.go              # Core domain types
 ├── store.go              # SQLite persistence (sub agents, templates, tasks, metrics, messages)
-├── intercom.go           # Pub/sub topics (TinyClaw-compatible)
+├── intercom.go           # Pub/sub topics
 ├── timeout_estimator.go  # Category-based adaptive timeouts
 ├── templates.go          # Role template find/create and reuse (Jaccard / threshold)
 ├── lifecycle.go          # Sub-agent lifecycle

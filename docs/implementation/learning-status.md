@@ -6,7 +6,7 @@
 **集成方式**: 与现有 Memory 系统深度集成
 **实现策略**: 全部并行推进
 **状态**: 核心实现完成 ✅
-**来源**: 借鉴 TinyClaw 的 learning 包经验，已完全植入 MoonHub
+**来源**: MoonHub 自主实现
 
 ---
 
@@ -22,8 +22,7 @@
 | `PreviousToolResults` 未传递 | ✅ 已修复 | 在 `AnalysisContext` 中新增 `RecentToolResults`，`Engine.Analyze` 传递给 `DetectionContext` |
 | 分析使用旧历史 | ✅ 已修复 | 使用 `agent.Sessions.GetHistory()` 获取包含本回合的完整历史 |
 
-### 与 TinyClaw 对比
-- **TinyClaw**: JSON 文件存储，仅分析 user/assistant 文本，无工具跟踪
+### 技术特性
 - **MoonHub**: SQLite + FTS5，行为评分、工具效率、隐式信号、模式演化、主动建议等完整能力
 
 ---

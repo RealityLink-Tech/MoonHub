@@ -48,7 +48,7 @@ type AgentInstance struct {
 	// whether to route to LightCandidates or stay with Candidates.
 	Router *routing.Router
 
-	// RouterV2 is the 4-tier router (TinyClaw style). When non-nil and TierCandidates
+	// RouterV2 is the 4-tier router. When non-nil and TierCandidates
 	// is populated, the agent uses 4-tier routing (simple/moderate/complex/reasoning).
 	RouterV2 *routing.RouterV2
 
@@ -235,7 +235,7 @@ func NewAgentInstance(
 
 	rc := defaults.Routing
 	if rc != nil && rc.Enabled {
-		// V2 4-tier routing (TinyClaw style) when tier_mapping is configured
+		// V2 4-tier routing when tier_mapping is configured
 		if len(rc.TierMapping) > 0 {
 			tierCandidates = make(map[routing.QueryTier][]providers.FallbackCandidate)
 			tierMapping := make(routing.TierModelMapping)

@@ -4,7 +4,7 @@
 
 ## 实现概述
 
-MoonHub 的 Smart Router V2 将原有的 2 级路由 (light/heavy) 升级为 TinyClaw 风格的 4 级路由系统，同时保留了 MoonHub 现有的语言无关结构化特征、会话历史感知等优势。
+MoonHub 的 Smart Router V2 将原有的 2 级路由 (light/heavy) 升级为 4 级路由系统，同时保留了 MoonHub 现有的语言无关结构化特征、会话历史感知等优势。
 
 ## 实现状态摘要
 
@@ -98,7 +98,7 @@ type RoutingConfig struct {
     LightModel string  `json:"light_model"`  // 2-tier 模式
     Threshold  float64 `json:"threshold"`    // 2-tier 模式
 
-    // V2 4-tier (TinyClaw style)
+    // V2 4-tier
     TierMapping    map[string]string      `json:"tier_mapping,omitempty"`
     TierBoundaries *TierBoundariesConfig  `json:"tier_boundaries,omitempty"`
 }
@@ -163,7 +163,7 @@ func (al *AgentLoop) selectCandidates(
 
 ### 4. 配置示例
 
-#### 4-tier 模式 (TinyClaw style)
+#### 4-tier 模式
 
 ```json
 {
@@ -449,5 +449,4 @@ router.SetRecorder(customRecorder)
 
 ## 参考资料
 
-- TinyClaw 4-tier 路由系统 (原始灵感来源)
 - MoonHub 原有 2-tier 路由实现

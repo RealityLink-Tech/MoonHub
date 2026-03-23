@@ -1,9 +1,9 @@
 # MoonHub
 
 > [!NOTE]
-> **基于**
+> **致谢**
 >
-> 本项目基于 [TinyClaw](https://github.com/wgtechlabs/tinyclaw) 的功能特性与 [PicoClaw](https://github.com/sipeed/picoclaw) 的轻量化设计，并开发了本项目的独有功能。采用 GPL-3.0 许可证。
+> 本项目灵感来源于 [TinyClaw](https://github.com/wgtechlabs/tinyclaw) 的功能集成和 [PicoClaw](https://github.com/sipeed/picoclaw) 的轻量化设计，在此基础上继续发展独属于本项目的方向。
 
 **文档索引**（插件、学习、压缩器、SHIELD、记忆、委托、配网等）：[`docs/README.md`](docs/README.md)。
 
@@ -75,7 +75,7 @@ MoonHub 扎根于边缘计算场景，在保持极致轻量（<10MB 内存）的
 - **上下文压缩器** — 4 层上下文压缩流水线（规则、去重、LLM 摘要、L0/L1/L2 分层），集成于 Agent 循环；参见 [`docs/implementation/compactor-status.md`](docs/implementation/compactor-status.md) 和 [`pkg/compactor/docs/`](pkg/compactor/docs/README.md)。
 - **SHIELD.md 反恶意软件** — 运行时威胁评估引擎，支持 YAML 威胁解析、模式匹配、审批流程，内置 8 种威胁；参见 [`docs/implementation/shield-status.md`](docs/implementation/shield-status.md) 和 [`pkg/shield/docs/`](pkg/shield/docs/README.md)。
 - **委托系统** — 子 Agent 编排（非阻塞与后台任务、模板复用、自适应超时、SQLite 持久化、Intercom 发布订阅）。通过 `config.json` 中的 `delegation.enabled` 启用（默认关闭）；参见 [`pkg/delegation/docs/README.md`](pkg/delegation/docs/README.md)、[`pkg/delegation/docs/CONFIG.md`](pkg/delegation/docs/CONFIG.md) 和 [`docs/implementation/delegation-status.md`](docs/implementation/delegation-status.md)。
-- **Agent 间通信（Intercom）** — 进程内发布订阅，用于委托时信号传递：按主题订阅（`On`）、通配订阅（`OnAny`）、有界主题保留（`Recent`/`RecentAll`）。兼容 TinyClaw 主题常量；参见 [`pkg/delegation/intercom.go`](pkg/delegation/intercom.go) 和 [`docs/implementation/delegation-status.md`](docs/implementation/delegation-status.md) 中的 Intercom 章节。
+- **Agent 间通信（Intercom）** — 进程内发布订阅，用于委托时信号传递：按主题订阅（`On`）、通配订阅（`OnAny`）、有界主题保留（`Recent`/`RecentAll`）；参见 [`pkg/delegation/intercom.go`](pkg/delegation/intercom.go) 和 [`docs/implementation/delegation-status.md`](docs/implementation/delegation-status.md) 中的 Intercom 章节。
 - **智能路由 V2** — 4 层模型路由系统（简单/中等/复杂/推理），基于规则评分、特征提取、隐私安全指标。将简单查询路由到廉价模型，复杂查询路由到强大模型；参见 [`pkg/routing/docs/README.md`](pkg/routing/docs/README.md) 和 [`docs/implementation/routing-status.md`](docs/implementation/routing-status.md)。
 - **设备配网** — 零配置 WiFi 配网（热点、扫描/连接、诊断、自动与手动恢复、恢复出厂、授权码、SSE）。在 Web 启动器上通过 `MOONHUB_PROVISIONING_ENABLED=1` 启用；含 React 配网向导与可选 PWA 离线缓存。参见 [`pkg/provisioning/docs/README.md`](pkg/provisioning/docs/README.md)、[`pkg/provisioning/docs/CONFIG.md`](pkg/provisioning/docs/CONFIG.md)、[`docs/implementation/provisioning-status.md`](docs/implementation/provisioning-status.md)。
 
@@ -125,7 +125,7 @@ MoonHub 扎根于边缘计算场景，在保持极致轻量（<10MB 内存）的
 
 #### 摘要
 
-4 层模型路由系统（TinyClaw 风格），基于规则分类，取代原有的 2 层（轻量/重量）系统。根据消息复杂度自动选择合适的 LLM。
+4 层模型路由系统，基于规则分类，取代原有的 2 层（轻量/重量）系统。根据消息复杂度自动选择合适的 LLM。
 
 #### 新功能
 
@@ -174,7 +174,7 @@ MoonHub 扎根于边缘计算场景，在保持极致轻量（<10MB 内存）的
 
 #### 摘要
 
-子 Agent 委托系统对齐 TinyClaw 风格工作流：八个工具、SQLite 存储、会话队列、Agent 循环中的后台任务注入，以及工具执行上下文中的 `DelegationUserID`。
+子 Agent 委托系统支持自主工作流：八个工具、SQLite 存储、会话队列、Agent 循环中的后台任务注入，以及工具执行上下文中的 `DelegationUserID`。
 
 #### 文档
 
@@ -197,7 +197,7 @@ MoonHub 扎根于边缘计算场景，在保持极致轻量（<10MB 内存）的
 
 **SHIELD.md 反恶意软件系统**（`pkg/shield/`）
 
-受 TinyClaw 设计启发的运行时威胁评估引擎：
+运行时威胁评估引擎：
 
 - **威胁解析器** — YAML 格式的 SHIELD.md 解析器，支持威胁定义、指令和元数据
 - **模式匹配器** — 条件语法支持工具调用、文件路径、网络出口、技能操作

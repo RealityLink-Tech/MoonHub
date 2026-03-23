@@ -18,7 +18,7 @@ func EnsureOnboarded(configPath string) error {
 		return fmt.Errorf("stat config: %w", err)
 	}
 
-	cmd := execCommand(FindPicoclawBinary(), "onboard")
+	cmd := execCommand(FindMoonHubBinary(), "onboard")
 	cmd.Env = append(os.Environ(), "MOONHUB_CONFIG="+configPath)
 	cmd.Stdin = strings.NewReader("n\n")
 

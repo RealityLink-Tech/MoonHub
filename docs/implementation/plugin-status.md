@@ -4,7 +4,7 @@
 
 ## 实现概述
 
-MoonHub 正在实现一个完整的插件架构，借鉴 TinyClaw 的设计理念。目标是让 channels、providers 和 tools 都成为可扩展的插件，保持核心精简。
+MoonHub 正在实现一个完整的插件架构。目标是让 channels、providers 和 tools 都成为可扩展的插件，保持核心精简。
 
 ## 设计决策
 

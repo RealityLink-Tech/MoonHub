@@ -4,7 +4,7 @@
 
 ## 概述
 
-Context Compactor 是一个为 MoonHub 设计的 4 层上下文压缩管道，灵感来自 TinyClaw。它通过以下 4 层管道提供智能的上下文管理：
+Context Compactor 是一个为 MoonHub 设计的 4 层上下文压缩管道。它通过以下 4 层管道提供智能的上下文管理：
 
 1. **Layer 1: 基于规则的预压缩** - 9 个确定性规则
 2. **Layer 2: 消息去重** - Shingle 哈希 + Jaccard 相似度
@@ -350,10 +350,8 @@ go test ./pkg/compactor/... -bench=. -benchmem
 
 ## 参考
 
-基于 TinyClaw 的上下文压缩器：`/TinyClaw/tinyclaw/packages/compactor/`
-
-关键差异和改进：
-1. 纯 Go 实现（而非 TypeScript）
+技术特点：
+1. 纯 Go 实现
 2. 动态基于 Token 的触发（而非固定消息计数）
 3. 三种优化全部实现：并行处理、增量压缩、智能规则选择
 4. SQLite 持久化存储所有分层摘要

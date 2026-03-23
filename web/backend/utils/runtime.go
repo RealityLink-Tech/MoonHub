@@ -24,12 +24,12 @@ func GetDefaultConfigPath() string {
 	return filepath.Join(home, ".moonhub", "config.json")
 }
 
-// FindPicoclawBinary locates the moonhub executable.
+// FindMoonHubBinary locates the moonhub executable.
 // Search order:
 //  1. MOONHUB_BINARY environment variable (explicit override)
 //  2. Same directory as the current executable
 //  3. Falls back to "moonhub" and relies on $PATH
-func FindPicoclawBinary() string {
+func FindMoonHubBinary() string {
 	binaryName := "moonhub"
 	if runtime.GOOS == "windows" {
 		binaryName = "moonhub.exe"

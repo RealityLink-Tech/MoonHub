@@ -10,7 +10,7 @@
 
 ## 实现概述
 
-MoonHub 设备配网系统已成功从 TinyClaw 移植，实现了"插电即用"的零配置设备体验。系统包含完整的后端 API 层和前端配网页面。
+MoonHub 设备配网系统已成功实现，实现了"插电即用"的零配置设备体验。系统包含完整的后端 API 层和前端配网页面。
 
 ## 已完成的工作
 
@@ -406,10 +406,6 @@ go test ./pkg/provisioning/... -v
 - `web/frontend/public/site.webmanifest` - 更新 PWA 配置
 
 ## 参考实现
-
-TinyClaw TypeScript 实现：
-- `TinyClaw/tinyclaw/packages/device/src/index.ts` - DeviceManager 完整实现
-- `TinyClaw/tinyclaw/packages/device/src/http.ts` - HTTP API 定义
 
 设计参考：
 - `web/frontend/public/provisioning/wifi/index.html` - WiFi 配置页设计稿

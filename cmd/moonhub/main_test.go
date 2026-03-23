@@ -12,8 +12,8 @@ import (
 	"github.com/sipeed/moonhub/pkg/config"
 )
 
-func TestNewPicoclawCommand(t *testing.T) {
-	cmd := NewPicoclawCommand()
+func TestNewMoonHubCommand(t *testing.T) {
+	cmd := NewMoonHubCommand()
 
 	require.NotNil(t, cmd)
 

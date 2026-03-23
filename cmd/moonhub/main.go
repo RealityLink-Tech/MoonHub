@@ -26,7 +26,7 @@ import (
 	"github.com/sipeed/moonhub/pkg/config"
 )
 
-func NewPicoclawCommand() *cobra.Command {
+func NewMoonHubCommand() *cobra.Command {
 	short := fmt.Sprintf("%s moonhub - Personal AI Assistant v%s\n\n", internal.Logo, config.GetVersion())
 
 	cmd := &cobra.Command{
@@ -66,7 +66,7 @@ const (
 
 func main() {
 	fmt.Printf("%s", banner)
-	cmd := NewPicoclawCommand()
+	cmd := NewMoonHubCommand()
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
