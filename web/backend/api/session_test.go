@@ -39,7 +39,7 @@ func TestHandleListSessions_JSONLStorage(t *testing.T) {
 		t.Fatalf("NewJSONLStore() error = %v", err)
 	}
 
-	sessionKey := picoSessionPrefix + "history-jsonl"
+	sessionKey := moonhubSessionPrefix + "history-jsonl"
 	if err := store.AddFullMessage(nil, sessionKey, providers.Message{
 		Role:    "user",
 		Content: "Explain why the history API is empty after migration.",
@@ -105,7 +105,7 @@ func TestHandleListSessions_TitleUsesTrimmedSummary(t *testing.T) {
 		t.Fatalf("NewJSONLStore() error = %v", err)
 	}
 
-	sessionKey := picoSessionPrefix + "summary-title"
+	sessionKey := moonhubSessionPrefix + "summary-title"
 	if err := store.AddFullMessage(nil, sessionKey, providers.Message{
 		Role:    "user",
 		Content: "fallback preview",
@@ -161,7 +161,7 @@ func TestHandleGetSession_JSONLStorage(t *testing.T) {
 		t.Fatalf("NewJSONLStore() error = %v", err)
 	}
 
-	sessionKey := picoSessionPrefix + "detail-jsonl"
+	sessionKey := moonhubSessionPrefix + "detail-jsonl"
 	for _, msg := range []providers.Message{
 		{Role: "user", Content: "first"},
 		{Role: "assistant", Content: "second"},
@@ -225,7 +225,7 @@ func TestHandleDeleteSession_JSONLStorage(t *testing.T) {
 		t.Fatalf("NewJSONLStore() error = %v", err)
 	}
 
-	sessionKey := picoSessionPrefix + "delete-jsonl"
+	sessionKey := moonhubSessionPrefix + "delete-jsonl"
 	if err := store.AddFullMessage(nil, sessionKey, providers.Message{
 		Role:    "user",
 		Content: "delete me",
@@ -262,7 +262,7 @@ func TestHandleGetSession_LegacyJSONFallback(t *testing.T) {
 
 	dir := sessionsTestDir(t, configPath)
 	manager := session.NewSessionManager(dir)
-	sessionKey := picoSessionPrefix + "legacy-json"
+	sessionKey := moonhubSessionPrefix + "legacy-json"
 	manager.AddMessage(sessionKey, "user", "legacy user")
 	manager.AddMessage(sessionKey, "assistant", "legacy assistant")
 	if err := manager.Save(sessionKey); err != nil {
@@ -287,7 +287,7 @@ func TestHandleSessions_FiltersEmptyJSONLFiles(t *testing.T) {
 	defer cleanup()
 
 	dir := sessionsTestDir(t, configPath)
-	base := filepath.Join(dir, sanitizeSessionKey(picoSessionPrefix+"empty-jsonl"))
+	base := filepath.Join(dir, sanitizeSessionKey(moonhubSessionPrefix+"empty-jsonl"))
 	if err := os.WriteFile(base+".jsonl", []byte{}, 0o644); err != nil {
 		t.Fatalf("WriteFile(jsonl) error = %v", err)
 	}

@@ -29,7 +29,7 @@ function ProvisioningAuth() {
           .toString()
           .replace(/(\d{3})(\d{3})/, "$1 $2")
         setAuthCode(code)
-        setDeviceId("YSHU-" + Date.now().getFullYear() + "-" + Math.random().toString(36).slice(0, 3).toUpperCase())
+        setDeviceId("YSHU-" + new Date().getFullYear() + "-" + Math.random().toString(36).slice(0, 3).toUpperCase())
       } finally {
         setIsLoading(false)
       }

@@ -1,0 +1,27 @@
+# Minimal MoonHub images built from docker/Dockerfile (local build, no registry pull).
+services:
+  #   docker compose -f docker/docker-compose.minimal.yml run --rm moonhub-agent -m "Hello"
+  moonhub-agent:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: moonhub-agent
+    profiles:
+      - agent
+    volumes:
+      - ./data:/root/.moonhub
+    entrypoint: ["moonhub", "agent"]
+    stdin_open: true
+    tty: true
+
+  #   docker compose -f docker/docker-compose.minimal.yml --profile gateway up
+  moonhub-gateway:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: moonhub-gateway
+    restart: on-failure
+    profiles:
+      - gateway
+    volumes:
+      - ./data:/root/.moonhub

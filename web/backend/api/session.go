@@ -51,7 +51,7 @@ type sessionMetaFile struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-// picoSessionPrefix is the key prefix used by the gateway's routing for Pico
+// moonhubSessionPrefix is the key prefix used by the gateway's routing for MoonHub
 // channel sessions. The full key format is:
 //
 //	agent:main:pico:direct:pico:<session-uuid>
@@ -60,24 +60,24 @@ type sessionMetaFile struct {
 //
 //	agent_main_pico_direct_pico_<session-uuid>.json
 const (
-	picoSessionPrefix          = "agent:main:pico:direct:pico:"
-	sanitizedPicoSessionPrefix = "agent_main_pico_direct_pico_"
-	maxSessionJSONLLineSize    = 10 * 1024 * 1024 // 10 MB
-	maxSessionTitleRunes       = 60
+	moonhubSessionPrefix          = "agent:main:pico:direct:pico:"
+	sanitizedMoonhubSessionPrefix = "agent_main_pico_direct_pico_"
+	maxSessionJSONLLineSize       = 10 * 1024 * 1024 // 10 MB
+	maxSessionTitleRunes          = 60
 )
 
-// extractPicoSessionID extracts the session UUID from a full session key.
-// Returns the UUID and true if the key matches the Pico session pattern.
-func extractPicoSessionID(key string) (string, bool) {
-	if strings.HasPrefix(key, picoSessionPrefix) {
-		return strings.TrimPrefix(key, picoSessionPrefix), true
+// extractMoonhubSessionID extracts the session UUID from a full session key.
+// Returns the UUID and true if the key matches the MoonHub session pattern.
+func extractMoonhubSessionID(key string) (string, bool) {
+	if strings.HasPrefix(key, moonhubSessionPrefix) {
+		return strings.TrimPrefix(key, moonhubSessionPrefix), true
 	}
 	return "", false
 }
 
-func extractPicoSessionIDFromSanitizedKey(key string) (string, bool) {
-	if strings.HasPrefix(key, sanitizedPicoSessionPrefix) {
-		return strings.TrimPrefix(key, sanitizedPicoSessionPrefix), true
+func extractMoonhubSessionIDFromSanitizedKey(key string) (string, bool) {
+	if strings.HasPrefix(key, sanitizedMoonhubSessionPrefix) {
+		return strings.TrimPrefix(key, sanitizedMoonhubSessionPrefix), true
 	}
 	return "", false
 }
@@ -87,7 +87,7 @@ func sanitizeSessionKey(key string) string {
 }
 
 func (h *Handler) readLegacySession(dir, sessionID string) (sessionFile, error) {
-	path := filepath.Join(dir, sanitizeSessionKey(picoSessionPrefix+sessionID)+".json")
+	path := filepath.Join(dir, sanitizeSessionKey(moonhubSessionPrefix+sessionID)+".json")
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return sessionFile{}, err
@@ -155,7 +155,7 @@ func (h *Handler) readSessionMessages(path string, skip int) ([]providers.Messag
 }
 
 func (h *Handler) readJSONLSession(dir, sessionID string) (sessionFile, error) {
-	sessionKey := picoSessionPrefix + sessionID
+	sessionKey := moonhubSessionPrefix + sessionID
 	base := filepath.Join(dir, sanitizeSessionKey(sessionKey))
 	jsonlPath := base + ".jsonl"
 	metaPath := base + ".meta.json"
@@ -274,7 +274,7 @@ func (h *Handler) sessionsDir() (string, error) {
 	return filepath.Join(workspace, "sessions"), nil
 }
 
-// handleListSessions returns a list of Pico session summaries.
+// handleListSessions returns a list of MoonHub session summaries.
 //
 //	GET /api/sessions
 func (h *Handler) handleListSessions(w http.ResponseWriter, r *http.Request) {
@@ -310,7 +310,7 @@ func (h *Handler) handleListSessions(w http.ResponseWriter, r *http.Request) {
 
 		switch {
 		case strings.HasSuffix(name, ".jsonl"):
-			sessionID, ok = extractPicoSessionIDFromSanitizedKey(strings.TrimSuffix(name, ".jsonl"))
+			sessionID, ok = extractMoonhubSessionIDFromSanitizedKey(strings.TrimSuffix(name, ".jsonl"))
 			if !ok {
 				continue
 			}
@@ -323,7 +323,7 @@ func (h *Handler) handleListSessions(w http.ResponseWriter, r *http.Request) {
 		case filepath.Ext(name) == ".json":
 			base := strings.TrimSuffix(name, ".json")
 			if _, statErr := os.Stat(filepath.Join(dir, base+".jsonl")); statErr == nil {
-				if jsonlSessionID, found := extractPicoSessionIDFromSanitizedKey(base); found {
+				if jsonlSessionID, found := extractMoonhubSessionIDFromSanitizedKey(base); found {
 					if jsonlSess, jsonlErr := h.readJSONLSession(
 						dir,
 						jsonlSessionID,
@@ -343,7 +343,7 @@ func (h *Handler) handleListSessions(w http.ResponseWriter, r *http.Request) {
 			if isEmptySession(sess) {
 				continue
 			}
-			sessionID, ok = extractPicoSessionID(sess.Key)
+			sessionID, ok = extractMoonhubSessionID(sess.Key)
 			if !ok {
 				continue
 			}
@@ -480,7 +480,7 @@ func (h *Handler) handleDeleteSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	base := filepath.Join(dir, sanitizeSessionKey(picoSessionPrefix+sessionID))
+	base := filepath.Join(dir, sanitizeSessionKey(moonhubSessionPrefix+sessionID))
 	jsonlPath := base + ".jsonl"
 	metaPath := base + ".meta.json"
 	legacyPath := base + ".json"

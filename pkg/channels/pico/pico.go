@@ -20,6 +20,10 @@ import (
 	"github.com/sipeed/moonhub/pkg/logger"
 )
 
+// moonhubHTTPPrefix is the gateway HTTP path prefix for the MoonHub native WebSocket
+// channel (public URL: /moonhub/ws). Internal channel name and bus IDs remain "pico".
+const moonhubHTTPPrefix = "/moonhub"
+
 // picoConn represents a single WebSocket connection.
 type picoConn struct {
 	id        string
@@ -123,11 +127,11 @@ func (c *PicoChannel) Stop(ctx context.Context) error {
 }
 
 // WebhookPath implements channels.WebhookHandler.
-func (c *PicoChannel) WebhookPath() string { return "/pico/" }
+func (c *PicoChannel) WebhookPath() string { return moonhubHTTPPrefix + "/" }
 
 // ServeHTTP implements http.Handler for the shared HTTP server.
 func (c *PicoChannel) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	path := strings.TrimPrefix(r.URL.Path, "/pico")
+	path := strings.TrimPrefix(r.URL.Path, moonhubHTTPPrefix)
 
 	switch {
 	case path == "/ws" || path == "/ws/":

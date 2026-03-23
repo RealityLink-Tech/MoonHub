@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
 
-import type { DeviceStatus, WifiNetwork } from "@/api/provisioning"
-import { scanNetworks, connectWifi, getStatus } from "@/api/provisioning"
+import type { WifiNetwork } from "@/api/provisioning"
+import { scanNetworks, connectWifi } from "@/api/provisioning"
 import { WifiSelector } from "@/components/provisioning/wifi-selector"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,17 +19,18 @@ function ProvisioningIndex() {
   const [password, setPassword] = useState("")
   const [manualSsid, setManualSsid] = useState("")
   const [isManualMode, setIsManualMode] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [isScanning, setIsScanning] = useState(true)
   const [isConnecting, setIsConnecting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [status, setStatus] = useState<DeviceStatus | null>(null)
 
   // Initial scan
   useEffect(() => {
     handleScan()
-    getStatus().then(setStatus).catch(console.error)
   }, [])
+
+  const handleSelectNetwork = (network: WifiNetwork) => {
+    setSelectedSsid(network.ssid)
+  }
 
   const handleScan = async () => {
     setIsScanning(true)
@@ -85,7 +86,7 @@ function ProvisioningIndex() {
         <WifiSelector
           networks={networks}
           selectedSsid={selectedSsid}
-          onSelect={setSelectedSsid}
+          onSelect={handleSelectNetwork}
           onRefresh={handleScan}
           isLoading={isScanning}
         />

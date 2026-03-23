@@ -1373,7 +1373,7 @@ agentLoop.Stop()               // Stop Agent
 
 3. **WeCom has two factories**: `"wecom"` (Bot mode, webhook only) and `"wecom_app"` (App mode, supports MediaSender) are registered separately. Both implement `WebhookHandler` and `HealthChecker`.
 
-4. **Pico Protocol**: `pkg/channels/pico/` implements a custom MoonHub native protocol channel that receives messages via WebSocket webhook (`/pico/ws`).
+4. **MoonHub native WebSocket**: `pkg/channels/pico/` implements the MoonHub protocol channel; the gateway exposes it at **`/moonhub/ws`** (internal channel id remains `pico` for routing and session keys).
 
 5. **WhatsApp has two modes**: `"whatsapp"` (Bridge mode, communicates via external bridge URL) and `"whatsapp_native"` (native whatsmeow mode, connects directly to WhatsApp). Manager selects which to initialize based on `WhatsAppConfig.UseNative`.
 

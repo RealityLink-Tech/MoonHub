@@ -44,11 +44,11 @@ func TestBuildWsURLUsesRequestHostWhenLauncherPublicSaved(t *testing.T) {
 	cfg.Gateway.Host = "127.0.0.1"
 	cfg.Gateway.Port = 18790
 
-	req := httptest.NewRequest("GET", "http://launcher.local/api/pico/token", nil)
+	req := httptest.NewRequest("GET", "http://launcher.local/api/moonhub/token", nil)
 	req.Host = "192.168.1.9:18800"
 
-	if got := h.buildWsURL(req, cfg); got != "ws://192.168.1.9:18790/pico/ws" {
-		t.Fatalf("buildWsURL() = %q, want %q", got, "ws://192.168.1.9:18790/pico/ws")
+	if got := h.buildWsURL(req, cfg); got != "ws://192.168.1.9:18790/moonhub/ws" {
+		t.Fatalf("buildWsURL() = %q, want %q", got, "ws://192.168.1.9:18790/moonhub/ws")
 	}
 }
 

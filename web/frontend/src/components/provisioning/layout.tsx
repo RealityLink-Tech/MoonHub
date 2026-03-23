@@ -1,4 +1,5 @@
-import { Link, type ReactNode } from "@tanstack/react-router"
+import { type ReactNode } from "react"
+import { Link } from "@tanstack/react-router"
 import { useCallback, useEffect, useState } from "react"
 
 import {

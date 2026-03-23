@@ -62,5 +62,5 @@ func (h *Handler) buildWsURL(r *http.Request, cfg *config.Config) string {
 	if host == "" || host == "0.0.0.0" {
 		host = requestHostName(r)
 	}
-	return "ws://" + net.JoinHostPort(host, strconv.Itoa(cfg.Gateway.Port)) + "/pico/ws"
+	return "ws://" + net.JoinHostPort(host, strconv.Itoa(cfg.Gateway.Port)) + "/moonhub/ws"
 }

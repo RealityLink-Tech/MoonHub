@@ -17,8 +17,8 @@ function ProvisioningRouteLayout() {
   })
 
   // Determine current step based on pathname
-  const getStep = (): "connect" | "auth" | "install" | "settings" => {
-    if (pathname === "/provisioning/auth") return "auth"
+  const getStep = (): "connect" | "authorize" | "install" | "settings" => {
+    if (pathname === "/provisioning/auth") return "authorize"
     if (pathname === "/provisioning/install") return "install"
     if (pathname === "/provisioning/settings") return "settings"
     return "connect"
@@ -28,7 +28,7 @@ function ProvisioningRouteLayout() {
   const getTitle = (): string => {
     const step = getStep()
     switch (step) {
-      case "auth":
+      case "authorize":
         return "设备授权"
       case "install":
         return "应用安装"
@@ -41,7 +41,7 @@ function ProvisioningRouteLayout() {
 
   // Redirect to WiFi page if accessing /provisioning directly
   if (pathname === "/provisioning") {
-    return <Navigate to="/provisioning/" />
+    return <Navigate to="/provisioning" />
   }
 
   return (

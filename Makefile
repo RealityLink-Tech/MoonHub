@@ -267,7 +267,7 @@ run: build
 ## docker-build: Build Docker image (minimal Alpine-based)
 docker-build:
 	@echo "Building minimal Docker image (Alpine-based)..."
-	docker compose -f docker/docker-compose.yml build moonhub-agent moonhub-gateway
+	docker compose -f docker/docker-compose.minimal.yml build moonhub-agent moonhub-gateway
 
 ## docker-build-full: Build Docker image with full MCP support (Node.js 24)
 docker-build-full:
@@ -282,7 +282,7 @@ docker-test:
 
 ## docker-run: Run moonhub gateway in Docker (Alpine-based)
 docker-run:
-	docker compose -f docker/docker-compose.yml --profile gateway up
+	docker compose -f docker/docker-compose.minimal.yml --profile gateway up
 
 ## docker-run-full: Run moonhub gateway in Docker (full-featured)
 docker-run-full:
@@ -290,7 +290,7 @@ docker-run-full:
 
 ## docker-run-agent: Run moonhub agent in Docker (interactive, Alpine-based)
 docker-run-agent:
-	docker compose -f docker/docker-compose.yml run --rm moonhub-agent
+	docker compose -f docker/docker-compose.minimal.yml run --rm moonhub-agent
 
 ## docker-run-agent-full: Run moonhub agent in Docker (interactive, full-featured)
 docker-run-agent-full:
@@ -298,7 +298,7 @@ docker-run-agent-full:
 
 ## docker-clean: Clean Docker images and volumes
 docker-clean:
-	docker compose -f docker/docker-compose.yml down -v
+	docker compose -f docker/docker-compose.minimal.yml down -v
 	docker compose -f docker/docker-compose.full.yml down -v
 	docker rmi moonhub:latest moonhub:full 2>/dev/null || true
 

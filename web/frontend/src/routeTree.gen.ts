@@ -9,291 +9,145 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ModelsRouteImport } from './routes/models'
-import { Route as LogsRouteImport } from './routes/logs'
-import { Route as CredentialsRouteImport } from './routes/credentials'
-import { Route as ConfigRouteImport } from './routes/config'
-import { Route as AgentRouteImport } from './routes/agent'
-import { Route as ChannelsRouteRouteImport } from './routes/channels/route'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ConfigRawRouteImport } from './routes/config.raw'
-import { Route as ChannelsNameRouteImport } from './routes/channels/$name'
-import { Route as AgentToolsRouteImport } from './routes/agent/tools'
-import { Route as AgentSkillsRouteImport } from './routes/agent/skills'
+import { Route as ProvisioningRouteRouteImport } from './routes/provisioning/route'
+import { Route as ProvisioningIndexRouteImport } from './routes/provisioning/index'
+import { Route as ProvisioningSettingsRouteImport } from './routes/provisioning/settings'
+import { Route as ProvisioningInstallRouteImport } from './routes/provisioning/install'
+import { Route as ProvisioningAuthRouteImport } from './routes/provisioning/auth'
 
-const ModelsRoute = ModelsRouteImport.update({
-  id: '/models',
-  path: '/models',
+const ProvisioningRouteRoute = ProvisioningRouteRouteImport.update({
+  id: '/provisioning',
+  path: '/provisioning',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LogsRoute = LogsRouteImport.update({
-  id: '/logs',
-  path: '/logs',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CredentialsRoute = CredentialsRouteImport.update({
-  id: '/credentials',
-  path: '/credentials',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConfigRoute = ConfigRouteImport.update({
-  id: '/config',
-  path: '/config',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AgentRoute = AgentRouteImport.update({
-  id: '/agent',
-  path: '/agent',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChannelsRouteRoute = ChannelsRouteRouteImport.update({
-  id: '/channels',
-  path: '/channels',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
+const ProvisioningIndexRoute = ProvisioningIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => ProvisioningRouteRoute,
 } as any)
-const ConfigRawRoute = ConfigRawRouteImport.update({
-  id: '/raw',
-  path: '/raw',
-  getParentRoute: () => ConfigRoute,
+const ProvisioningSettingsRoute = ProvisioningSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => ProvisioningRouteRoute,
 } as any)
-const ChannelsNameRoute = ChannelsNameRouteImport.update({
-  id: '/$name',
-  path: '/$name',
-  getParentRoute: () => ChannelsRouteRoute,
+const ProvisioningInstallRoute = ProvisioningInstallRouteImport.update({
+  id: '/install',
+  path: '/install',
+  getParentRoute: () => ProvisioningRouteRoute,
 } as any)
-const AgentToolsRoute = AgentToolsRouteImport.update({
-  id: '/tools',
-  path: '/tools',
-  getParentRoute: () => AgentRoute,
-} as any)
-const AgentSkillsRoute = AgentSkillsRouteImport.update({
-  id: '/skills',
-  path: '/skills',
-  getParentRoute: () => AgentRoute,
+const ProvisioningAuthRoute = ProvisioningAuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => ProvisioningRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/channels': typeof ChannelsRouteRouteWithChildren
-  '/agent': typeof AgentRouteWithChildren
-  '/config': typeof ConfigRouteWithChildren
-  '/credentials': typeof CredentialsRoute
-  '/logs': typeof LogsRoute
-  '/models': typeof ModelsRoute
-  '/agent/skills': typeof AgentSkillsRoute
-  '/agent/tools': typeof AgentToolsRoute
-  '/channels/$name': typeof ChannelsNameRoute
-  '/config/raw': typeof ConfigRawRoute
+  '/provisioning': typeof ProvisioningRouteRouteWithChildren
+  '/provisioning/auth': typeof ProvisioningAuthRoute
+  '/provisioning/install': typeof ProvisioningInstallRoute
+  '/provisioning/settings': typeof ProvisioningSettingsRoute
+  '/provisioning/': typeof ProvisioningIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/channels': typeof ChannelsRouteRouteWithChildren
-  '/agent': typeof AgentRouteWithChildren
-  '/config': typeof ConfigRouteWithChildren
-  '/credentials': typeof CredentialsRoute
-  '/logs': typeof LogsRoute
-  '/models': typeof ModelsRoute
-  '/agent/skills': typeof AgentSkillsRoute
-  '/agent/tools': typeof AgentToolsRoute
-  '/channels/$name': typeof ChannelsNameRoute
-  '/config/raw': typeof ConfigRawRoute
+  '/provisioning/auth': typeof ProvisioningAuthRoute
+  '/provisioning/install': typeof ProvisioningInstallRoute
+  '/provisioning/settings': typeof ProvisioningSettingsRoute
+  '/provisioning': typeof ProvisioningIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/channels': typeof ChannelsRouteRouteWithChildren
-  '/agent': typeof AgentRouteWithChildren
-  '/config': typeof ConfigRouteWithChildren
-  '/credentials': typeof CredentialsRoute
-  '/logs': typeof LogsRoute
-  '/models': typeof ModelsRoute
-  '/agent/skills': typeof AgentSkillsRoute
-  '/agent/tools': typeof AgentToolsRoute
-  '/channels/$name': typeof ChannelsNameRoute
-  '/config/raw': typeof ConfigRawRoute
+  '/provisioning': typeof ProvisioningRouteRouteWithChildren
+  '/provisioning/auth': typeof ProvisioningAuthRoute
+  '/provisioning/install': typeof ProvisioningInstallRoute
+  '/provisioning/settings': typeof ProvisioningSettingsRoute
+  '/provisioning/': typeof ProvisioningIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/channels'
-    | '/agent'
-    | '/config'
-    | '/credentials'
-    | '/logs'
-    | '/models'
-    | '/agent/skills'
-    | '/agent/tools'
-    | '/channels/$name'
-    | '/config/raw'
+    | '/provisioning'
+    | '/provisioning/auth'
+    | '/provisioning/install'
+    | '/provisioning/settings'
+    | '/provisioning/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
-    | '/channels'
-    | '/agent'
-    | '/config'
-    | '/credentials'
-    | '/logs'
-    | '/models'
-    | '/agent/skills'
-    | '/agent/tools'
-    | '/channels/$name'
-    | '/config/raw'
+    | '/provisioning/auth'
+    | '/provisioning/install'
+    | '/provisioning/settings'
+    | '/provisioning'
   id:
     | '__root__'
-    | '/'
-    | '/channels'
-    | '/agent'
-    | '/config'
-    | '/credentials'
-    | '/logs'
-    | '/models'
-    | '/agent/skills'
-    | '/agent/tools'
-    | '/channels/$name'
-    | '/config/raw'
+    | '/provisioning'
+    | '/provisioning/auth'
+    | '/provisioning/install'
+    | '/provisioning/settings'
+    | '/provisioning/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ChannelsRouteRoute: typeof ChannelsRouteRouteWithChildren
-  AgentRoute: typeof AgentRouteWithChildren
-  ConfigRoute: typeof ConfigRouteWithChildren
-  CredentialsRoute: typeof CredentialsRoute
-  LogsRoute: typeof LogsRoute
-  ModelsRoute: typeof ModelsRoute
+  ProvisioningRouteRoute: typeof ProvisioningRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/models': {
-      id: '/models'
-      path: '/models'
-      fullPath: '/models'
-      preLoaderRoute: typeof ModelsRouteImport
+    '/provisioning': {
+      id: '/provisioning'
+      path: '/provisioning'
+      fullPath: '/provisioning'
+      preLoaderRoute: typeof ProvisioningRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/logs': {
-      id: '/logs'
-      path: '/logs'
-      fullPath: '/logs'
-      preLoaderRoute: typeof LogsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/credentials': {
-      id: '/credentials'
-      path: '/credentials'
-      fullPath: '/credentials'
-      preLoaderRoute: typeof CredentialsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/config': {
-      id: '/config'
-      path: '/config'
-      fullPath: '/config'
-      preLoaderRoute: typeof ConfigRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/agent': {
-      id: '/agent'
-      path: '/agent'
-      fullPath: '/agent'
-      preLoaderRoute: typeof AgentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/channels': {
-      id: '/channels'
-      path: '/channels'
-      fullPath: '/channels'
-      preLoaderRoute: typeof ChannelsRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
+    '/provisioning/': {
+      id: '/provisioning/'
       path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      fullPath: '/provisioning/'
+      preLoaderRoute: typeof ProvisioningIndexRouteImport
+      parentRoute: typeof ProvisioningRouteRoute
     }
-    '/config/raw': {
-      id: '/config/raw'
-      path: '/raw'
-      fullPath: '/config/raw'
-      preLoaderRoute: typeof ConfigRawRouteImport
-      parentRoute: typeof ConfigRoute
+    '/provisioning/settings': {
+      id: '/provisioning/settings'
+      path: '/settings'
+      fullPath: '/provisioning/settings'
+      preLoaderRoute: typeof ProvisioningSettingsRouteImport
+      parentRoute: typeof ProvisioningRouteRoute
     }
-    '/channels/$name': {
-      id: '/channels/$name'
-      path: '/$name'
-      fullPath: '/channels/$name'
-      preLoaderRoute: typeof ChannelsNameRouteImport
-      parentRoute: typeof ChannelsRouteRoute
+    '/provisioning/install': {
+      id: '/provisioning/install'
+      path: '/install'
+      fullPath: '/provisioning/install'
+      preLoaderRoute: typeof ProvisioningInstallRouteImport
+      parentRoute: typeof ProvisioningRouteRoute
     }
-    '/agent/tools': {
-      id: '/agent/tools'
-      path: '/tools'
-      fullPath: '/agent/tools'
-      preLoaderRoute: typeof AgentToolsRouteImport
-      parentRoute: typeof AgentRoute
-    }
-    '/agent/skills': {
-      id: '/agent/skills'
-      path: '/skills'
-      fullPath: '/agent/skills'
-      preLoaderRoute: typeof AgentSkillsRouteImport
-      parentRoute: typeof AgentRoute
+    '/provisioning/auth': {
+      id: '/provisioning/auth'
+      path: '/auth'
+      fullPath: '/provisioning/auth'
+      preLoaderRoute: typeof ProvisioningAuthRouteImport
+      parentRoute: typeof ProvisioningRouteRoute
     }
   }
 }
 
-interface ChannelsRouteRouteChildren {
-  ChannelsNameRoute: typeof ChannelsNameRoute
+interface ProvisioningRouteRouteChildren {
+  ProvisioningAuthRoute: typeof ProvisioningAuthRoute
+  ProvisioningInstallRoute: typeof ProvisioningInstallRoute
+  ProvisioningSettingsRoute: typeof ProvisioningSettingsRoute
+  ProvisioningIndexRoute: typeof ProvisioningIndexRoute
 }
 
-const ChannelsRouteRouteChildren: ChannelsRouteRouteChildren = {
-  ChannelsNameRoute: ChannelsNameRoute,
+const ProvisioningRouteRouteChildren: ProvisioningRouteRouteChildren = {
+  ProvisioningAuthRoute: ProvisioningAuthRoute,
+  ProvisioningInstallRoute: ProvisioningInstallRoute,
+  ProvisioningSettingsRoute: ProvisioningSettingsRoute,
+  ProvisioningIndexRoute: ProvisioningIndexRoute,
 }
 
-const ChannelsRouteRouteWithChildren = ChannelsRouteRoute._addFileChildren(
-  ChannelsRouteRouteChildren,
-)
-
-interface AgentRouteChildren {
-  AgentSkillsRoute: typeof AgentSkillsRoute
-  AgentToolsRoute: typeof AgentToolsRoute
-}
-
-const AgentRouteChildren: AgentRouteChildren = {
-  AgentSkillsRoute: AgentSkillsRoute,
-  AgentToolsRoute: AgentToolsRoute,
-}
-
-const AgentRouteWithChildren = AgentRoute._addFileChildren(AgentRouteChildren)
-
-interface ConfigRouteChildren {
-  ConfigRawRoute: typeof ConfigRawRoute
-}
-
-const ConfigRouteChildren: ConfigRouteChildren = {
-  ConfigRawRoute: ConfigRawRoute,
-}
-
-const ConfigRouteWithChildren =
-  ConfigRoute._addFileChildren(ConfigRouteChildren)
+const ProvisioningRouteRouteWithChildren =
+  ProvisioningRouteRoute._addFileChildren(ProvisioningRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  ChannelsRouteRoute: ChannelsRouteRouteWithChildren,
-  AgentRoute: AgentRouteWithChildren,
-  ConfigRoute: ConfigRouteWithChildren,
-  CredentialsRoute: CredentialsRoute,
-  LogsRoute: LogsRoute,
-  ModelsRoute: ModelsRoute,
+  ProvisioningRouteRoute: ProvisioningRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
