@@ -84,6 +84,17 @@ This page is the **entry point and reading guide** for the repository documentat
 | 2 | [`pkg/provisioning/docs/CONFIG.md`](../pkg/provisioning/docs/CONFIG.md) | Environment variables, `device.*` / `onboarding.*` keys, sidecar `provisioning.json` |
 | Status | [`docs/implementation/provisioning-status.md`](./implementation/provisioning-status.md) | Full implementation status (Chinese), API table, frontend layout, tests |
 
+### LAN Communication (Phase 1)
+
+| Order | Document | Description |
+| --- | --- | --- |
+| 1 | [`pkg/mdns/README.md`](../pkg/mdns/README.md) | mDNS service discovery overview |
+| 2 | [`pkg/mdns/docs/CONFIG.md`](../pkg/mdns/docs/CONFIG.md) | mDNS configuration options |
+| 3 | [`pkg/devices/README.md`](../pkg/devices/README.md) | Device pairing and token management |
+| 4 | [`pkg/devices/docs/CONFIG.md`](../pkg/devices/docs/CONFIG.md) | Pairing configuration options |
+| Status | [`docs/implementation/lan-discovery-status.md`](./implementation/lan-discovery-status.md) | Discovery implementation status |
+| Status | [`docs/implementation/lan-pairing-status.md`](./implementation/lan-pairing-status.md) | Pairing implementation status |
+
 ### Channels
 
 Channel architecture, migration, and how to implement a channel: [`pkg/channels/README.md`](../pkg/channels/README.md). Per-channel behavior also lives with each plugin under [`pkg/plugins/channels/`](../pkg/plugins/channels/) (see [`pkg/plugins/docs/PLUGIN_INDEX.md`](../pkg/plugins/docs/PLUGIN_INDEX.md)).
@@ -108,6 +119,8 @@ Channel architecture, migration, and how to implement a channel: [`pkg/channels/
 | [`delegation-status.md`](./implementation/delegation-status.md) | Sub-agent delegation orchestration implementation status |
 | [`routing-status.md`](./implementation/routing-status.md) | Smart Router V2 (4-tier routing) implementation status |
 | [`provisioning-status.md`](./implementation/provisioning-status.md) | Device provisioning (WiFi, hotspot, SSE, recovery, auth code, web UI) implementation status |
+| [`lan-discovery-status.md`](./implementation/lan-discovery-status.md) | LAN mDNS discovery implementation status |
+| [`lan-pairing-status.md`](./implementation/lan-pairing-status.md) | LAN device pairing implementation status |
 
 ---
 

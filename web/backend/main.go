@@ -1,7 +1,7 @@
-// MoonHub Web Console - Web-based chat and management interface
+// MoonHub Web Console - Web-based configuration and management interface
 //
-// Provides a web UI for chatting with MoonHub via the Pico Channel WebSocket,
-// with configuration management and gateway process control.
+// Provides a web UI for configuring MoonHub and managing the gateway process,
+// with optional device provisioning support.
 //
 // Usage:
 //
@@ -21,13 +21,17 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
-	"github.com/sipeed/moonhub/pkg/provisioning"
-	"github.com/sipeed/moonhub/web/backend/api"
-	"github.com/sipeed/moonhub/web/backend/launcherconfig"
-	"github.com/sipeed/moonhub/web/backend/middleware"
-	"github.com/sipeed/moonhub/web/backend/utils"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/devices"
+	"github.com/RealityLink-Tech/MoonHub/pkg/mdns"
+	"github.com/RealityLink-Tech/MoonHub/pkg/provisioning"
+	"github.com/RealityLink-Tech/MoonHub/web/backend/api"
+	"github.com/RealityLink-Tech/MoonHub/web/backend/launcherconfig"
+	"github.com/RealityLink-Tech/MoonHub/web/backend/middleware"
+	"github.com/RealityLink-Tech/MoonHub/web/backend/utils"
 )
 
 func main() {
@@ -117,6 +121,21 @@ func main() {
 	apiHandler := api.NewHandler(absPath)
 	apiHandler.SetServerOptions(portNum, effectivePublic, explicitPublic, launcherCfg.AllowedCIDRs)
 
+	configDir := filepath.Dir(absPath)
+	lanDeviceID, lanIDErr := utils.EnsureLANDeviceID(configDir)
+	if lanIDErr != nil {
+		log.Printf("Warning: LAN device ID unavailable, using hostname fallback: %v", lanIDErr)
+		lanDeviceID = fallbackLANDeviceID()
+	}
+	apiHandler.SetDeviceInfo(lanDeviceID, "MoonHub")
+
+	deviceStore, err := devices.NewDeviceStore(configDir)
+	if err != nil {
+		log.Printf("Warning: device store unavailable (discovery/auth APIs disabled): %v", err)
+	} else {
+		apiHandler.SetDeviceStore(deviceStore)
+	}
+
 	// Device provisioning: SetProvisioningHandler must run before RegisterRoutes so routes are mounted.
 	provisioningEnabled := os.Getenv("MOONHUB_PROVISIONING_ENABLED") == "1"
 	if provisioningEnabled {
@@ -188,8 +207,40 @@ func main() {
 		apiHandler.TryAutoStartGateway()
 	}()
 
+	// LAN-only: advertise HTTP API on multicast DNS when listening on all interfaces.
+	if deviceStore != nil && effectivePublic && os.Getenv("MOONHUB_MDNS_DISABLED") != "1" {
+		mdnsSrv := mdns.NewServer(mdns.ServerConfig{
+			DeviceID: lanDeviceID,
+			Name:     "MoonHub",
+			Version:  config.GetVersion(),
+			Port:     portNum,
+		})
+		if err := mdnsSrv.Start(context.Background()); err != nil {
+			log.Printf("mDNS: failed to start: %v", err)
+		}
+	}
+
 	// Start the Server
 	if err := http.ListenAndServe(addr, handler); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}
+}
+
+// fallbackLANDeviceID returns a hostname-derived identifier when .moonhub_lan_device_id cannot be created.
+func fallbackLANDeviceID() string {
+	h, err := os.Hostname()
+	h = strings.TrimSpace(h)
+	if err != nil || h == "" {
+		return "moonhub"
+	}
+	var b strings.Builder
+	for _, r := range h {
+		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') || r == '-' {
+			b.WriteRune(r)
+		}
+	}
+	if b.Len() == 0 {
+		return "moonhub"
+	}
+	return b.String()
 }
