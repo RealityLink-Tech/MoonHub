@@ -5,8 +5,9 @@ This page is the **entry point and reading guide** for the repository documentat
 ## Recommended Reading Order (First Time)
 
 1. [Repository Root README](../README.md) — Feature overview, license, and recent changelog summary
-2. [CLAUDE.md](../CLAUDE.md) — Project architecture, build commands, and development guidelines for Claude Code
-3. [Troubleshooting](./troubleshooting.md), [Debug Guide](./debug.md) — Runtime issues reference
+2. [CHANGELOG.md](../CHANGELOG.md) — Project updates and release notes
+3. [CLAUDE.md](../CLAUDE.md) — Project architecture, build commands, and development guidelines for Claude Code
+4. [Troubleshooting](./troubleshooting.md), [Debug Guide](./debug.md) — Runtime issues reference
 4. [Tools & Capabilities Configuration](./tools_configuration.md) — Tool-side configuration (`tools.*` in `config.json`)
 5. If you enable **sub-agent delegation** (`delegation.enabled`): [pkg/delegation/docs/README.md](../pkg/delegation/docs/README.md) → [CONFIG.md](../pkg/delegation/docs/CONFIG.md) → [implementation status](./implementation/delegation-status.md)
 6. If you enable **device provisioning** on the web launcher (`MOONHUB_PROVISIONING_ENABLED=1`): [pkg/provisioning/docs/README.md](../pkg/provisioning/docs/README.md) → [CONFIG.md](../pkg/provisioning/docs/CONFIG.md) → [implementation status](./implementation/provisioning-status.md) (detailed reference)
