@@ -555,5 +555,8 @@ func DefaultConfig() *Config {
 		},
 		Compactor:  DefaultCompactorConfig(),
 		Delegation: DefaultDelegationConfig(),
+		Cloud: CloudConfig{
+			HeartbeatInterval: 60,
+		},
 	}
 }

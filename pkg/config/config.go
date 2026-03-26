@@ -89,6 +89,7 @@ type Config struct {
 	AdaptiveMemory AdaptiveMemoryConfig `json:"adaptive_memory,omitempty"` // Adaptive memory system configuration
 	Compactor      CompactorConfig      `json:"compactor,omitempty"`       // Context compactor configuration
 	Delegation     DelegationConfig     `json:"delegation,omitempty"`      // Delegation system configuration
+	Cloud          CloudConfig          `json:"cloud,omitempty"`           // Cloud directory and relay configuration
 	// BuildInfo contains build-time version information
 	BuildInfo BuildInfo `json:"build_info,omitempty"`
 }
@@ -185,6 +186,15 @@ func DefaultDelegationConfig() DelegationConfig {
 		RetentionDays:        14,
 		ReuseThreshold:       0.6,
 	}
+}
+
+// CloudConfig configures cloud directory and relay services.
+type CloudConfig struct {
+	Enabled           bool   `json:"enabled"                       env:"MOONHUB_CLOUD_ENABLED"`
+	DirectoryURL      string `json:"directory_url"                 env:"MOONHUB_CLOUD_DIRECTORY_URL"`
+	RelayURL          string `json:"relay_url"                     env:"MOONHUB_CLOUD_RELAY_URL"`
+	HeartbeatInterval int    `json:"heartbeat_interval,omitempty"  env:"MOONHUB_CLOUD_HEARTBEAT_INTERVAL"`
+	RegisterOnBoot    bool   `json:"register_on_boot,omitempty"    env:"MOONHUB_CLOUD_REGISTER_ON_BOOT"`
 }
 
 // BuildInfo contains build-time version information
