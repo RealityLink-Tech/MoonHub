@@ -39,6 +39,12 @@ type DeviceInfo struct {
 
 	// Hostname is the device hostname.
 	Hostname string `json:"hostname,omitempty"`
+
+	// AgentID is the MoonHub agent identity ID (e.g., "mh_abcdef1234567890").
+	AgentID string `json:"agent_id,omitempty"`
+
+	// AgentName is the agent's friendly name.
+	AgentName string `json:"agent_name,omitempty"`
 }
 
 // ServerConfig holds configuration for the mDNS server.
@@ -57,6 +63,12 @@ type ServerConfig struct {
 
 	// Iface is the network interface to broadcast on (optional).
 	Iface *net.Interface
+
+	// AgentID is the MoonHub agent identity to advertise.
+	AgentID string
+
+	// AgentName is the agent's friendly name.
+	AgentName string
 }
 
 // ClientConfig holds configuration for the mDNS client.

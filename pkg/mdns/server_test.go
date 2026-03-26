@@ -2,6 +2,8 @@ package mdns
 
 import (
 	"context"
+	"net"
+	"strings"
 	"testing"
 	"time"
 )
@@ -131,5 +133,84 @@ func TestServerStartStop(t *testing.T) {
 
 	if server.running {
 		t.Error("expected server to be stopped")
+	}
+}
+
+func TestServiceTXTRecords_WithAgentIdentity(t *testing.T) {
+	s := NewServer(ServerConfig{
+		DeviceID:  "TEST-001",
+		Name:      "TestDevice",
+		Version:   "1.0.0",
+		Port:      18800,
+		AgentID:   "mh_abcdef1234567890",
+		AgentName: "MyAgent",
+	})
+
+	records := s.serviceTXTRecords()
+
+	recordMap := make(map[string]string)
+	for _, r := range records {
+		parts := strings.SplitN(r, "=", 2)
+		if len(parts) == 2 {
+			recordMap[parts[0]] = parts[1]
+		}
+	}
+
+	if recordMap["agent_id"] != "mh_abcdef1234567890" {
+		t.Errorf("expected agent_id mh_abcdef1234567890, got %s", recordMap["agent_id"])
+	}
+	if recordMap["agent_name"] != "MyAgent" {
+		t.Errorf("expected agent_name MyAgent, got %s", recordMap["agent_name"])
+	}
+	if recordMap["id"] != "TEST-001" {
+		t.Errorf("expected id TEST-001, got %s", recordMap["id"])
+	}
+}
+
+func TestServiceTXTRecords_WithoutAgentIdentity(t *testing.T) {
+	s := NewServer(ServerConfig{
+		DeviceID: "TEST-001",
+		Name:     "TestDevice",
+		Version:  "1.0.0",
+		Port:     18800,
+	})
+
+	records := s.serviceTXTRecords()
+
+	recordMap := make(map[string]string)
+	for _, r := range records {
+		parts := strings.SplitN(r, "=", 2)
+		if len(parts) == 2 {
+			recordMap[parts[0]] = parts[1]
+		}
+	}
+
+	if _, ok := recordMap["agent_id"]; ok {
+		t.Error("expected no agent_id when not configured")
+	}
+	if _, ok := recordMap["agent_name"]; ok {
+		t.Error("expected no agent_name when not configured")
+	}
+}
+
+func TestParseDeviceFromTXT_WithAgentIdentity(t *testing.T) {
+	txt := []string{
+		"id=TEST-001",
+		"name=TestDevice",
+		"version=1.0.0",
+		"port=18800",
+		"agent_id=mh_abcdef1234567890",
+		"agent_name=MyAgent",
+	}
+
+	device := parseDeviceFromTXT(txt, net.ParseIP("192.168.1.100"), 18800)
+	if device == nil {
+		t.Fatal("expected non-nil device")
+	}
+	if device.AgentID != "mh_abcdef1234567890" {
+		t.Errorf("expected agent_id mh_abcdef1234567890, got %s", device.AgentID)
+	}
+	if device.AgentName != "MyAgent" {
+		t.Errorf("expected agent_name MyAgent, got %s", device.AgentName)
 	}
 }

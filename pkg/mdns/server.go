@@ -116,12 +116,19 @@ func sanitizeHostname(h string) string {
 
 // serviceTXTRecords returns TXT records for the mDNS service.
 func (s *Server) serviceTXTRecords() []string {
-	return []string{
+	records := []string{
 		fmt.Sprintf("id=%s", s.config.DeviceID),
 		fmt.Sprintf("name=%s", s.config.Name),
 		fmt.Sprintf("version=%s", s.config.Version),
 		fmt.Sprintf("port=%d", s.config.Port),
 	}
+	if s.config.AgentID != "" {
+		records = append(records, fmt.Sprintf("agent_id=%s", s.config.AgentID))
+	}
+	if s.config.AgentName != "" {
+		records = append(records, fmt.Sprintf("agent_name=%s", s.config.AgentName))
+	}
+	return records
 }
 
 // parseTXTRecords parses TXT records from mDNS response into a map.
@@ -163,11 +170,16 @@ func parseDeviceFromTXT(txt []string, addr net.IP, port int) *DeviceInfo {
 		port = DefaultPort
 	}
 
+	agentID := records["agent_id"]
+	agentName := records["agent_name"]
+
 	return &DeviceInfo{
-		ID:      id,
-		Name:    name,
-		Version: version,
-		Addr:    addr,
-		Port:    port,
+		ID:        id,
+		Name:      name,
+		Version:   version,
+		Addr:      addr,
+		Port:      port,
+		AgentID:   agentID,
+		AgentName: agentName,
 	}
 }
