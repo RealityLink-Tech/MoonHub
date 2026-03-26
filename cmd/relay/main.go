@@ -24,13 +24,15 @@ func main() {
 			return
 		}
 
-		agentID, err := auth.Verify(r.Header.Get("Authorization"), "relay-connect")
+		challenge := relay.GenerateChallenge()
+		agentID, err := auth.Verify(r.Header.Get("Authorization"), challenge)
 		if err != nil {
 			http.Error(w, "authentication failed", http.StatusUnauthorized)
 			return
 		}
 
 		r.Header.Set("X-Agent-ID", agentID)
+		r.Header.Set("X-Challenge", challenge)
 		bridge.ServeHTTP(w, r)
 	})
 

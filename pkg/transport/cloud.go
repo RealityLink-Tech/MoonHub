@@ -3,6 +3,7 @@ package transport
 
 import (
 	"bytes"
+	"context"
 	"crypto/ed25519"
 	"encoding/base64"
 	"encoding/json"
@@ -184,4 +185,27 @@ func (c *CloudClient) putJSON(path string, body interface{}) error {
 		return fmt.Errorf("put %s: status %d", path, resp.StatusCode)
 	}
 	return nil
+}
+
+// StartHeartbeat starts a background goroutine that sends heartbeats at the configured interval.
+// Call StopHeartbeat to stop it.
+func (c *CloudClient) StartHeartbeat(ctx context.Context, interval time.Duration) {
+	ticker := time.NewTicker(interval)
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				c.Heartbeat()
+			case <-ctx.Done():
+				ticker.Stop()
+				return
+			}
+		}
+	}()
+}
+
+// StopHeartbeat sends an unregister request and should be called on shutdown.
+// Note: if using StartHeartbeat, cancel the context instead to stop the goroutine.
+func (c *CloudClient) Stop() error {
+	return c.Unregister()
 }

@@ -43,7 +43,6 @@ func (s *postgresStore) UpsertAgent(ctx context.Context, agent *AgentRecord) err
 		VALUES ($1, $2, $3, $4, $5, $6)
 		ON CONFLICT (agent_id) DO UPDATE SET
 			agent_name = EXCLUDED.agent_name,
-			public_key = EXCLUDED.public_key,
 			endpoint = EXCLUDED.endpoint,
 			last_seen_at = EXCLUDED.last_seen_at`,
 		agent.AgentID, agent.AgentName, agent.PublicKey, agent.Endpoint,

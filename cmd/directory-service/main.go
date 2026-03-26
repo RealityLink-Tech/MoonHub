@@ -22,6 +22,33 @@ func main() {
 	dbName := flag.String("db-name", "moonhub", "PostgreSQL database")
 	flag.Parse()
 
+	// Environment variable fallbacks (for Docker Compose)
+	if *dbHost == "localhost" {
+		if v := os.Getenv("DB_HOST"); v != "" {
+			*dbHost = v
+		}
+	}
+	if *dbPort == "5432" {
+		if v := os.Getenv("DB_PORT"); v != "" {
+			*dbPort = v
+		}
+	}
+	if *dbUser == "moonhub" {
+		if v := os.Getenv("DB_USER"); v != "" {
+			*dbUser = v
+		}
+	}
+	if *dbPass == "" {
+		if v := os.Getenv("DB_PASS"); v != "" {
+			*dbPass = v
+		}
+	}
+	if *dbName == "moonhub" {
+		if v := os.Getenv("DB_NAME"); v != "" {
+			*dbName = v
+		}
+	}
+
 	connStr := "host=" + *dbHost + " port=" + *dbPort + " user=" + *dbUser +
 		" password=" + *dbPass + " dbname=" + *dbName + " sslmode=disable"
 

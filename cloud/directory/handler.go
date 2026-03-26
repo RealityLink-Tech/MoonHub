@@ -3,7 +3,9 @@ package directory
 
 import (
 	"crypto/ed25519"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -96,9 +98,13 @@ func (h *Handler) handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// First registration: verify signature with the provided public key
+	// Verify signature: use stored key for re-registration (prevents key replacement)
+	verifyKey := pubKeyBytes
+	if storedPubKey, err := h.store.GetPublicKey(r.Context(), req.AgentID); err == nil {
+		verifyKey = storedPubKey
+	}
 	msg := fmt.Sprintf("%s%s%s%d", req.AgentID, req.AgentName, req.PublicKey, req.Timestamp)
-	if !ed25519.Verify(pubKeyBytes, []byte(msg), sigBytes) {
+	if !ed25519.Verify(verifyKey, []byte(msg), sigBytes) {
 		http.Error(w, "invalid signature", http.StatusUnauthorized)
 		return
 	}
@@ -142,13 +148,22 @@ func (h *Handler) handleHeartbeat(w http.ResponseWriter, r *http.Request, agentI
 		return
 	}
 
+	if time.Since(time.Unix(req.Timestamp, 0)) > 5*time.Minute {
+		http.Error(w, "timestamp too old", http.StatusBadRequest)
+		return
+	}
+
 	pubKey, err := h.store.GetPublicKey(r.Context(), agentID)
 	if err != nil {
 		http.Error(w, "agent not found", http.StatusNotFound)
 		return
 	}
 
-	sigBytes, _ := base64.StdEncoding.DecodeString(req.Signature)
+	sigBytes, err := base64.StdEncoding.DecodeString(req.Signature)
+	if err != nil {
+		http.Error(w, "invalid signature encoding", http.StatusBadRequest)
+		return
+	}
 	msg := fmt.Sprintf("%s%d", agentID, req.Timestamp)
 	if !ed25519.Verify(pubKey, []byte(msg), sigBytes) {
 		http.Error(w, "invalid signature", http.StatusUnauthorized)
@@ -176,7 +191,8 @@ func (h *Handler) handleGetAgent(w http.ResponseWriter, r *http.Request, agentID
 	}
 
 	online, endpoint, _ := h.cache.IsOnline(r.Context(), agentID)
-	fingerprint := agentidentity.DeriveAgentID(agent.PublicKey)[:8]
+	fpHash := sha256.Sum256(agent.PublicKey)
+	fingerprint := "sha256:" + hex.EncodeToString(fpHash[:])[:8]
 
 	resp := AgentResponse{
 		AgentID:              agent.AgentID,
@@ -213,13 +229,22 @@ func (h *Handler) handleDelete(w http.ResponseWriter, r *http.Request, agentID s
 		return
 	}
 
+	if time.Since(time.Unix(req.Timestamp, 0)) > 5*time.Minute {
+		http.Error(w, "timestamp too old", http.StatusBadRequest)
+		return
+	}
+
 	pubKey, err := h.store.GetPublicKey(r.Context(), agentID)
 	if err != nil {
 		http.Error(w, "agent not found", http.StatusNotFound)
 		return
 	}
 
-	sigBytes, _ := base64.StdEncoding.DecodeString(req.Signature)
+	sigBytes, err := base64.StdEncoding.DecodeString(req.Signature)
+	if err != nil {
+		http.Error(w, "invalid signature encoding", http.StatusBadRequest)
+		return
+	}
 	msg := fmt.Sprintf("%s%d", agentID, req.Timestamp)
 	if !ed25519.Verify(pubKey, []byte(msg), sigBytes) {
 		http.Error(w, "invalid signature", http.StatusUnauthorized)

@@ -2,6 +2,7 @@
 package transport
 
 import (
+	"context"
 	"crypto/ed25519"
 	"encoding/base64"
 	"encoding/json"
@@ -129,5 +130,33 @@ func TestCloudClient_GetPublicKey(t *testing.T) {
 	}
 	if string(key) != "remote-pub-key" {
 		t.Errorf("key = %q, want %q", string(key), "remote-pub-key")
+	}
+}
+
+func TestCloudClient_StartStopHeartbeat(t *testing.T) {
+	identity, _ := agentidentity.NewAgentIdentity("Test")
+	var heartbeatCount int
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/agents/"+identity.AgentID+"/heartbeat" && r.Method == "PUT" {
+			heartbeatCount++
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+			return
+		}
+		http.NotFound(w, r)
+	}))
+	defer ts.Close()
+
+	client := NewCloudClient(ts.URL, identity)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	client.StartHeartbeat(ctx, 100*time.Millisecond)
+
+	// Wait for at least 2 heartbeats
+	time.Sleep(350 * time.Millisecond)
+	cancel()
+
+	if heartbeatCount < 2 {
+		t.Errorf("expected at least 2 heartbeats, got %d", heartbeatCount)
 	}
 }

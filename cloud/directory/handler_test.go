@@ -220,3 +220,143 @@ func TestHandler_Delete(t *testing.T) {
 		t.Errorf("after delete, get status = %d, want 404", rec3.Code)
 	}
 }
+
+func TestHandler_Register_PreventsKeyReplacement(t *testing.T) {
+	store := newMemoryStore()
+	cache := newMemoryCache()
+	handler := NewHandler(store, cache)
+
+	// First registration with original key
+	identity, pub := testAgent(t)
+	pubKeyB64 := base64.StdEncoding.EncodeToString(pub)
+	timestamp := time.Now().Unix()
+
+	regBody := RegisterRequest{
+		AgentID:   identity.AgentID,
+		AgentName: "TestAgent",
+		PublicKey: pubKeyB64,
+		Endpoint:  "wss://relay.example.com",
+		Timestamp: timestamp,
+		Signature: signRegister(identity, identity.AgentID, "TestAgent", pubKeyB64, timestamp),
+	}
+
+	body, _ := json.Marshal(regBody)
+	req := httptest.NewRequest("POST", "/agents/register", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("first register: %d", rec.Code)
+	}
+
+	// Try to register with a DIFFERENT key
+	_, fakePriv, _ := ed25519.GenerateKey(nil)
+	fakeIdentity, _ := agentidentity.LoadFromKeys("TestAgent", fakePriv, time.Now())
+
+	fakePubB64 := base64.StdEncoding.EncodeToString(fakeIdentity.PublicKey)
+	reRegBody := RegisterRequest{
+		AgentID:   identity.AgentID, // Same agent ID
+		AgentName: "TestAgent",
+		PublicKey: fakePubB64,        // Different public key
+		Endpoint:  "wss://evil.example.com",
+		Timestamp: time.Now().Unix(),
+		// Sign with fake key — should fail because stored key doesn't match
+		Signature: signRegister(fakeIdentity, identity.AgentID, "TestAgent", fakePubB64, time.Now().Unix()),
+	}
+
+	reBody, _ := json.Marshal(reRegBody)
+	req2 := httptest.NewRequest("POST", "/agents/register", bytes.NewReader(reBody))
+	req2.Header.Set("Content-Type", "application/json")
+	rec2 := httptest.NewRecorder()
+	handler.ServeHTTP(rec2, req2)
+
+	if rec2.Code != http.StatusUnauthorized {
+		t.Errorf("re-register with different key: status = %d, want 401", rec2.Code)
+	}
+}
+
+func TestHandler_Heartbeat_ExpiredTimestamp(t *testing.T) {
+	store := newMemoryStore()
+	cache := newMemoryCache()
+	handler := NewHandler(store, cache)
+
+	identity, pub := testAgent(t)
+	pubKeyB64 := base64.StdEncoding.EncodeToString(pub)
+	timestamp := time.Now().Unix()
+
+	// Register first
+	regBody := RegisterRequest{
+		AgentID:   identity.AgentID,
+		AgentName: "TestAgent",
+		PublicKey: pubKeyB64,
+		Endpoint:  "wss://relay.example.com",
+		Timestamp: timestamp,
+		Signature: signRegister(identity, identity.AgentID, "TestAgent", pubKeyB64, timestamp),
+	}
+	body, _ := json.Marshal(regBody)
+	req := httptest.NewRequest("POST", "/agents/register", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	// Heartbeat with expired timestamp (10 minutes ago)
+	expiredTs := time.Now().Add(-10 * time.Minute).Unix()
+	expiredMsg := fmt.Sprintf("%s%d", identity.AgentID, expiredTs)
+	expiredSig := identity.Sign([]byte(expiredMsg))
+	hbBody := HeartbeatRequest{
+		Timestamp: expiredTs,
+		Signature: base64.StdEncoding.EncodeToString(expiredSig),
+	}
+	hbBytes, _ := json.Marshal(hbBody)
+	req2 := httptest.NewRequest("PUT", "/agents/"+identity.AgentID+"/heartbeat", bytes.NewReader(hbBytes))
+	req2.Header.Set("Content-Type", "application/json")
+	rec2 := httptest.NewRecorder()
+	handler.ServeHTTP(rec2, req2)
+
+	if rec2.Code != http.StatusBadRequest {
+		t.Errorf("expired heartbeat: status = %d, want 400", rec2.Code)
+	}
+}
+
+func TestHandler_Delete_ExpiredTimestamp(t *testing.T) {
+	store := newMemoryStore()
+	cache := newMemoryCache()
+	handler := NewHandler(store, cache)
+
+	identity, pub := testAgent(t)
+	pubKeyB64 := base64.StdEncoding.EncodeToString(pub)
+	timestamp := time.Now().Unix()
+
+	// Register
+	regBody := RegisterRequest{
+		AgentID:   identity.AgentID,
+		AgentName: "TestAgent",
+		PublicKey: pubKeyB64,
+		Endpoint:  "wss://relay.example.com",
+		Timestamp: timestamp,
+		Signature: signRegister(identity, identity.AgentID, "TestAgent", pubKeyB64, timestamp),
+	}
+	body, _ := json.Marshal(regBody)
+	req := httptest.NewRequest("POST", "/agents/register", bytes.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	// Delete with expired timestamp
+	expiredTs := time.Now().Add(-10 * time.Minute).Unix()
+	expiredMsg := fmt.Sprintf("%s%d", identity.AgentID, expiredTs)
+	expiredSig := identity.Sign([]byte(expiredMsg))
+	delBody := DeleteRequest{
+		Timestamp: expiredTs,
+		Signature: base64.StdEncoding.EncodeToString(expiredSig),
+	}
+	delBytes, _ := json.Marshal(delBody)
+	req2 := httptest.NewRequest("DELETE", "/agents/"+identity.AgentID, bytes.NewReader(delBytes))
+	req2.Header.Set("Content-Type", "application/json")
+	rec2 := httptest.NewRecorder()
+	handler.ServeHTTP(rec2, req2)
+
+	if rec2.Code != http.StatusBadRequest {
+		t.Errorf("expired delete: status = %d, want 400", rec2.Code)
+	}
+}

@@ -25,7 +25,8 @@ func NewAuthenticator(directoryURL string) *Authenticator {
 	}
 }
 
-// Verify checks a Bearer token (format: "Bearer agentID:base64-signature") against the directory.
+// Verify checks a Bearer token against the directory.
+// The challenge should include a timestamp to prevent replay attacks.
 // Returns the verified agentID on success.
 func (a *Authenticator) Verify(authHeader, challenge string) (string, error) {
 	if !strings.HasPrefix(authHeader, "Bearer ") {
@@ -56,6 +57,12 @@ func (a *Authenticator) Verify(authHeader, challenge string) (string, error) {
 	}
 
 	return agentID, nil
+}
+
+// GenerateChallenge creates a unique challenge string for authentication.
+// The challenge includes a timestamp to prevent replay attacks.
+func GenerateChallenge() string {
+	return fmt.Sprintf("relay-auth-%d", time.Now().UnixNano())
 }
 
 func (a *Authenticator) fetchPublicKey(agentID string) (ed25519.PublicKey, error) {
