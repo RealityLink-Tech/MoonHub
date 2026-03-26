@@ -90,6 +90,7 @@ func TestMoonHubChannel_WebSocketUpgrade(t *testing.T) {
 	if err != nil {
 		t.Fatalf("dial failed: %v (resp: %d)", err, resp.StatusCode)
 	}
+	resp.Body.Close()
 	defer conn.Close()
 }
 
@@ -115,8 +116,10 @@ func TestMoonHubChannel_Unauthorized(t *testing.T) {
 	conn, resp, err := websocket.DefaultDialer.Dial(wsURL+"/ws", nil)
 	if err == nil {
 		conn.Close()
+		resp.Body.Close()
 		t.Fatal("expected error for unauthorized connection")
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusUnauthorized {
 		t.Errorf("expected 401, got %d", resp.StatusCode)
 	}
@@ -153,10 +156,11 @@ func TestMoonHubChannel_ReceiveFriendRequest(t *testing.T) {
 	header := http.Header{}
 	header.Set("Authorization", "Bearer test-token")
 
-	conn, _, err := websocket.DefaultDialer.Dial(wsURL+"/ws", header)
+	conn, resp, err := websocket.DefaultDialer.Dial(wsURL+"/ws", header)
 	if err != nil {
 		t.Fatal(err)
 	}
+	resp.Body.Close()
 	defer conn.Close()
 
 	env := mhp.NewEnvelope("mh_remote0000000000", ch.AgentID(), mhp.MsgFriendRequest, &mhp.FriendRequestPayload{
@@ -202,22 +206,24 @@ func TestMoonHubChannel_ConnectionLimit(t *testing.T) {
 	header := http.Header{}
 	header.Set("Authorization", "Bearer test-token")
 
-	conn1, _, err := websocket.DefaultDialer.Dial(wsURL+"/ws", header)
+	conn1, resp1, err := websocket.DefaultDialer.Dial(wsURL+"/ws", header)
 	if err != nil {
 		t.Fatalf("first connection failed: %v", err)
 	}
+	resp1.Body.Close()
 	defer conn1.Close()
 
 	// Send handshake envelope to complete connection setup and increment connCount
 	sendHandshake(t, conn1, "mh_remote0000000000", ch.AgentID(), priv)
 	time.Sleep(50 * time.Millisecond)
 
-	_, resp, err := websocket.DefaultDialer.Dial(wsURL+"/ws", header)
+	_, resp2, err := websocket.DefaultDialer.Dial(wsURL+"/ws", header)
 	if err == nil {
 		t.Fatal("expected second connection to fail")
 	}
-	if resp.StatusCode != http.StatusServiceUnavailable {
-		t.Errorf("expected 503 for connection limit, got %d", resp.StatusCode)
+	defer resp2.Body.Close()
+	if resp2.StatusCode != http.StatusServiceUnavailable {
+		t.Errorf("expected 503 for connection limit, got %d", resp2.StatusCode)
 	}
 }
 
@@ -242,10 +248,11 @@ func TestMoonHubChannel_SendToAgent(t *testing.T) {
 	header := http.Header{}
 	header.Set("Authorization", "Bearer test-token")
 
-	conn, _, err := websocket.DefaultDialer.Dial(wsURL+"/ws", header)
+	conn, resp3, err := websocket.DefaultDialer.Dial(wsURL+"/ws", header)
 	if err != nil {
 		t.Fatal(err)
 	}
+	resp3.Body.Close()
 	defer conn.Close()
 
 	// Send handshake envelope to complete connection setup

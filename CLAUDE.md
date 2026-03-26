@@ -110,6 +110,12 @@ make docker-test
 - **routing/** - Message routing between channels and agents
 - **mcp/** - Model Context Protocol integration
 - **provisioning/** - Optional device WiFi provisioning, hotspot, recovery, auth code (used by web launcher when enabled)
+- **transport/** - Agent-to-agent WebSocket paths: `Manager`, `Resolver` (LAN-first then cloud directory), `CloudClient` for directory HTTP; see [pkg/transport/docs/README.md](pkg/transport/docs/README.md)
+
+### Optional cloud services (`cloud/`, `cmd/`)
+
+- **cloud/directory/** - HTTP agent directory (signed register/heartbeat, PostgreSQL, Redis online cache); binary: `cmd/directory-service` — [cloud/directory/docs/README.md](cloud/directory/docs/README.md)
+- **cloud/relay/** - WebSocket relay with directory-backed Bearer+challenge auth; binary: `cmd/relay` — [cloud/relay/docs/README.md](cloud/relay/docs/README.md)
 
 ### CLI Commands (cmd/moonhub/internal/)
 

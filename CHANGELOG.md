@@ -4,6 +4,47 @@ All notable changes to MoonHub will be documented in this file.
 
 ---
 
+## 2026-03-27 — Cloud directory, relay, and transport cloud path
+
+### Summary
+
+Documented and indexed optional **cloud directory** (HTTP + PostgreSQL + Redis), **WebSocket relay**, and device-side **`pkg/transport`** integration (`CloudClient`, `Resolver` LAN-first / cloud fallback) for agent-to-agent connectivity beyond LAN.
+
+### New Features (reference)
+
+**Cloud directory** (`cloud/directory/`, `cmd/directory-service/`)
+- Signed agent registration, heartbeat, lookup, pubkey, and unregister HTTP API
+- PostgreSQL persistence and Redis-backed online endpoint / relay URL exposure
+
+**Cloud relay** (`cloud/relay/`, `cmd/relay/`)
+- Directory-backed WebSocket authentication (Bearer `agentID` + Ed25519 signature over server challenge)
+- In-process bridge: `CONNECT`, `PING`/`PONG`, bidirectional forwarding between paired agents
+
+**Transport** (`pkg/transport/`)
+- `CloudClient` for directory HTTP calls
+- `Resolver` prefers LAN map entries, then cloud lookup when the peer is online
+
+### Files Changed
+
+- `cloud/directory/docs/` — Package README and CONFIG for operators
+- `cloud/relay/docs/` — Relay protocol and CONFIG
+- `pkg/transport/docs/README.md` — Transport and cloud integration entry point
+- `docs/implementation/cloud-directory-relay-status.md` — Implementation status (Chinese)
+- `docs/README.md` — Reading order, subsystem table, package overview, `cmd/` cloud binaries
+- `README.md` / `README_CN.md` — Feature bullets aligned with cloud path
+- `CLAUDE.md` — Architecture pointers for `transport/`, `cloud/`, and cloud commands
+
+### Documentation
+
+- [`cloud/directory/docs/README.md`](cloud/directory/docs/README.md)
+- [`cloud/directory/docs/CONFIG.md`](cloud/directory/docs/CONFIG.md)
+- [`cloud/relay/docs/README.md`](cloud/relay/docs/README.md)
+- [`cloud/relay/docs/CONFIG.md`](cloud/relay/docs/CONFIG.md)
+- [`pkg/transport/docs/README.md`](pkg/transport/docs/README.md)
+- [`docs/implementation/cloud-directory-relay-status.md`](docs/implementation/cloud-directory-relay-status.md)
+
+---
+
 ## 2026-03-26 — Friends System & Identity Management
 
 ### Summary

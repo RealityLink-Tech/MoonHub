@@ -152,7 +152,7 @@ func (b *Bridge) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	agentID := r.Header.Get("X-Agent-ID")
+	agentID := r.Header.Get("X-Agent-Id")
 	if agentID == "" {
 		conn.Close()
 		return

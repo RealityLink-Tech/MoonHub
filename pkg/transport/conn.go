@@ -49,11 +49,12 @@ func (c *AgentConn) State() ConnState { return ConnState(c.state.Load()) }
 func (c *AgentConn) Connect() error {
 	c.state.Store(int32(ConnConnecting))
 
-	conn, _, err := websocket.DefaultDialer.Dial(c.wsURL, nil)
+	conn, resp, err := websocket.DefaultDialer.Dial(c.wsURL, nil)
 	if err != nil {
 		c.state.Store(int32(ConnDisconnected))
 		return fmt.Errorf("dial %s: %w", c.wsURL, err)
 	}
+	resp.Body.Close()
 
 	c.conn = conn
 	writer, err := mhp.NewEnvelopeWriter(conn)

@@ -3,7 +3,7 @@
 > [!NOTE]
 > **Acknowledgments**
 >
-> This project was inspired by the feature integration of [TinyClaw](https://github.com/wgtechlabs/tinyclaw) and the lightweight design of [PicoClaw](https://github.com/sipeed/picoclaw), and continues to develop in its own unique direction.
+> This project was inspired by the feature integration of [TinyClaw](https://github.com/warengonzaga/tinyclaw) and the lightweight design of [PicoClaw](https://github.com/sipeed/picoclaw), and continues to develop in its own unique direction.
 
 **Documentation Index** (plugins, learning, compactor, SHIELD, memory, delegation, etc.): [`docs/README.md`](docs/README.md).
 
@@ -80,6 +80,7 @@ Your imagination is MoonHub's only boundary.
 - **Inter-Agent Comms (Intercom)** — In-process pub/sub for delegation-time signals: subscribe per topic (`On`), catch-all via `OnAny`, bounded per-topic retention with `Recent` / `RecentAll`; see [`pkg/delegation/intercom.go`](pkg/delegation/intercom.go) and the Intercom section in [`docs/implementation/delegation-status.md`](docs/implementation/delegation-status.md).
 - **Smart Router V2** — 4-tier model routing system (simple/moderate/complex/reasoning) with rule-based scoring, feature extraction, and privacy-safe metrics. Routes simple queries to cheap models and complex ones to powerful models; see [`pkg/routing/docs/README.md`](pkg/routing/docs/README.md) and [`docs/implementation/routing-status.md`](docs/implementation/routing-status.md).
 - **Device Provisioning** — Zero-config WiFi setup (hotspot, scan/connect, diagnostics, automatic and manual recovery, factory reset, auth code, SSE). Opt-in on the web launcher via `MOONHUB_PROVISIONING_ENABLED=1`; includes React provisioning wizard and optional PWA offline cache for that flow. See [`pkg/provisioning/docs/README.md`](pkg/provisioning/docs/README.md), [`pkg/provisioning/docs/CONFIG.md`](pkg/provisioning/docs/CONFIG.md), and [`docs/implementation/provisioning-status.md`](docs/implementation/provisioning-status.md).
+- **Cloud directory & relay** — Optional HTTP directory (PostgreSQL + Redis) for agent registration and online relay endpoints, plus a WebSocket relay with directory-backed Ed25519 auth; device-side [`pkg/transport`](pkg/transport/cloud.go) `CloudClient` and `Resolver` (LAN-first, then cloud). See [`docs/implementation/cloud-directory-relay-status.md`](docs/implementation/cloud-directory-relay-status.md), [`cloud/directory/docs/README.md`](cloud/directory/docs/README.md), [`cloud/relay/docs/README.md`](cloud/relay/docs/README.md), and [`pkg/transport/docs/README.md`](pkg/transport/docs/README.md).
 
 ### Planned
 

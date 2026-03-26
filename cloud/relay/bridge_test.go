@@ -41,10 +41,11 @@ func TestBridge_ConnectAndBridge(t *testing.T) {
 
 	// Connect agent A
 	wsURLA := wsURL + "?agent_id=mh_aaaa1111bbbb2222"
-	dialedConnA, _, err := websocket.DefaultDialer.Dial(wsURLA, nil)
+	dialedConnA, respA, err := websocket.DefaultDialer.Dial(wsURLA, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+	respA.Body.Close()
 	defer dialedConnA.Close()
 
 	// Wait for agent A to be registered
@@ -52,10 +53,11 @@ func TestBridge_ConnectAndBridge(t *testing.T) {
 
 	// Connect agent B
 	wsURLB := wsURL + "?agent_id=mh_cccc3333dddd4444"
-	dialedConnB, _, err := websocket.DefaultDialer.Dial(wsURLB, nil)
+	dialedConnB, respB, err := websocket.DefaultDialer.Dial(wsURLB, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+	respB.Body.Close()
 	defer dialedConnB.Close()
 
 	// Wait for agent B to be registered
@@ -111,10 +113,11 @@ func TestBridge_TargetOffline(t *testing.T) {
 
 	wsURL := "ws" + strings.TrimPrefix(server.URL, "http")
 	wsURLA := wsURL + "?agent_id=mh_aaaa1111bbbb2222"
-	connA, _, err := websocket.DefaultDialer.Dial(wsURLA, nil)
+	connA, respA2, err := websocket.DefaultDialer.Dial(wsURLA, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+	respA2.Body.Close()
 	defer connA.Close()
 
 	// Wait for agent A to be registered

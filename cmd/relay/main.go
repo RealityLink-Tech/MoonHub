@@ -31,7 +31,7 @@ func main() {
 			return
 		}
 
-		r.Header.Set("X-Agent-ID", agentID)
+		r.Header.Set("X-Agent-Id", agentID)
 		r.Header.Set("X-Challenge", challenge)
 		bridge.ServeHTTP(w, r)
 	})

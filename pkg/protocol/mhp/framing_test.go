@@ -60,10 +60,11 @@ func TestWriteEnvelope_SendsValidJSON(t *testing.T) {
 	defer server.Close()
 
 	wsURL := "ws" + strings.TrimPrefix(server.URL, "http")
-	conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
+	conn, resp, err := websocket.DefaultDialer.Dial(wsURL, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+	resp.Body.Close()
 	defer conn.Close()
 
 	env := NewEnvelope("mh_abcdef1234567890", "mh_1111111111111111", MsgFriendRequest, &FriendRequestPayload{
@@ -111,10 +112,11 @@ func TestEnvelopeReader_ReadValidEnvelope(t *testing.T) {
 	defer server.Close()
 
 	wsURL := "ws" + strings.TrimPrefix(server.URL, "http")
-	conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
+	conn, resp2, err := websocket.DefaultDialer.Dial(wsURL, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+	resp2.Body.Close()
 	defer conn.Close()
 
 	reader := NewEnvelopeReader(conn)
@@ -145,10 +147,11 @@ func TestEnvelopeReader_InvalidJSON(t *testing.T) {
 	defer server.Close()
 
 	wsURL := "ws" + strings.TrimPrefix(server.URL, "http")
-	conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
+	conn, resp3, err := websocket.DefaultDialer.Dial(wsURL, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+	resp3.Body.Close()
 	defer conn.Close()
 
 	reader := NewEnvelopeReader(conn)
@@ -170,10 +173,11 @@ func TestEnvelopeReader_ConnectionClosed(t *testing.T) {
 	defer server.Close()
 
 	wsURL := "ws" + strings.TrimPrefix(server.URL, "http")
-	conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
+	conn, resp4, err := websocket.DefaultDialer.Dial(wsURL, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+	resp4.Body.Close()
 	defer conn.Close()
 
 	reader := NewEnvelopeReader(conn)
@@ -207,10 +211,11 @@ func TestWriteEnvelope_WriteLock(t *testing.T) {
 	defer server.Close()
 
 	wsURL := "ws" + strings.TrimPrefix(server.URL, "http")
-	conn, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
+	conn, resp5, err := websocket.DefaultDialer.Dial(wsURL, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
+	resp5.Body.Close()
 	defer conn.Close()
 
 	writer, err := NewEnvelopeWriter(conn)

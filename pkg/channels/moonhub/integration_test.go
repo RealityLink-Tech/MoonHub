@@ -65,10 +65,11 @@ func TestIntegration_FriendRequestOverWebSocket(t *testing.T) {
 	header := http.Header{}
 	header.Set("Authorization", "Bearer test-token")
 
-	conn, _, err := websocket.DefaultDialer.Dial(wsURL+"/ws", header)
+	conn, resp, err := websocket.DefaultDialer.Dial(wsURL+"/ws", header)
 	if err != nil {
 		t.Fatal(err)
 	}
+	resp.Body.Close()
 	defer conn.Close()
 
 	env := mhp.NewEnvelope(aliceID, bobCh.AgentID(), mhp.MsgFriendRequest, &mhp.FriendRequestPayload{
@@ -127,8 +128,10 @@ func TestIntegration_UnauthorizedConnection(t *testing.T) {
 	conn, resp, err := websocket.DefaultDialer.Dial(wsURL+"/ws", nil)
 	if err == nil {
 		conn.Close()
+		resp.Body.Close()
 		t.Fatal("expected error with wrong token")
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusUnauthorized {
 		t.Errorf("expected 401, got %d", resp.StatusCode)
 	}

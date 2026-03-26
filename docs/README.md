@@ -11,6 +11,7 @@ This page is the **entry point and reading guide** for the repository documentat
 4. [Tools & Capabilities Configuration](./tools_configuration.md) — Tool-side configuration (`tools.*` in `config.json`)
 5. If you enable **sub-agent delegation** (`delegation.enabled`): [pkg/delegation/docs/README.md](../pkg/delegation/docs/README.md) → [CONFIG.md](../pkg/delegation/docs/CONFIG.md) → [implementation status](./implementation/delegation-status.md)
 6. If you enable **device provisioning** on the web launcher (`MOONHUB_PROVISIONING_ENABLED=1`): [pkg/provisioning/docs/README.md](../pkg/provisioning/docs/README.md) → [CONFIG.md](../pkg/provisioning/docs/CONFIG.md) → [implementation status](./implementation/provisioning-status.md) (detailed reference)
+7. If you deploy **cloud directory + relay** (optional Phase 3 services): [cloud/directory/docs/README.md](../cloud/directory/docs/README.md) → [CONFIG.md](../cloud/directory/docs/CONFIG.md) → [cloud/relay/docs/README.md](../cloud/relay/docs/README.md) → [CONFIG.md](../cloud/relay/docs/CONFIG.md) → [pkg/transport/docs/README.md](../pkg/transport/docs/README.md) → [implementation status](./implementation/cloud-directory-relay-status.md)
 
 ## Documentation Flow by Subsystem
 
@@ -96,6 +97,17 @@ This page is the **entry point and reading guide** for the repository documentat
 | Status | [`docs/implementation/lan-discovery-status.md`](./implementation/lan-discovery-status.md) | Discovery implementation status |
 | Status | [`docs/implementation/lan-pairing-status.md`](./implementation/lan-pairing-status.md) | Pairing implementation status |
 
+### Cloud directory & relay (optional)
+
+| Order | Document | Description |
+| --- | --- | --- |
+| 1 | [`cloud/directory/docs/README.md`](../cloud/directory/docs/README.md) | HTTP API, PostgreSQL store, Redis online cache |
+| 2 | [`cloud/directory/docs/CONFIG.md`](../cloud/directory/docs/CONFIG.md) | `directory-service` flags, `DB_*`, `REDIS_URL` |
+| 3 | [`cloud/relay/docs/README.md`](../cloud/relay/docs/README.md) | WebSocket bridge, Bearer + challenge auth, `CONNECT` handshake |
+| 4 | [`cloud/relay/docs/CONFIG.md`](../cloud/relay/docs/CONFIG.md) | `relay` flags (`-addr`, `-directory-url`) |
+| 5 | [`pkg/transport/docs/README.md`](../pkg/transport/docs/README.md) | `CloudClient`, `Resolver` (LAN first, then cloud), `Manager` |
+| Status | [`docs/implementation/cloud-directory-relay-status.md`](./implementation/cloud-directory-relay-status.md) | Implementation status (Chinese) |
+
 ### Channels
 
 Channel architecture, migration, and how to implement a channel: [`pkg/channels/README.md`](../pkg/channels/README.md). Per-channel behavior also lives with each plugin under [`pkg/plugins/channels/`](../pkg/plugins/channels/) (see [`pkg/plugins/docs/PLUGIN_INDEX.md`](../pkg/plugins/docs/PLUGIN_INDEX.md)).
@@ -122,6 +134,7 @@ Channel architecture, migration, and how to implement a channel: [`pkg/channels/
 | [`provisioning-status.md`](./implementation/provisioning-status.md) | Device provisioning (WiFi, hotspot, SSE, recovery, auth code, web UI) implementation status |
 | [`lan-discovery-status.md`](./implementation/lan-discovery-status.md) | LAN mDNS discovery implementation status |
 | [`lan-pairing-status.md`](./implementation/lan-pairing-status.md) | LAN device pairing implementation status |
+| [`cloud-directory-relay-status.md`](./implementation/cloud-directory-relay-status.md) | Cloud directory, WebSocket relay, and `pkg/transport` cloud path |
 
 ---
 
@@ -176,8 +189,16 @@ Per-channel specific documentation:
 | `voice/` | Voice/audio processing |
 | `devices/` | Hardware device interfaces (I2C, SPI) |
 | `provisioning/` | Device WiFi provisioning, hotspot, recovery, auth code (opt-in via launcher env) |
+| `transport/` | Agent-to-agent connections: `Manager`, `Resolver` (LAN vs cloud), `CloudClient` for directory HTTP; see [pkg/transport/docs/README.md](../pkg/transport/docs/README.md) |
 | `fileutil/` | File operation utilities |
 | `constants/` | Shared constants |
+
+### Optional cloud binaries (`cmd/`)
+
+| Command | Description |
+| --- | --- |
+| `directory-service/` | HTTP agent directory (PostgreSQL + Redis); see [cloud/directory/docs/README.md](../cloud/directory/docs/README.md) |
+| `relay/` | WebSocket relay with directory-backed auth; see [cloud/relay/docs/README.md](../cloud/relay/docs/README.md) |
 
 ### CLI Commands (`cmd/moonhub/internal/`)
 
