@@ -22,6 +22,7 @@ import (
 	_ "github.com/RealityLink-Tech/MoonHub/pkg/plugins/channels/irc"
 	_ "github.com/RealityLink-Tech/MoonHub/pkg/plugins/channels/line"
 	_ "github.com/RealityLink-Tech/MoonHub/pkg/plugins/channels/maixcam"
+	_ "github.com/RealityLink-Tech/MoonHub/pkg/plugins/channels/moonhub"
 	_ "github.com/RealityLink-Tech/MoonHub/pkg/plugins/channels/matrix"
 	_ "github.com/RealityLink-Tech/MoonHub/pkg/plugins/channels/onebot"
 	_ "github.com/RealityLink-Tech/MoonHub/pkg/plugins/channels/pico"
