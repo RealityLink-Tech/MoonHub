@@ -1,0 +1,64 @@
+version: "3.8"
+
+services:
+  directory:
+    build:
+      context: ../
+      dockerfile: cloud/directory/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=moonhub
+      - DB_PASS=moonhub
+      - DB_NAME=moonhub
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  relay:
+    build:
+      context: ../
+      dockerfile: cloud/relay/Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - DIRECTORY_URL=http://directory:8080
+    depends_on:
+      - directory
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: moonhub
+      POSTGRES_USER: moonhub
+      POSTGRES_PASSWORD: moonhub
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U moonhub"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
