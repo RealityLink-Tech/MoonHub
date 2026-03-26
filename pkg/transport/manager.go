@@ -2,16 +2,18 @@ package transport
 
 import (
 	"crypto/ed25519"
+	"fmt"
 	"sync"
 
 	_ "github.com/RealityLink-Tech/MoonHub/pkg/protocol/mhp"
 )
 
 type Manager struct {
-	localID string
-	privKey ed25519.PrivateKey
-	mu      sync.RWMutex
-	conns   map[string]*AgentConn
+	localID  string
+	privKey  ed25519.PrivateKey
+	mu       sync.RWMutex
+	conns    map[string]*AgentConn
+	resolver *Resolver
 }
 
 func NewManager(localID string, privKey ed25519.PrivateKey) *Manager {
@@ -23,6 +25,11 @@ func NewManager(localID string, privKey ed25519.PrivateKey) *Manager {
 }
 
 func (m *Manager) LocalAgentID() string { return m.localID }
+
+// SetResolver sets the connection resolver for LAN/Cloud path selection.
+func (m *Manager) SetResolver(r *Resolver) {
+	m.resolver = r
+}
 
 func (m *Manager) GetOrCreate(remoteAgentID, wsURL string) (*AgentConn, error) {
 	m.mu.RLock()
@@ -37,6 +44,19 @@ func (m *Manager) GetOrCreate(remoteAgentID, wsURL string) (*AgentConn, error) {
 
 	if conn, ok := m.conns[remoteAgentID]; ok {
 		return conn, nil
+	}
+
+	// If no explicit URL, use resolver
+	if wsURL == "" && m.resolver != nil {
+		strategy, err := m.resolver.Resolve(remoteAgentID)
+		if err != nil {
+			return nil, err
+		}
+		wsURL = strategy.URL
+	}
+
+	if wsURL == "" {
+		return nil, fmt.Errorf("no connection URL for agent %s", remoteAgentID)
 	}
 
 	conn := NewAgentConn(m.localID, remoteAgentID, m.privKey, wsURL)

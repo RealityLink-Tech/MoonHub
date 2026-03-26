@@ -81,3 +81,72 @@ func TestManager_Get_Nonexistent(t *testing.T) {
 		t.Error("expected nil for nonexistent connection")
 	}
 }
+
+func TestManager_ResolveAndConnect_LAN(t *testing.T) {
+	_, priv, _ := ed25519.GenerateKey(nil)
+	mgr := NewManager("mh_local0000000000", priv)
+
+	cloud := &mockCloudClient{
+		agents: map[string]*AgentLookupResult{
+			"mh_remote1111111111": {
+				Online:        true,
+				RelayEndpoint: "wss://relay.example.com",
+			},
+		},
+	}
+	resolver := NewResolver(cloud)
+	resolver.SetLANEndpoint("mh_remote1111111111", "ws://192.168.1.50:18801/agent/ws")
+	mgr.SetResolver(resolver)
+
+	conn, err := mgr.GetOrCreate("mh_remote1111111111", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if conn == nil {
+		t.Fatal("expected non-nil connection")
+	}
+	if conn.RemoteAgentID() != "mh_remote1111111111" {
+		t.Errorf("remoteID = %q", conn.RemoteAgentID())
+	}
+}
+
+func TestManager_ResolveAndConnect_Cloud(t *testing.T) {
+	_, priv, _ := ed25519.GenerateKey(nil)
+	mgr := NewManager("mh_local0000000000", priv)
+
+	cloud := &mockCloudClient{
+		agents: map[string]*AgentLookupResult{
+			"mh_remote1111111111": {
+				Online:        true,
+				RelayEndpoint: "wss://relay.example.com",
+			},
+		},
+	}
+	resolver := NewResolver(cloud)
+	mgr.SetResolver(resolver)
+
+	conn, err := mgr.GetOrCreate("mh_remote1111111111", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if conn == nil {
+		t.Fatal("expected non-nil connection")
+	}
+	if conn.RemoteAgentID() != "mh_remote1111111111" {
+		t.Errorf("remoteID = %q", conn.RemoteAgentID())
+	}
+}
+
+func TestManager_Resolve_Offline(t *testing.T) {
+	_, priv, _ := ed25519.GenerateKey(nil)
+	mgr := NewManager("mh_local0000000000", priv)
+
+	cloud := &mockCloudClient{agents: make(map[string]*AgentLookupResult)}
+	resolver := NewResolver(cloud)
+	mgr.SetResolver(resolver)
+
+	_, err := mgr.GetOrCreate("mh_offline000000000", "")
+	if err == nil {
+		t.Error("expected error for offline agent")
+	}
+}
