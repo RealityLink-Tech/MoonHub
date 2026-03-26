@@ -50,6 +50,7 @@ const (
 	ScopeNetworkEgress ShieldScope = "network.egress"
 	ScopeSecretsRead   ShieldScope = "secrets.read"
 	ScopePrompt        ShieldScope = "prompt"
+	ScopeFile          ShieldScope = "file"
 )
 
 // ThreatEntry represents a parsed threat definition from SHIELD.md.

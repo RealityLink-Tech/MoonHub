@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"sync"
+
+	"github.com/RealityLink-Tech/MoonHub/pkg/zones"
 )
 
 const (
@@ -232,4 +234,27 @@ func (e *ShieldEngine) RemoveThreat(id string) bool {
 		}
 	}
 	return false
+}
+
+// EvaluateZoneAccess checks whether a zone access request should be allowed.
+// This is used by the moonhub channel to enforce data partition rules.
+// It returns a ShieldDecision with ActionBlock if access is denied.
+func EvaluateZoneAccess(zone zones.Zone, rel zones.Relationship, access zones.AccessLevel, resource string) ShieldDecision {
+	allowed := zone.Allow(rel, access)
+	if !allowed {
+		return ShieldDecision{
+			Action:     ActionBlock,
+			Scope:      ScopeFile,
+			MatchedOn:  "zone:" + zone.String(),
+			MatchValue: resource,
+			Reason:     fmt.Sprintf("access denied: %s %s to %s zone resource %q", rel, access, zone, resource),
+		}
+	}
+	return ShieldDecision{
+		Action:     ActionLog,
+		Scope:      ScopeFile,
+		MatchedOn:  "zone:" + zone.String(),
+		MatchValue: resource,
+		Reason:     fmt.Sprintf("access allowed: %s %s to %s zone resource %q", rel, access, zone, resource),
+	}
 }
