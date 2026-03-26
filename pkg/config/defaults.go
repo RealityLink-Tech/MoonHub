@@ -175,6 +175,14 @@ func DefaultConfig() *Config {
 				MaxConnections: 100,
 				AllowFrom:      FlexibleStringSlice{},
 			},
+			MoonHub: MoonHubConfig{
+				Enabled:        false,
+				Port:           18801,
+				PingInterval:   30,
+				ReadTimeout:    60,
+				MaxConnections: 50,
+				AllowFrom:      FlexibleStringSlice{},
+			},
 		},
 		Providers: ProvidersConfig{
 			OpenAI: OpenAIProviderConfig{WebSearch: true},
