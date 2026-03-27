@@ -55,6 +55,8 @@ type AgentLoop struct {
 	mu             sync.RWMutex
 	// pluginToolReg holds tools from plugin manager; used when reloading registry
 	pluginToolReg *tools.ToolRegistry
+	// eventEmitter is the callback for agent activity events (nil-safe).
+	eventEmitter   EventEmitter
 	// Track active requests for safe provider cleanup
 	activeRequests sync.WaitGroup
 }
@@ -578,6 +580,22 @@ func (al *AgentLoop) SetMediaStore(s media.MediaStore) {
 // SetTranscriber injects a voice transcriber for agent-level audio transcription.
 func (al *AgentLoop) SetTranscriber(t voice.Transcriber) {
 	al.transcriber = t
+}
+
+// SetEventEmitter sets the callback for agent activity events.
+// The emitter is nil-safe — if no emitter is set, events are silently discarded.
+func (al *AgentLoop) SetEventEmitter(emitter EventEmitter) {
+	al.mu.Lock()
+	defer al.mu.Unlock()
+	al.eventEmitter = emitter
+}
+
+// emitEvent sends an event through the configured emitter (nil-safe).
+func (al *AgentLoop) emitEvent(evt AgentEvent) {
+	al.mu.RLock()
+	emitter := al.eventEmitter
+	al.mu.RUnlock()
+	emitter.Emit(evt)
 }
 
 var audioAnnotationRe = regexp.MustCompile(`\[(voice|audio)(?::[^\]]*)?\]`)
@@ -1290,6 +1308,12 @@ func (al *AgentLoop) runLLMIteration(
 					"model":     activeModel,
 					"error":     err.Error(),
 				})
+			al.emitEvent(AgentEvent{
+				Kind:    EventError,
+				Content: fmt.Sprintf("LLM call failed: %v", err),
+				Channel: opts.Channel,
+				ChatID:  opts.ChatID,
+			})
 			return "", iteration, fmt.Errorf("LLM call failed after retries: %w", err)
 		}
 
@@ -1299,6 +1323,16 @@ func (al *AgentLoop) runLLMIteration(
 			opts.Channel,
 			al.targetReasoningChannelID(opts.Channel),
 		)
+
+		// Emit thinking event if reasoning content is present
+		if response.ReasoningContent != "" {
+			al.emitEvent(AgentEvent{
+				Kind:    EventThinking,
+				Content: response.ReasoningContent,
+				Channel: opts.Channel,
+				ChatID:  opts.ChatID,
+			})
+		}
 
 		logger.DebugCF("agent", "LLM response",
 			map[string]any{
@@ -1322,6 +1356,12 @@ func (al *AgentLoop) runLLMIteration(
 					"iteration":     iteration,
 					"content_chars": len(finalContent),
 				})
+			al.emitEvent(AgentEvent{
+				Kind:    EventContentChunk,
+				Content: finalContent,
+				Channel: opts.Channel,
+				ChatID:  opts.ChatID,
+			})
 			break
 		}
 
@@ -1387,6 +1427,16 @@ func (al *AgentLoop) runLLMIteration(
 
 		for i, tc := range normalizedToolCalls {
 			agentResults[i].tc = tc
+
+			// Emit tool start event
+			al.emitEvent(AgentEvent{
+				Kind:      EventToolStart,
+				ToolName:  tc.Name,
+				ToolArgs:  tc.Arguments,
+				Channel:   opts.Channel,
+				ChatID:    opts.ChatID,
+				Iteration: iteration,
+			})
 
 			wg.Add(1)
 			go func(idx int, tc providers.ToolCall) {
@@ -1545,6 +1595,20 @@ func (al *AgentLoop) runLLMIteration(
 					toolResult = al.runToolPendingApproval(ctx, agent, opts, tc, toolResult, asyncCallback)
 				}
 				agentResults[idx].result = toolResult
+
+				// Emit tool end event
+				toolErrStr := ""
+				if toolResult != nil && toolResult.Err != nil {
+					toolErrStr = toolResult.Err.Error()
+				}
+				al.emitEvent(AgentEvent{
+					Kind:      EventToolEnd,
+					ToolName:  tc.Name,
+					ToolError: toolErrStr,
+					Channel:   opts.Channel,
+					ChatID:    opts.ChatID,
+					Iteration: iteration,
+				})
 			}(i, tc)
 		}
 		wg.Wait()
@@ -1628,6 +1692,14 @@ func (al *AgentLoop) runLLMIteration(
 			"agent_id": agent.ID, "iteration": iteration,
 		})
 	}
+
+	// Emit done event with final content
+	al.emitEvent(AgentEvent{
+		Kind:    EventDone,
+		Content: finalContent,
+		Channel: opts.Channel,
+		ChatID:  opts.ChatID,
+	})
 
 	return finalContent, iteration, nil
 }
