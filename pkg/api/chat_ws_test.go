@@ -37,7 +37,7 @@ func TestChatWS_UpgradeWithoutToken(t *testing.T) {
 }
 
 func TestChatHub_Broadcast(t *testing.T) {
-	hub := newChatHub(nil)
+	hub := NewChatHub(nil)
 	received := make(chan agent.AgentEvent, 1)
 
 	hub.onEvent = func(clientID string, evt agent.AgentEvent) {
@@ -64,7 +64,7 @@ func TestChatHub_Broadcast(t *testing.T) {
 }
 
 func TestChatHub_BroadcastFiltersByChatID(t *testing.T) {
-	hub := newChatHub(nil)
+	hub := NewChatHub(nil)
 	received := make(chan agent.AgentEvent, 1)
 
 	hub.onEvent = func(clientID string, evt agent.AgentEvent) {

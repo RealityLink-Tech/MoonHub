@@ -41,7 +41,7 @@ type ChatHub struct {
 	onEvent func(clientID string, evt agent.AgentEvent)
 }
 
-func newChatHub(agent *agent.AgentLoop) *ChatHub {
+func NewChatHub(agent *agent.AgentLoop) *ChatHub {
 	return &ChatHub{
 		clients: make(map[string]*wsClient),
 		agent:   agent,

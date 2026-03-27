@@ -305,6 +305,15 @@ func (m *Manager) SetupHTTPServer(addr string, healthServer *health.Server) {
 	}
 }
 
+// RegisterExternalRoutes allows external packages to register routes on the shared HTTP mux.
+// This must be called after SetupHTTPServer.
+func (m *Manager) RegisterExternalRoutes(register func(mux *http.ServeMux)) {
+	if m.mux == nil {
+		return
+	}
+	register(m.mux)
+}
+
 func (m *Manager) StartAll(ctx context.Context) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()

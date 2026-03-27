@@ -12,6 +12,7 @@ import (
 
 	"github.com/RealityLink-Tech/MoonHub/cmd/moonhub/internal"
 	"github.com/RealityLink-Tech/MoonHub/pkg/agent"
+	"github.com/RealityLink-Tech/MoonHub/pkg/api"
 	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
 	"github.com/RealityLink-Tech/MoonHub/pkg/channels"
 	"github.com/RealityLink-Tech/MoonHub/pkg/framework"
@@ -25,7 +26,6 @@ import (
 	_ "github.com/RealityLink-Tech/MoonHub/pkg/plugins/channels/moonhub"
 	_ "github.com/RealityLink-Tech/MoonHub/pkg/plugins/channels/matrix"
 	_ "github.com/RealityLink-Tech/MoonHub/pkg/plugins/channels/onebot"
-	_ "github.com/RealityLink-Tech/MoonHub/pkg/plugins/channels/pico"
 	_ "github.com/RealityLink-Tech/MoonHub/pkg/plugins/channels/qq"
 	_ "github.com/RealityLink-Tech/MoonHub/pkg/plugins/channels/slack"
 	_ "github.com/RealityLink-Tech/MoonHub/pkg/plugins/channels/telegram"
@@ -265,11 +265,15 @@ func setupAndStartServices(
 	agentLoop.SetChannelManager(services.ChannelManager)
 	agentLoop.SetMediaStore(services.MediaStore)
 
+	// Create console ChatHub for PWA console (before wiring EventEmitter)
+	chatHub := api.NewChatHub(agentLoop)
+
 	// Inject agent event emitter to forward events through channel manager
 	agentLoop.SetEventEmitter(func(evt bus.AgentEvent) {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		services.ChannelManager.HandleAgentEvent(ctx, evt)
+		chatHub.Broadcast(evt)
 	})
 
 	// Wire up voice transcription if a supported provider is configured.
@@ -288,7 +292,14 @@ func setupAndStartServices(
 	// Setup shared HTTP server with health endpoints and webhook handlers
 	addr := fmt.Sprintf("%s:%d", cfg.Gateway.Host, cfg.Gateway.Port)
 	services.HealthServer = health.NewServer(cfg.Gateway.Host, cfg.Gateway.Port)
+
+	// Create console API handler for PWA console
+	apiHandler := api.NewHandler(internal.GetConfigPath(), agentLoop, chatHub)
+
 	services.ChannelManager.SetupHTTPServer(addr, services.HealthServer)
+
+	// Register console API routes on the shared mux
+	services.ChannelManager.RegisterExternalRoutes(apiHandler.RegisterOnMux)
 
 	if err := services.ChannelManager.StartAll(context.Background()); err != nil {
 		return nil, fmt.Errorf("error starting channels: %w", err)
@@ -517,11 +528,15 @@ func restartServices(
 	}
 	al.SetChannelManager(services.ChannelManager)
 
+	// Re-create console ChatHub for PWA console
+	chatHub := api.NewChatHub(al)
+
 	// Re-wire agent event emitter with new channel manager
 	al.SetEventEmitter(func(evt bus.AgentEvent) {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		services.ChannelManager.HandleAgentEvent(ctx, evt)
+		chatHub.Broadcast(evt)
 	})
 
 	enabledChannels := services.ChannelManager.GetEnabledChannels()
@@ -534,7 +549,14 @@ func restartServices(
 	// Setup HTTP server with new config
 	addr := fmt.Sprintf("%s:%d", cfg.Gateway.Host, cfg.Gateway.Port)
 	services.HealthServer = health.NewServer(cfg.Gateway.Host, cfg.Gateway.Port)
+
+	// Re-create console API handler and ChatHub for PWA console
+	apiHandler := api.NewHandler(internal.GetConfigPath(), al, chatHub)
+
 	services.ChannelManager.SetupHTTPServer(addr, services.HealthServer)
+
+	// Register console API routes on the shared mux
+	services.ChannelManager.RegisterExternalRoutes(apiHandler.RegisterOnMux)
 
 	if err := services.ChannelManager.StartAll(ctx); err != nil {
 		return fmt.Errorf("error restarting channels: %w", err)
