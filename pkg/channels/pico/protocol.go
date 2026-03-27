@@ -17,6 +17,14 @@ const (
 	TypeTypingStop    = "typing.stop"
 	TypeError         = "error"
 	TypePong          = "pong"
+
+	// Agent activity event types (server → client).
+	TypeAgentToolStart = "agent.tool_start"
+	TypeAgentToolEnd   = "agent.tool_end"
+	TypeAgentContent   = "agent.content"
+	TypeAgentThinking  = "agent.thinking"
+	TypeAgentDone      = "agent.done"
+	TypeAgentError     = "agent.error"
 )
 
 // PicoMessage is the wire format for all Pico Protocol messages.

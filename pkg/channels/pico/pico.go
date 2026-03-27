@@ -456,6 +456,70 @@ func (c *PicoChannel) handleMessageSend(pc *picoConn, msg PicoMessage) {
 	c.HandleMessage(c.ctx, peer, msg.ID, senderID, chatID, content, nil, metadata, sender)
 }
 
+// EmitAgentEvent implements channels.AgentEventEmitter.
+func (c *PicoChannel) EmitAgentEvent(ctx context.Context, chatID string, event bus.AgentEvent) error {
+	if !c.IsRunning() {
+		return channels.ErrNotRunning
+	}
+
+	var msgType string
+	var payload map[string]any
+
+	switch event.Kind {
+	case bus.EventToolStart:
+		argsPreview := ""
+		if event.ToolArgs != nil {
+			raw, err := json.Marshal(event.ToolArgs)
+			if err == nil {
+				argsPreview = truncate(string(raw), 100)
+			}
+		}
+		msgType = TypeAgentToolStart
+		payload = map[string]any{
+			"tool_name":         event.ToolName,
+			"tool_args_preview": argsPreview,
+		}
+
+	case bus.EventToolEnd:
+		msgType = TypeAgentToolEnd
+		payload = map[string]any{
+			"tool_name": event.ToolName,
+			"success":   event.ToolError == "",
+			"error":     event.ToolError,
+		}
+
+	case bus.EventContentChunk:
+		msgType = TypeAgentContent
+		payload = map[string]any{
+			"content": event.Content,
+			"done":    false,
+		}
+
+	case bus.EventThinking:
+		msgType = TypeAgentThinking
+		payload = map[string]any{
+			"content": event.Content,
+		}
+
+	case bus.EventDone:
+		msgType = TypeAgentDone
+		payload = map[string]any{
+			"content": event.Content,
+		}
+
+	case bus.EventError:
+		msgType = TypeAgentError
+		payload = map[string]any{
+			"message": event.Content,
+		}
+
+	default:
+		return fmt.Errorf("unknown agent event kind: %s", event.Kind)
+	}
+
+	return c.broadcastToSession(chatID, newMessage(msgType, payload))
+}
+
 // truncate truncates a string to maxLen runes.
 func truncate(s string, maxLen int) string {
 	runes := []rune(s)
