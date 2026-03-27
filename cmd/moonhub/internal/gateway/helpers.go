@@ -265,6 +265,13 @@ func setupAndStartServices(
 	agentLoop.SetChannelManager(services.ChannelManager)
 	agentLoop.SetMediaStore(services.MediaStore)
 
+	// Inject agent event emitter to forward events through channel manager
+	agentLoop.SetEventEmitter(func(evt bus.AgentEvent) {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		services.ChannelManager.HandleAgentEvent(ctx, evt)
+	})
+
 	// Wire up voice transcription if a supported provider is configured.
 	if transcriber := voice.DetectTranscriber(cfg); transcriber != nil {
 		agentLoop.SetTranscriber(transcriber)
@@ -509,6 +516,13 @@ func restartServices(
 		return fmt.Errorf("error recreating channel manager: %w", err)
 	}
 	al.SetChannelManager(services.ChannelManager)
+
+	// Re-wire agent event emitter with new channel manager
+	al.SetEventEmitter(func(evt bus.AgentEvent) {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		services.ChannelManager.HandleAgentEvent(ctx, evt)
+	})
 
 	enabledChannels := services.ChannelManager.GetEnabledChannels()
 	if len(enabledChannels) > 0 {
