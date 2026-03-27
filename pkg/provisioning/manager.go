@@ -17,6 +17,7 @@ type ConfigStore interface {
 	Get(key string) interface{}
 	Set(key string, value interface{})
 	Delete(key string)
+	Save() error
 }
 
 // DeviceManagerOptions contains configuration options for the device manager.
@@ -864,7 +865,8 @@ func (s *JSONConfigStore) load() error {
 	return json.Unmarshal(data, &s.data)
 }
 
-func (s *JSONConfigStore) save() error {
+// Save persists the store to disk.
+func (s *JSONConfigStore) Save() error {
 	data, err := json.MarshalIndent(s.data, "", "  ")
 	if err != nil {
 		return err
@@ -884,7 +886,7 @@ func (s *JSONConfigStore) Set(key string, value interface{}) {
 	s.mu.Lock()
 	s.data[key] = value
 	s.mu.Unlock()
-	_ = s.save()
+	_ = s.Save()
 }
 
 // Delete removes a key from the store
@@ -892,7 +894,7 @@ func (s *JSONConfigStore) Delete(key string) {
 	s.mu.Lock()
 	delete(s.data, key)
 	s.mu.Unlock()
-	_ = s.save()
+	_ = s.Save()
 }
 
 // Auth code management

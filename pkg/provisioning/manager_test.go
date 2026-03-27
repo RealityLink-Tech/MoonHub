@@ -29,6 +29,10 @@ func (m *MockConfigStore) Delete(key string) {
 	delete(m.data, key)
 }
 
+func (m *MockConfigStore) Save() error {
+	return nil
+}
+
 // MockCommandRunner returns mock results for commands
 func MockCommandRunner(ctx context.Context, args ...string) CommandResult {
 	if len(args) == 0 {
