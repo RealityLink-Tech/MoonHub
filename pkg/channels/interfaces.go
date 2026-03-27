@@ -3,6 +3,7 @@ package channels
 import (
 	"context"
 
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
 	"github.com/RealityLink-Tech/MoonHub/pkg/commands"
 )
 
@@ -49,4 +50,11 @@ type PlaceholderRecorder interface {
 // Channels that do not support platform-level command menus can ignore it.
 type CommandRegistrarCapable interface {
 	RegisterCommands(ctx context.Context, defs []commands.Definition) error
+}
+
+// AgentEventEmitter is implemented by channels that can forward real-time
+// agent activity events (tool calls, thinking, streaming content) to their
+// connected clients.
+type AgentEventEmitter interface {
+	EmitAgentEvent(ctx context.Context, chatID string, event bus.AgentEvent) error
 }

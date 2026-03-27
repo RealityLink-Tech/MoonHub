@@ -826,6 +826,34 @@ func (m *Manager) SendMessage(ctx context.Context, msg bus.OutboundMessage) erro
 	return nil
 }
 
+// HandleAgentEvent routes an agent event to the appropriate channel.
+// If the channel implements AgentEventEmitter, the event is forwarded.
+// Events for unknown or internal channels are silently dropped.
+func (m *Manager) HandleAgentEvent(ctx context.Context, event bus.AgentEvent) {
+	if event.Channel == "" {
+		return
+	}
+
+	m.mu.RLock()
+	ch, exists := m.channels[event.Channel]
+	m.mu.RUnlock()
+
+	if !exists {
+		return
+	}
+
+	if emitter, ok := ch.(AgentEventEmitter); ok {
+		if err := emitter.EmitAgentEvent(ctx, event.ChatID, event); err != nil {
+			logger.DebugCF("channels", "Failed to emit agent event", map[string]any{
+				"channel": event.Channel,
+				"chat_id": event.ChatID,
+				"kind":    event.Kind,
+				"error":   err.Error(),
+			})
+		}
+	}
+}
+
 func (m *Manager) SendToChannel(ctx context.Context, channelName, chatID, content string) error {
 	m.mu.RLock()
 	_, exists := m.channels[channelName]
