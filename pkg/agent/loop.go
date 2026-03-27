@@ -1309,10 +1309,11 @@ func (al *AgentLoop) runLLMIteration(
 					"error":     err.Error(),
 				})
 			al.emitEvent(AgentEvent{
-				Kind:    EventError,
-				Content: fmt.Sprintf("LLM call failed: %v", err),
-				Channel: opts.Channel,
-				ChatID:  opts.ChatID,
+				Kind:       EventError,
+				Content:    fmt.Sprintf("LLM call failed: %v", err),
+				SessionKey: opts.SessionKey,
+				Channel:    opts.Channel,
+				ChatID:     opts.ChatID,
 			})
 			return "", iteration, fmt.Errorf("LLM call failed after retries: %w", err)
 		}
@@ -1327,10 +1328,11 @@ func (al *AgentLoop) runLLMIteration(
 		// Emit thinking event if reasoning content is present
 		if response.ReasoningContent != "" {
 			al.emitEvent(AgentEvent{
-				Kind:    EventThinking,
-				Content: response.ReasoningContent,
-				Channel: opts.Channel,
-				ChatID:  opts.ChatID,
+				Kind:       EventThinking,
+				Content:    response.ReasoningContent,
+				SessionKey: opts.SessionKey,
+				Channel:    opts.Channel,
+				ChatID:     opts.ChatID,
 			})
 		}
 
@@ -1357,10 +1359,11 @@ func (al *AgentLoop) runLLMIteration(
 					"content_chars": len(finalContent),
 				})
 			al.emitEvent(AgentEvent{
-				Kind:    EventContentChunk,
-				Content: finalContent,
-				Channel: opts.Channel,
-				ChatID:  opts.ChatID,
+				Kind:       EventContentChunk,
+				Content:    finalContent,
+				SessionKey: opts.SessionKey,
+				Channel:    opts.Channel,
+				ChatID:     opts.ChatID,
 			})
 			break
 		}
@@ -1430,12 +1433,13 @@ func (al *AgentLoop) runLLMIteration(
 
 			// Emit tool start event
 			al.emitEvent(AgentEvent{
-				Kind:      EventToolStart,
-				ToolName:  tc.Name,
-				ToolArgs:  tc.Arguments,
-				Channel:   opts.Channel,
-				ChatID:    opts.ChatID,
-				Iteration: iteration,
+				Kind:       EventToolStart,
+				ToolName:   tc.Name,
+				ToolArgs:   tc.Arguments,
+				SessionKey: opts.SessionKey,
+				Channel:    opts.Channel,
+				ChatID:     opts.ChatID,
+				Iteration:  iteration,
 			})
 
 			wg.Add(1)
@@ -1518,8 +1522,16 @@ func (al *AgentLoop) runLLMIteration(
 								"match_value": decision.MatchValue,
 							})
 						agentResults[idx].result = toolResult
+						al.emitEvent(AgentEvent{
+							Kind:       EventToolEnd,
+							ToolName:   tc.Name,
+							ToolError:  fmt.Sprintf("blocked: %s", decision.Reason),
+							SessionKey: opts.SessionKey,
+							Channel:    opts.Channel,
+							ChatID:     opts.ChatID,
+							Iteration:  iteration,
+						})
 						return
-					case shield.ActionRequireApproval:
 						// Create approval request
 						req := agent.ApprovalManager.CreateRequest(shield.ShieldEvent{
 							Scope:    shield.ScopeToolCall,
@@ -1559,6 +1571,15 @@ func (al *AgentLoop) runLLMIteration(
 									"error":     err,
 								})
 							agentResults[idx].result = toolResult
+							al.emitEvent(AgentEvent{
+								Kind:       EventToolEnd,
+								ToolName:   tc.Name,
+								ToolError:  fmt.Sprintf("rejected: %s", decision.Reason),
+								SessionKey: opts.SessionKey,
+								Channel:    opts.Channel,
+								ChatID:     opts.ChatID,
+								Iteration:  iteration,
+							})
 							return
 						}
 
@@ -1602,12 +1623,13 @@ func (al *AgentLoop) runLLMIteration(
 					toolErrStr = toolResult.Err.Error()
 				}
 				al.emitEvent(AgentEvent{
-					Kind:      EventToolEnd,
-					ToolName:  tc.Name,
-					ToolError: toolErrStr,
-					Channel:   opts.Channel,
-					ChatID:    opts.ChatID,
-					Iteration: iteration,
+					Kind:       EventToolEnd,
+					ToolName:   tc.Name,
+					ToolError:  toolErrStr,
+					SessionKey: opts.SessionKey,
+					Channel:    opts.Channel,
+					ChatID:     opts.ChatID,
+					Iteration:  iteration,
 				})
 			}(i, tc)
 		}
@@ -1695,10 +1717,11 @@ func (al *AgentLoop) runLLMIteration(
 
 	// Emit done event with final content
 	al.emitEvent(AgentEvent{
-		Kind:    EventDone,
-		Content: finalContent,
-		Channel: opts.Channel,
-		ChatID:  opts.ChatID,
+		Kind:       EventDone,
+		Content:    finalContent,
+		SessionKey: opts.SessionKey,
+		Channel:    opts.Channel,
+		ChatID:     opts.ChatID,
 	})
 
 	return finalContent, iteration, nil
