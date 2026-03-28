@@ -2,7 +2,10 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 	"strings"
 
 	"github.com/RealityLink-Tech/MoonHub/pkg/config"
@@ -122,4 +125,78 @@ func maskAPIKey(key string) string {
 	}
 	// Show first 3 chars and last 4 chars
 	return key[:3] + "****" + key[len(key)-4:]
+}
+
+// handleUpdateModel updates a single model entry in model_list by index.
+// Only the fields present in the request body are updated.
+// If api_key is empty string, the existing key is preserved (allows updating other fields without re-entering key).
+//
+//	PATCH /api/models/{index}
+func (h *Handler) handleUpdateModel(w http.ResponseWriter, r *http.Request) {
+	indexStr := r.PathValue("index")
+	index, err := strconv.Atoi(indexStr)
+	if err != nil || index < 0 {
+		writeJSONError(w, http.StatusBadRequest, "Invalid model index")
+		return
+	}
+
+	var patch struct {
+		APIKey        *string `json:"api_key"`
+		APIBase       *string `json:"api_base"`
+		Proxy         *string `json:"proxy"`
+		RPM           *int    `json:"rpm"`
+		ThinkingLevel *string `json:"thinking_level"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&patch); err != nil {
+		writeJSONError(w, http.StatusBadRequest, "Invalid JSON")
+		return
+	}
+
+	cfg, err := config.LoadConfig(h.configPath)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			writeJSONError(w, http.StatusInternalServerError, "Failed to load config")
+			return
+		}
+		cfg = config.DefaultConfig()
+	}
+
+	if index >= len(cfg.ModelList) {
+		writeJSONError(w, http.StatusNotFound, fmt.Sprintf("Model index %d out of range", index))
+		return
+	}
+
+	m := &cfg.ModelList[index]
+
+	if patch.APIKey != nil {
+		if *patch.APIKey != "" {
+			m.APIKey = *patch.APIKey
+		}
+		// Empty string → preserve existing key (no-op)
+	}
+	if patch.APIBase != nil {
+		m.APIBase = *patch.APIBase
+	}
+	if patch.Proxy != nil {
+		m.Proxy = *patch.Proxy
+	}
+	if patch.RPM != nil {
+		m.RPM = *patch.RPM
+	}
+	if patch.ThinkingLevel != nil {
+		m.ThinkingLevel = *patch.ThinkingLevel
+	}
+
+	if err := cfg.ValidateModelList(); err != nil {
+		writeJSONError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := config.SaveConfig(h.configPath, cfg); err != nil {
+		writeJSONError(w, http.StatusInternalServerError, "Failed to save config")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 }
