@@ -15,7 +15,7 @@ import (
 )
 
 func TestHandleListSkills(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 
 	cfg, err := config.LoadConfig(configPath)
@@ -78,7 +78,7 @@ func TestHandleListSkills(t *testing.T) {
 		t.Fatalf("WriteFile(builtin skill) error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -114,7 +114,7 @@ func TestHandleListSkills(t *testing.T) {
 }
 
 func TestHandleGetSkill(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 
 	cfg, err := config.LoadConfig(configPath)
@@ -143,7 +143,7 @@ func TestHandleGetSkill(t *testing.T) {
 		t.Fatalf("WriteFile() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -168,7 +168,7 @@ func TestHandleGetSkill(t *testing.T) {
 }
 
 func TestHandleGetSkillUsesResolvedPath(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 
 	cfg, err := config.LoadConfig(configPath)
@@ -195,7 +195,7 @@ func TestHandleGetSkillUsesResolvedPath(t *testing.T) {
 		t.Fatalf("WriteFile() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -220,7 +220,7 @@ func TestHandleGetSkillUsesResolvedPath(t *testing.T) {
 }
 
 func TestHandleImportSkill(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 
 	cfg, err := config.LoadConfig(configPath)
@@ -249,7 +249,7 @@ func TestHandleImportSkill(t *testing.T) {
 		t.Fatalf("Close() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -294,7 +294,7 @@ func TestHandleImportSkill(t *testing.T) {
 }
 
 func TestHandleDeleteSkill(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 
 	cfg, err := config.LoadConfig(configPath)
@@ -319,7 +319,7 @@ func TestHandleDeleteSkill(t *testing.T) {
 		t.Fatalf("WriteFile() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 

@@ -173,11 +173,6 @@ func validateConfig(cfg *config.Config) []string {
 		errs = append(errs, fmt.Sprintf("gateway.port %d is out of valid range (1-65535)", cfg.Gateway.Port))
 	}
 
-	// Pico channel: token required when enabled
-	if cfg.Channels.Pico.Enabled && cfg.Channels.Pico.Token == "" {
-		errs = append(errs, "channels.pico.token is required when pico channel is enabled")
-	}
-
 	// Telegram: token required when enabled
 	if cfg.Channels.Telegram.Enabled && cfg.Channels.Telegram.Token == "" {
 		errs = append(errs, "channels.telegram.token is required when telegram channel is enabled")

@@ -26,7 +26,7 @@ func resetModelProbeHooks(t *testing.T) {
 }
 
 func TestHandleListModels_ConfiguredStatusUsesRuntimeProbesForLocalModels(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 	resetOAuthHooks(t)
 	resetModelProbeHooks(t)
@@ -92,7 +92,7 @@ func TestHandleListModels_ConfiguredStatusUsesRuntimeProbesForLocalModels(t *tes
 		t.Fatalf("SaveConfig() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -143,7 +143,7 @@ func TestHandleListModels_ConfiguredStatusUsesRuntimeProbesForLocalModels(t *tes
 }
 
 func TestHandleListModels_ConfiguredStatusForOAuthModelWithCredential(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 	resetOAuthHooks(t)
 	resetModelProbeHooks(t)
@@ -170,7 +170,7 @@ func TestHandleListModels_ConfiguredStatusForOAuthModelWithCredential(t *testing
 		t.Fatalf("SetCredential() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -197,7 +197,7 @@ func TestHandleListModels_ConfiguredStatusForOAuthModelWithCredential(t *testing
 }
 
 func TestHandleListModels_ProbesLocalModelsConcurrently(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 	resetOAuthHooks(t)
 	resetModelProbeHooks(t)
@@ -231,7 +231,7 @@ func TestHandleListModels_ProbesLocalModelsConcurrently(t *testing.T) {
 		t.Fatalf("SaveConfig() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -259,7 +259,7 @@ func TestHandleListModels_ProbesLocalModelsConcurrently(t *testing.T) {
 }
 
 func TestHandleListModels_NormalizesWildcardLocalAPIBaseForProbe(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 	resetOAuthHooks(t)
 	resetModelProbeHooks(t)
@@ -283,7 +283,7 @@ func TestHandleListModels_NormalizesWildcardLocalAPIBaseForProbe(t *testing.T) {
 		t.Fatalf("SaveConfig() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 

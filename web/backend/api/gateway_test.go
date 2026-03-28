@@ -16,6 +16,7 @@ import (
 
 	"github.com/RealityLink-Tech/MoonHub/pkg/auth"
 	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/devices"
 	"github.com/RealityLink-Tech/MoonHub/web/backend/utils"
 )
 
@@ -74,7 +75,12 @@ func resetGatewayTestState(t *testing.T) {
 
 func TestGatewayStartReady_NoDefaultModel(t *testing.T) {
 	configPath := filepath.Join(t.TempDir(), "config.json")
-	h := NewHandler(configPath)
+	deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 
 	ready, reason, err := h.gatewayStartReady()
 	if err != nil {
@@ -90,14 +96,19 @@ func TestGatewayStartReady_NoDefaultModel(t *testing.T) {
 
 func TestGatewayStartReady_InvalidDefaultModel(t *testing.T) {
 	configPath := filepath.Join(t.TempDir(), "config.json")
+	deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
 	cfg := config.DefaultConfig()
 	cfg.Agents.Defaults.Model = "missing-model"
-	err := config.SaveConfig(configPath, cfg)
+	err = config.SaveConfig(configPath, cfg)
 	if err != nil {
 		t.Fatalf("SaveConfig() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	ready, reason, err := h.gatewayStartReady()
 	if err != nil {
 		t.Fatalf("gatewayStartReady() error = %v", err)
@@ -112,15 +123,20 @@ func TestGatewayStartReady_InvalidDefaultModel(t *testing.T) {
 
 func TestGatewayStartReady_ValidDefaultModel(t *testing.T) {
 	configPath := filepath.Join(t.TempDir(), "config.json")
+	deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
 	cfg := config.DefaultConfig()
 	cfg.Agents.Defaults.ModelName = cfg.ModelList[0].ModelName
 	cfg.ModelList[0].APIKey = "test-key"
-	err := config.SaveConfig(configPath, cfg)
+	err = config.SaveConfig(configPath, cfg)
 	if err != nil {
 		t.Fatalf("SaveConfig() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	ready, reason, err := h.gatewayStartReady()
 	if err != nil {
 		t.Fatalf("gatewayStartReady() error = %v", err)
@@ -132,16 +148,21 @@ func TestGatewayStartReady_ValidDefaultModel(t *testing.T) {
 
 func TestGatewayStartReady_DefaultModelWithoutCredential(t *testing.T) {
 	configPath := filepath.Join(t.TempDir(), "config.json")
+	deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
 	cfg := config.DefaultConfig()
 	cfg.Agents.Defaults.ModelName = cfg.ModelList[0].ModelName
 	cfg.ModelList[0].APIKey = ""
 	cfg.ModelList[0].AuthMethod = ""
-	err := config.SaveConfig(configPath, cfg)
+	err = config.SaveConfig(configPath, cfg)
 	if err != nil {
 		t.Fatalf("SaveConfig() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	ready, reason, err := h.gatewayStartReady()
 	if err != nil {
 		t.Fatalf("gatewayStartReady() error = %v", err)
@@ -155,7 +176,7 @@ func TestGatewayStartReady_DefaultModelWithoutCredential(t *testing.T) {
 }
 
 func TestGatewayStartReady_LocalModelWithoutAPIKey(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 	resetModelProbeHooks(t)
 
@@ -178,7 +199,7 @@ func TestGatewayStartReady_LocalModelWithoutAPIKey(t *testing.T) {
 		t.Fatalf("SaveConfig() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	ready, reason, err := h.gatewayStartReady()
 	if err != nil {
 		t.Fatalf("gatewayStartReady() error = %v", err)
@@ -192,7 +213,7 @@ func TestGatewayStartReady_LocalModelWithoutAPIKey(t *testing.T) {
 }
 
 func TestGatewayStartReady_LocalModelWithRunningService(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 	resetModelProbeHooks(t)
 
@@ -215,7 +236,7 @@ func TestGatewayStartReady_LocalModelWithRunningService(t *testing.T) {
 		t.Fatalf("SaveConfig() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	ready, reason, err := h.gatewayStartReady()
 	if err != nil {
 		t.Fatalf("gatewayStartReady() error = %v", err)
@@ -226,7 +247,7 @@ func TestGatewayStartReady_LocalModelWithRunningService(t *testing.T) {
 }
 
 func TestGatewayStartReady_RemoteVLLMWithAPIKeyDoesNotProbe(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 	resetModelProbeHooks(t)
 
@@ -251,7 +272,7 @@ func TestGatewayStartReady_RemoteVLLMWithAPIKeyDoesNotProbe(t *testing.T) {
 		t.Fatalf("SaveConfig() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	ready, reason, err := h.gatewayStartReady()
 	if err != nil {
 		t.Fatalf("gatewayStartReady() error = %v", err)
@@ -262,7 +283,7 @@ func TestGatewayStartReady_RemoteVLLMWithAPIKeyDoesNotProbe(t *testing.T) {
 }
 
 func TestGatewayStartReady_LocalOllamaUsesDefaultProbeBase(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 	resetModelProbeHooks(t)
 
@@ -284,7 +305,7 @@ func TestGatewayStartReady_LocalOllamaUsesDefaultProbeBase(t *testing.T) {
 		t.Fatalf("SaveConfig() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	ready, reason, err := h.gatewayStartReady()
 	if err != nil {
 		t.Fatalf("gatewayStartReady() error = %v", err)
@@ -295,7 +316,7 @@ func TestGatewayStartReady_LocalOllamaUsesDefaultProbeBase(t *testing.T) {
 }
 
 func TestGatewayStartReady_OAuthModelRequiresStoredCredential(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 
 	cfg, err := config.LoadConfig(configPath)
@@ -313,7 +334,7 @@ func TestGatewayStartReady_OAuthModelRequiresStoredCredential(t *testing.T) {
 		t.Fatalf("SaveConfig() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	ready, reason, err := h.gatewayStartReady()
 	if err != nil {
 		t.Fatalf("gatewayStartReady() error = %v", err)
@@ -345,7 +366,12 @@ func TestGatewayStartReady_OAuthModelRequiresStoredCredential(t *testing.T) {
 
 func TestGatewayStatusIncludesStartConditionWhenNotReady(t *testing.T) {
 	configPath := filepath.Join(t.TempDir(), "config.json")
-	h := NewHandler(configPath)
+		deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
+h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -378,7 +404,12 @@ func TestGatewayStatusKeepsRunningWhenHealthProbeFailsAfterRunning(t *testing.T)
 	resetGatewayTestState(t)
 
 	configPath := filepath.Join(t.TempDir(), "config.json")
-	h := NewHandler(configPath)
+		deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
+h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -423,7 +454,12 @@ func TestGatewayStatusReturnsErrorAfterStartupWindowExpires(t *testing.T) {
 	resetGatewayTestState(t)
 
 	configPath := filepath.Join(t.TempDir(), "config.json")
-	h := NewHandler(configPath)
+		deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
+h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -468,7 +504,12 @@ func TestGatewayStatusReturnsRestartingDuringRestartGap(t *testing.T) {
 	resetGatewayTestState(t)
 
 	configPath := filepath.Join(t.TempDir(), "config.json")
-	h := NewHandler(configPath)
+		deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
+h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -498,6 +539,11 @@ func TestGatewayStatusIncludesRestartRequiredWhenModelsDiffer(t *testing.T) {
 	resetGatewayTestState(t)
 
 	configPath := filepath.Join(t.TempDir(), "config.json")
+	deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
 	cfg := config.DefaultConfig()
 	cfg.Agents.Defaults.ModelName = cfg.ModelList[0].ModelName
 	cfg.ModelList[0].APIKey = "test-key"
@@ -505,7 +551,7 @@ func TestGatewayStatusIncludesRestartRequiredWhenModelsDiffer(t *testing.T) {
 		t.Fatalf("SaveConfig() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -550,6 +596,11 @@ func TestGatewayStatusIncludesRestartRequiredWhenModelsDiffer(t *testing.T) {
 
 func TestGatewayRestartKeepsRunningProcessWhenPreconditionsFail(t *testing.T) {
 	configPath := filepath.Join(t.TempDir(), "config.json")
+	deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
 	cfg := config.DefaultConfig()
 	cfg.Agents.Defaults.ModelName = cfg.ModelList[0].ModelName
 	cfg.ModelList[0].APIKey = ""
@@ -558,7 +609,7 @@ func TestGatewayRestartKeepsRunningProcessWhenPreconditionsFail(t *testing.T) {
 		t.Fatalf("SaveConfig() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -603,6 +654,11 @@ func TestGatewayRestartKeepsOldProcessWhenItDoesNotExitInTime(t *testing.T) {
 	resetGatewayTestState(t)
 
 	configPath := filepath.Join(t.TempDir(), "config.json")
+	deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
 	cfg := config.DefaultConfig()
 	cfg.Agents.Defaults.ModelName = cfg.ModelList[0].ModelName
 	cfg.ModelList[0].APIKey = "test-key"
@@ -610,7 +666,7 @@ func TestGatewayRestartKeepsOldProcessWhenItDoesNotExitInTime(t *testing.T) {
 		t.Fatalf("SaveConfig() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -664,6 +720,11 @@ func TestGatewayRestartReturnsErrorStatusWhenReplacementFailsToStart(t *testing.
 	resetGatewayTestState(t)
 
 	configPath := filepath.Join(t.TempDir(), "config.json")
+	deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
 	cfg := config.DefaultConfig()
 	cfg.Agents.Defaults.ModelName = cfg.ModelList[0].ModelName
 	cfg.ModelList[0].APIKey = "test-key"
@@ -677,7 +738,7 @@ func TestGatewayRestartReturnsErrorStatusWhenReplacementFailsToStart(t *testing.
 	}
 	t.Setenv("MOONHUB_BINARY", invalidBinaryPath)
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -709,7 +770,12 @@ func TestGatewayRestartReturnsErrorStatusWhenReplacementFailsToStart(t *testing.
 
 func TestGatewayStatusExcludesLogsFields(t *testing.T) {
 	configPath := filepath.Join(t.TempDir(), "config.json")
-	h := NewHandler(configPath)
+		deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
+h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -739,7 +805,12 @@ func TestGatewayStatusExcludesLogsFields(t *testing.T) {
 
 func TestGatewayLogsReturnsIncrementalHistory(t *testing.T) {
 	configPath := filepath.Join(t.TempDir(), "config.json")
-	h := NewHandler(configPath)
+		deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
+h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -782,7 +853,12 @@ func TestGatewayLogsReturnsIncrementalHistory(t *testing.T) {
 
 func TestGatewayClearLogsResetsBufferedHistory(t *testing.T) {
 	configPath := filepath.Join(t.TempDir(), "config.json")
-	h := NewHandler(configPath)
+		deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
+h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 

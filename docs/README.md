@@ -8,10 +8,11 @@ This page is the **entry point and reading guide** for the repository documentat
 2. [CHANGELOG.md](../CHANGELOG.md) — Project updates and release notes
 3. [CLAUDE.md](../CLAUDE.md) — Project architecture, build commands, and development guidelines for Claude Code
 4. [Troubleshooting](./troubleshooting.md), [Debug Guide](./debug.md) — Runtime issues reference
-4. [Tools & Capabilities Configuration](./tools_configuration.md) — Tool-side configuration (`tools.*` in `config.json`)
-5. If you enable **sub-agent delegation** (`delegation.enabled`): [pkg/delegation/docs/README.md](../pkg/delegation/docs/README.md) → [CONFIG.md](../pkg/delegation/docs/CONFIG.md) → [implementation status](./implementation/delegation-status.md)
-6. If you enable **device provisioning** on the web launcher (`MOONHUB_PROVISIONING_ENABLED=1`): [pkg/provisioning/docs/README.md](../pkg/provisioning/docs/README.md) → [CONFIG.md](../pkg/provisioning/docs/CONFIG.md) → [implementation status](./implementation/provisioning-status.md) (detailed reference)
-7. If you deploy **cloud directory + relay** (optional Phase 3 services): [cloud/directory/docs/README.md](../cloud/directory/docs/README.md) → [CONFIG.md](../cloud/directory/docs/CONFIG.md) → [cloud/relay/docs/README.md](../cloud/relay/docs/README.md) → [CONFIG.md](../cloud/relay/docs/CONFIG.md) → [pkg/transport/docs/README.md](../pkg/transport/docs/README.md) → [implementation status](./implementation/cloud-directory-relay-status.md)
+5. [Tools & Capabilities Configuration](./tools_configuration.md) — Tool-side configuration (`tools.*` in `config.json`)
+6. If you enable **sub-agent delegation** (`delegation.enabled`): [pkg/delegation/docs/README.md](../pkg/delegation/docs/README.md) → [CONFIG.md](../pkg/delegation/docs/CONFIG.md) → [implementation status](./implementation/delegation-status.md)
+7. If you enable **device provisioning** on the web launcher (`MOONHUB_PROVISIONING_ENABLED=1`): [pkg/provisioning/docs/README.md](../pkg/provisioning/docs/README.md) → [CONFIG.md](../pkg/provisioning/docs/CONFIG.md) → [implementation status](./implementation/provisioning-status.md) (detailed reference)
+8. If you deploy **cloud directory + relay** (optional Phase 3 services): [cloud/directory/docs/README.md](../cloud/directory/docs/README.md) → [CONFIG.md](../cloud/directory/docs/CONFIG.md) → [cloud/relay/docs/README.md](../cloud/relay/docs/README.md) → [CONFIG.md](../cloud/relay/docs/CONFIG.md) → [pkg/transport/docs/README.md](../pkg/transport/docs/README.md) → [implementation status](./implementation/cloud-directory-relay-status.md)
+9. If you integrate or debug the **companion PWA** (LAN discovery, pairing, channel settings, chat): [web/backend/api/README.md](../web/backend/api/README.md) (authoritative HTTP contract) → companion app index `MoonHub-PWA/docs/README.md` when using the split-repo layout → [LAN discovery](./implementation/lan-discovery-status.md) / [LAN pairing](./implementation/lan-pairing-status.md) on the device side
 
 ## Documentation Flow by Subsystem
 
@@ -117,6 +118,7 @@ Channel architecture, migration, and how to implement a channel: [`pkg/channels/
 | Document | Description |
 | --- | --- |
 | [`web/README.md`](../web/README.md) | Web interface development (React + Vite frontend, Go backend); includes device provisioning UI and API notes |
+| [`web/backend/api/README.md`](../web/backend/api/README.md) | **HTTP API reference** for the Go backend: LAN discovery (`/api/discover`), paired devices (`/api/devices`), auth, channel CRUD, config, chat, gateway, etc. Companion app: **MoonHub-PWA** (`MoonHub-PWA/docs/README.md` when using the split-repo layout). |
 
 ---
 

@@ -8,12 +8,19 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/RealityLink-Tech/MoonHub/pkg/devices"
 	"github.com/RealityLink-Tech/MoonHub/web/backend/launcherconfig"
 )
 
 func TestGetLauncherConfigUsesRuntimeFallback(t *testing.T) {
-	configPath := filepath.Join(t.TempDir(), "config.json")
-	h := NewHandler(configPath)
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "config.json")
+	deviceStore, err := devices.NewDeviceStore(tmpDir)
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	h.SetServerOptions(19999, true, false, []string{"192.168.1.0/24"})
 
 	mux := http.NewServeMux()
@@ -40,8 +47,14 @@ func TestGetLauncherConfigUsesRuntimeFallback(t *testing.T) {
 }
 
 func TestPutLauncherConfigPersists(t *testing.T) {
-	configPath := filepath.Join(t.TempDir(), "config.json")
-	h := NewHandler(configPath)
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "config.json")
+	deviceStore, err := devices.NewDeviceStore(tmpDir)
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
@@ -73,8 +86,14 @@ func TestPutLauncherConfigPersists(t *testing.T) {
 }
 
 func TestPutLauncherConfigRejectsInvalidPort(t *testing.T) {
-	configPath := filepath.Join(t.TempDir(), "config.json")
-	h := NewHandler(configPath)
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "config.json")
+	deviceStore, err := devices.NewDeviceStore(tmpDir)
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
@@ -94,8 +113,14 @@ func TestPutLauncherConfigRejectsInvalidPort(t *testing.T) {
 }
 
 func TestPutLauncherConfigRejectsInvalidCIDR(t *testing.T) {
-	configPath := filepath.Join(t.TempDir(), "config.json")
-	h := NewHandler(configPath)
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "config.json")
+	deviceStore, err := devices.NewDeviceStore(tmpDir)
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)

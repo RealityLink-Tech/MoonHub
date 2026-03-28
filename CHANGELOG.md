@@ -4,6 +4,35 @@ All notable changes to MoonHub will be documented in this file.
 
 ---
 
+## 2026-03-29 — PWA companion LAN APIs (discover, devices, channels)
+
+### Summary
+
+Documented **LAN-facing HTTP APIs** used by the MoonHub companion PWA: **mDNS discovery** (`GET /api/discover`), **paired-device list** (`GET /api/devices`), and **channel instance CRUD** (list/create/update/delete + per-id status), alongside existing discovery and auth routes. The web API README now matches `router.go` and the current file layout.
+
+### New Features (reference)
+
+**Web backend API** (`web/backend/api/`)
+- `GET /api/discover` — mDNS scan for MoonHub services on the LAN (LAN-only)
+- `GET /api/devices` — list paired clients from `DeviceStore` (LAN-only)
+- `GET` / `POST` / `PATCH` / `DELETE /api/channels` (+ `GET /api/channels/{id}/status`) — channel configuration and status for console/PWA settings flows (LAN-only where enforced by handlers)
+
+### Files Changed
+
+- `web/backend/api/README.md` — Full endpoint tables, file map, LAN notes, test command
+- `docs/README.md` — Web section + **Recommended Reading Order** step 9 (companion PWA / LAN API); fixed duplicate step numbering
+- `web/README.md` — Companion PWA + LAN API cross-link
+- `README.md` / `README_CN.md` — Feature bullets: companion PWA + LAN APIs; PWA moved from “planned” to “implemented” with cross-links
+- `CHANGELOG.md` — This entry
+
+### Documentation
+
+- [`web/backend/api/README.md`](web/backend/api/README.md)
+- [`docs/README.md`](docs/README.md)
+- [`web/README.md`](web/README.md)
+
+---
+
 ## 2026-03-27 — Cloud directory, relay, and transport cloud path
 
 ### Summary
@@ -271,7 +300,7 @@ A runtime threat evaluation engine:
 A comprehensive plugin system that makes channels, providers, and tools all extensible plugins:
 
 - **Core Framework** — Plugin types, interfaces (Channel/Provider/Tool), registry system, and lifecycle manager
-- **Channel Plugins** — 16 channel plugins migrated (Telegram, Discord, Slack, Matrix, Feishu, QQ, DingTalk, LINE, OneBot, WeCom, WeCom App, WeCom AIBot, Pico, IRC, MaixCam, WhatsApp)
+- **Channel Plugins** — 15 channel plugins migrated (Telegram, Discord, Slack, Matrix, Feishu, QQ, DingTalk, LINE, OneBot, WeCom, WeCom App, WeCom AIBot, IRC, MaixCam, WhatsApp)
 - **Provider Plugins** — 8 provider plugins migrated (OpenAI Compat, OpenAI OAuth, Anthropic, Anthropic Messages, Antigravity, Claude CLI, Codex CLI, GitHub Copilot)
 - **Tool Plugins** — Web tools (web_search, web_fetch) and message tool migrated to plugin system
 - **Plugin Resolver** — Provider factory now supports plugin-first resolution with built-in fallback

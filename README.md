@@ -81,11 +81,11 @@ Your imagination is MoonHub's only boundary.
 - **Smart Router V2** — 4-tier model routing system (simple/moderate/complex/reasoning) with rule-based scoring, feature extraction, and privacy-safe metrics. Routes simple queries to cheap models and complex ones to powerful models; see [`pkg/routing/docs/README.md`](pkg/routing/docs/README.md) and [`docs/implementation/routing-status.md`](docs/implementation/routing-status.md).
 - **Device Provisioning** — Zero-config WiFi setup (hotspot, scan/connect, diagnostics, automatic and manual recovery, factory reset, auth code, SSE). Opt-in on the web launcher via `MOONHUB_PROVISIONING_ENABLED=1`; includes React provisioning wizard and optional PWA offline cache for that flow. See [`pkg/provisioning/docs/README.md`](pkg/provisioning/docs/README.md), [`pkg/provisioning/docs/CONFIG.md`](pkg/provisioning/docs/CONFIG.md), and [`docs/implementation/provisioning-status.md`](docs/implementation/provisioning-status.md).
 - **Cloud directory & relay** — Optional HTTP directory (PostgreSQL + Redis) for agent registration and online relay endpoints, plus a WebSocket relay with directory-backed Ed25519 auth; device-side [`pkg/transport`](pkg/transport/cloud.go) `CloudClient` and `Resolver` (LAN-first, then cloud). See [`docs/implementation/cloud-directory-relay-status.md`](docs/implementation/cloud-directory-relay-status.md), [`cloud/directory/docs/README.md`](cloud/directory/docs/README.md), [`cloud/relay/docs/README.md`](cloud/relay/docs/README.md), and [`pkg/transport/docs/README.md`](pkg/transport/docs/README.md).
+- **MoonHub PWA (companion app)** — Installable progressive web app for LAN discovery, pairing, chat, Space, and settings; uses backend APIs such as `GET /api/discover`, `GET /api/devices`, and channel CRUD on `/api/channels`. Backend contract: [`web/backend/api/README.md`](web/backend/api/README.md). Frontend docs (split layout): `MoonHub-PWA/docs/README.md`.
 
 ### Planned
 
-- **PWA Frontend** — Full user-facing PWA for device discovery, pairing, and day-to-day interaction beyond the provisioning wizard
-- **Dynamic UI Generation** — Real-time visual component generation based on user needs (dashboards, task managers, data visualizations)
+- **Dynamic UI Generation** — Real-time visual component generation based on user needs (dashboards, task managers, data visualizations); server-side Wasm tool runtime for chat-driven UI remains on the roadmap
 - **Native APP** — Native mobile applications for iOS and Android platforms
 
 <details>
@@ -99,5 +99,6 @@ Your imagination is MoonHub's only boundary.
 - ~~**Smart Routing** — 4-tier query classifier that routes simple queries to cheap models and complex ones to powerful ones, cutting LLM costs.~~ → **Implemented** (see [`pkg/routing/docs/`](pkg/routing/docs/README.md) and [`docs/implementation/routing-status.md`](docs/implementation/routing-status.md))
 - ~~**Inter-Agent Comms** — Lightweight pub/sub event bus for real-time inter-agent communication with wildcard subscriptions and bounded history.~~ → **Implemented** (delegation **Intercom** in [`pkg/delegation/intercom.go`](pkg/delegation/intercom.go); enabled with delegation)
 - ~~**Device Provisioning** — Zero-config WiFi setup, recovery, factory reset, provisioning UI.~~ → **Implemented** (launcher opt-in; see [`pkg/provisioning/docs/README.md`](pkg/provisioning/docs/README.md) and [`docs/implementation/provisioning-status.md`](docs/implementation/provisioning-status.md))
+- ~~**PWA Frontend** — Companion PWA for discovery, pairing, chat, Space, and settings.~~ → **Implemented** (LAN APIs documented in [`web/backend/api/README.md`](web/backend/api/README.md); app repo `MoonHub-PWA`.)
 
 </details>

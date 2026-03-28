@@ -5,12 +5,19 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/RealityLink-Tech/MoonHub/pkg/devices"
 	"github.com/RealityLink-Tech/MoonHub/web/backend/launcherconfig"
 )
 
 func TestResolveLaunchCommandUsesConfigFileDefaults(t *testing.T) {
-	configPath := filepath.Join(t.TempDir(), "config.json")
-	h := NewHandler(configPath)
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "config.json")
+	deviceStore, err := devices.NewDeviceStore(tmpDir)
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 
 	// Persist non-default launcher options to ensure resolveLaunchCommand does not
 	// pin them into autostart args.

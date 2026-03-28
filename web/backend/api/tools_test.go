@@ -12,7 +12,7 @@ import (
 )
 
 func TestHandleListTools(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 
 	cfg, err := config.LoadConfig(configPath)
@@ -35,7 +35,7 @@ func TestHandleListTools(t *testing.T) {
 		t.Fatalf("SaveConfig() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -124,7 +124,7 @@ func TestHandleListTools(t *testing.T) {
 }
 
 func TestHandleUpdateToolState(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 
 	cfg, err := config.LoadConfig(configPath)
@@ -142,7 +142,7 @@ func TestHandleUpdateToolState(t *testing.T) {
 		t.Fatalf("SaveConfig() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 

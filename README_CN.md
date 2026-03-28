@@ -81,11 +81,11 @@ MoonHub 扎根于边缘计算场景，在保持极致轻量（<10MB 内存）的
 - **智能路由 V2** — 4 层模型路由系统（简单/中等/复杂/推理），基于规则评分、特征提取、隐私安全指标。将简单查询路由到廉价模型，复杂查询路由到强大模型；参见 [`pkg/routing/docs/README.md`](pkg/routing/docs/README.md) 和 [`docs/implementation/routing-status.md`](docs/implementation/routing-status.md)。
 - **设备配网** — 零配置 WiFi 配网（热点、扫描/连接、诊断、自动与手动恢复、恢复出厂、授权码、SSE）。在 Web 启动器上通过 `MOONHUB_PROVISIONING_ENABLED=1` 启用；含 React 配网向导与可选 PWA 离线缓存。参见 [`pkg/provisioning/docs/README.md`](pkg/provisioning/docs/README.md)、[`pkg/provisioning/docs/CONFIG.md`](pkg/provisioning/docs/CONFIG.md)、[`docs/implementation/provisioning-status.md`](docs/implementation/provisioning-status.md)。
 - **云目录与中继** — 可选 HTTP 目录（PostgreSQL + Redis）用于代理注册与中继端点，以及带目录侧 Ed25519 鉴权的 WebSocket 中继；设备侧 [`pkg/transport`](pkg/transport/cloud.go) 提供 `CloudClient` 与 `Resolver`（优先局域网、其次云端）。参见 [`docs/implementation/cloud-directory-relay-status.md`](docs/implementation/cloud-directory-relay-status.md)、[`cloud/directory/docs/README.md`](cloud/directory/docs/README.md)、[`cloud/relay/docs/README.md`](cloud/relay/docs/README.md)、[`pkg/transport/docs/README.md`](pkg/transport/docs/README.md)。
+- **MoonHub PWA（配套客户端）** — 可安装的渐进式 Web 应用，用于局域网发现、配对、对话、Space 与设置；调用后端如 `GET /api/discover`、`GET /api/devices` 及 `/api/channels` 等频道 CRUD。后端契约见 [`web/backend/api/README.md`](web/backend/api/README.md)；前端文档（分仓布局）见 `MoonHub-PWA/docs/README.md`。
 
 ### 计划中
 
-- **PWA 前端** — 面向最终用户的完整 PWA，用于设备发现、配对与日常使用（超出配网向导范围）
-- **动态 UI 生成** — 基于用户需求实时生成可视化组件（仪表盘、任务管理器、数据可视化）
+- **动态 UI 生成** — 基于用户需求实时生成可视化组件（仪表盘、任务管理器、数据可视化）；服务端 Wasm 工具运行时与对话驱动 UI 仍在路线图
 - **原生 APP** — iOS 和 Android 原生移动应用
 
 <details>
@@ -99,5 +99,6 @@ MoonHub 扎根于边缘计算场景，在保持极致轻量（<10MB 内存）的
 - ~~**智能路由** — 4 层查询分类器，将简单查询路由到廉价模型，复杂查询路由到强大模型，降低 LLM 成本。~~ → **已实现**（参见 [`pkg/routing/docs/`](pkg/routing/docs/README.md) 和 [`docs/implementation/routing-status.md`](docs/implementation/routing-status.md)）
 - ~~**Agent 间通信** — 轻量级发布订阅事件总线，用于 Agent 间实时通信，支持通配订阅和有界历史。~~ → **已实现**（委托系统的 **Intercom**，位于 [`pkg/delegation/intercom.go`](pkg/delegation/intercom.go)；随委托功能启用）
 - ~~**设备配网** — 零配置 WiFi 配网、恢复、出厂重置、配网 UI。~~ → **已实现**（启动器可选启用；参见 [`pkg/provisioning/docs/README.md`](pkg/provisioning/docs/README.md) 和 [`docs/implementation/provisioning-status.md`](docs/implementation/provisioning-status.md)）
+- ~~**PWA 前端** — 配套 PWA：发现、配对、对话、Space 与设置。~~ → **已实现**（局域网 API 见 [`web/backend/api/README.md`](web/backend/api/README.md)；应用仓库 `MoonHub-PWA`。）
 
 </details>

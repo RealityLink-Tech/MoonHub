@@ -13,14 +13,15 @@ import (
 
 	"github.com/RealityLink-Tech/MoonHub/pkg/auth"
 	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/devices"
 )
 
 func TestOAuthLoginRejectsUnsupportedMethod(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 	resetOAuthHooks(t)
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -39,7 +40,7 @@ func TestOAuthLoginRejectsUnsupportedMethod(t *testing.T) {
 }
 
 func TestOAuthBrowserFlowCreatedAndQueried(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 	resetOAuthHooks(t)
 
@@ -51,7 +52,7 @@ func TestOAuthBrowserFlowCreatedAndQueried(t *testing.T) {
 		return "https://example.com/authorize?state=" + state
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -100,14 +101,14 @@ func TestOAuthBrowserFlowCreatedAndQueried(t *testing.T) {
 }
 
 func TestOAuthFlowExpiresWhenQueried(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 	resetOAuthHooks(t)
 
 	now := time.Date(2026, 3, 6, 12, 0, 0, 0, time.UTC)
 	oauthNow = func() time.Time { return now }
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	h.storeOAuthFlow(&oauthFlow{
 		ID:        "expired-flow",
 		Provider:  oauthProviderOpenAI,
@@ -137,11 +138,11 @@ func TestOAuthFlowExpiresWhenQueried(t *testing.T) {
 }
 
 func TestOAuthCallbackUnknownState(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 	resetOAuthHooks(t)
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -158,7 +159,7 @@ func TestOAuthCallbackUnknownState(t *testing.T) {
 }
 
 func TestOAuthLogoutClearsCredentialAndConfig(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 	resetOAuthHooks(t)
 
@@ -183,7 +184,7 @@ func TestOAuthLogoutClearsCredentialAndConfig(t *testing.T) {
 		t.Fatalf("SetCredential error: %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -218,7 +219,7 @@ func TestOAuthLogoutClearsCredentialAndConfig(t *testing.T) {
 	}
 }
 
-func setupOAuthTestEnv(t *testing.T) (string, func()) {
+func setupOAuthTestEnv(t *testing.T) (string, *devices.DeviceStore, *devices.PairingManager, func()) {
 	t.Helper()
 
 	tmp := t.TempDir()
@@ -245,6 +246,13 @@ func setupOAuthTestEnv(t *testing.T) (string, func()) {
 		t.Fatalf("SaveConfig error: %v", err)
 	}
 
+	// Initialize device store and pairing manager
+	deviceStore, err := devices.NewDeviceStore(tmp)
+	if err != nil {
+		t.Fatalf("Failed to create device store: %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
+
 	cleanup := func() {
 		_ = os.Setenv("HOME", oldHome)
 		if oldPicoHome == "" {
@@ -253,7 +261,7 @@ func setupOAuthTestEnv(t *testing.T) (string, func()) {
 			_ = os.Setenv("MOONHUB_HOME", oldPicoHome)
 		}
 	}
-	return configPath, cleanup
+	return configPath, deviceStore, pairingManager, cleanup
 }
 
 func resetOAuthHooks(t *testing.T) {

@@ -267,7 +267,6 @@ func (p *TelegramPlugin) Validate(cfg *config.Config) error {
 - `pkg/plugins/channels/wecom/plugin.go`
 - `pkg/plugins/channels/wecom_app/plugin.go`
 - `pkg/plugins/channels/wecom_aibot/plugin.go`
-- `pkg/plugins/channels/pico/plugin.go`
 - `pkg/plugins/channels/irc/plugin.go`
 - `pkg/plugins/channels/maixcam/plugin.go`
 - `pkg/plugins/channels/whatsapp/plugin.go`

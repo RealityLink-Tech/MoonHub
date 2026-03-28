@@ -25,7 +25,7 @@ var channelCatalog = []channelCatalogItem{
 	{Name: "wecom_aibot", ConfigKey: "wecom_aibot"},
 	{Name: "whatsapp", ConfigKey: "whatsapp", Variant: "bridge"},
 	{Name: "whatsapp_native", ConfigKey: "whatsapp", Variant: "native"},
-	{Name: "moonhub", ConfigKey: "pico"},
+	{Name: "moonhub", ConfigKey: "moonhub"},
 	{Name: "maixcam", ConfigKey: "maixcam"},
 	{Name: "matrix", ConfigKey: "matrix"},
 	{Name: "irc", ConfigKey: "irc"},

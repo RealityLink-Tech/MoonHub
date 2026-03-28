@@ -23,6 +23,10 @@ Edge-style **WiFi provisioning** (hotspot, scan/connect, recovery, auth code, fa
 
 **Documentation flow** (same pattern as other subsystems in the repo): [pkg/provisioning/docs/README.md](../pkg/provisioning/docs/README.md) → [CONFIG.md](../pkg/provisioning/docs/CONFIG.md) → [docs/implementation/provisioning-status.md](../docs/implementation/provisioning-status.md).
 
+### Companion PWA & LAN HTTP API
+
+The installable **MoonHub-PWA** client (separate repository; often checked out beside this repo as `MoonHub-PWA/`) talks to the device over **LAN** using the Go API under [`backend/api/`](backend/api/). Operator-facing endpoint tables (mDNS `GET /api/discover`, paired list `GET /api/devices`, channel CRUD, auth, config, chat, gateway) live in [`backend/api/README.md`](backend/api/README.md).
+
 ## Getting Started
 
 ### Prerequisites

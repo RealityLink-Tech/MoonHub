@@ -30,7 +30,7 @@ func sessionsTestDir(t *testing.T, configPath string) string {
 }
 
 func TestHandleListSessions_JSONLStorage(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 
 	dir := sessionsTestDir(t, configPath)
@@ -62,7 +62,7 @@ func TestHandleListSessions_JSONLStorage(t *testing.T) {
 		t.Fatalf("SetSummary() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -96,7 +96,7 @@ func TestHandleListSessions_JSONLStorage(t *testing.T) {
 }
 
 func TestHandleListSessions_TitleUsesTrimmedSummary(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 
 	dir := sessionsTestDir(t, configPath)
@@ -120,7 +120,7 @@ func TestHandleListSessions_TitleUsesTrimmedSummary(t *testing.T) {
 		t.Fatalf("SetSummary() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -152,7 +152,7 @@ func TestHandleListSessions_TitleUsesTrimmedSummary(t *testing.T) {
 }
 
 func TestHandleGetSession_JSONLStorage(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 
 	dir := sessionsTestDir(t, configPath)
@@ -175,7 +175,7 @@ func TestHandleGetSession_JSONLStorage(t *testing.T) {
 		t.Fatalf("SetSummary() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -216,7 +216,7 @@ func TestHandleGetSession_JSONLStorage(t *testing.T) {
 }
 
 func TestHandleDeleteSession_JSONLStorage(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 
 	dir := sessionsTestDir(t, configPath)
@@ -236,7 +236,7 @@ func TestHandleDeleteSession_JSONLStorage(t *testing.T) {
 		t.Fatalf("SetSummary() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -257,7 +257,7 @@ func TestHandleDeleteSession_JSONLStorage(t *testing.T) {
 }
 
 func TestHandleGetSession_LegacyJSONFallback(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 
 	dir := sessionsTestDir(t, configPath)
@@ -269,7 +269,7 @@ func TestHandleGetSession_LegacyJSONFallback(t *testing.T) {
 		t.Fatalf("Save() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -283,7 +283,7 @@ func TestHandleGetSession_LegacyJSONFallback(t *testing.T) {
 }
 
 func TestHandleSessions_FiltersEmptyJSONLFiles(t *testing.T) {
-	configPath, cleanup := setupOAuthTestEnv(t)
+	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
 
 	dir := sessionsTestDir(t, configPath)
@@ -292,7 +292,7 @@ func TestHandleSessions_FiltersEmptyJSONLFiles(t *testing.T) {
 		t.Fatalf("WriteFile(jsonl) error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 

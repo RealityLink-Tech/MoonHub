@@ -6,11 +6,13 @@ import (
 	"testing"
 
 	"github.com/RealityLink-Tech/MoonHub/pkg/config"
+	"github.com/RealityLink-Tech/MoonHub/pkg/devices"
 	"github.com/RealityLink-Tech/MoonHub/web/backend/launcherconfig"
 )
 
 func TestGatewayHostOverrideUsesExplicitRuntimePublic(t *testing.T) {
-	configPath := filepath.Join(t.TempDir(), "config.json")
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "config.json")
 	launcherPath := launcherconfig.PathForAppConfig(configPath)
 	if err := launcherconfig.Save(launcherPath, launcherconfig.Config{
 		Port:   18800,
@@ -19,7 +21,13 @@ func TestGatewayHostOverrideUsesExplicitRuntimePublic(t *testing.T) {
 		t.Fatalf("launcherconfig.Save() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	deviceStore, err := devices.NewDeviceStore(tmpDir)
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
+
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	h.SetServerOptions(18800, true, true, nil)
 
 	if got := h.gatewayHostOverride(); got != "0.0.0.0" {
@@ -28,7 +36,8 @@ func TestGatewayHostOverrideUsesExplicitRuntimePublic(t *testing.T) {
 }
 
 func TestBuildWsURLUsesRequestHostWhenLauncherPublicSaved(t *testing.T) {
-	configPath := filepath.Join(t.TempDir(), "config.json")
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "config.json")
 	launcherPath := launcherconfig.PathForAppConfig(configPath)
 	if err := launcherconfig.Save(launcherPath, launcherconfig.Config{
 		Port:   18800,
@@ -37,7 +46,13 @@ func TestBuildWsURLUsesRequestHostWhenLauncherPublicSaved(t *testing.T) {
 		t.Fatalf("launcherconfig.Save() error = %v", err)
 	}
 
-	h := NewHandler(configPath)
+	deviceStore, err := devices.NewDeviceStore(tmpDir)
+	if err != nil {
+		t.Fatalf("NewDeviceStore() error = %v", err)
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
+
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	h.SetServerOptions(18800, false, false, nil)
 
 	cfg := config.DefaultConfig()
