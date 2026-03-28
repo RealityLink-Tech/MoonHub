@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/RealityLink-Tech/MoonHub/pkg/devices"
+	"github.com/RealityLink-Tech/MoonHub/pkg/mdns"
 	"github.com/RealityLink-Tech/MoonHub/web/backend/launcherconfig"
 )
 
@@ -18,15 +20,24 @@ type Handler struct {
 	oauthFlows           map[string]*oauthFlow
 	oauthState           map[string]string
 	provisioning         *ProvisioningHandler
+	discovery            *DiscoveryHandler
+	discover             *DiscoverHandler
+	devices              *DevicesHandler
+	auth                 *AuthHandler
 }
 
 // NewHandler creates an instance of the API handler.
-func NewHandler(configPath string) *Handler {
+func NewHandler(configPath string, deviceStore *devices.DeviceStore, pairingManager *devices.PairingManager) *Handler {
+	mdnsClient := mdns.NewClient()
 	return &Handler{
-		configPath: configPath,
-		serverPort: launcherconfig.DefaultPort,
-		oauthFlows: make(map[string]*oauthFlow),
-		oauthState: make(map[string]string),
+		configPath:     configPath,
+		serverPort:     launcherconfig.DefaultPort,
+		oauthFlows:     make(map[string]*oauthFlow),
+		oauthState:     make(map[string]string),
+		discovery:      NewDiscoveryHandler(deviceStore),
+		discover:       NewDiscoverHandler(mdnsClient),
+		devices:        NewDevicesHandler(deviceStore),
+		auth:           NewAuthHandler(pairingManager, deviceStore),
 	}
 }
 
@@ -63,6 +74,9 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	// Channel catalog (for frontend navigation/config pages)
 	h.registerChannelRoutes(mux)
 
+	// Channel CRUD (create, read, update, delete channel configurations)
+	h.registerChannelCRUDRoutes(mux)
+
 	// Skills and tools support/actions
 	h.registerSkillRoutes(mux)
 	h.registerToolRoutes(mux)
@@ -77,4 +91,10 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	if h.provisioning != nil {
 		h.provisioning.RegisterRoutes(mux)
 	}
+
+	// Device discovery and authentication
+	h.discovery.RegisterRoutes(mux)
+	h.discover.RegisterRoutes(mux)
+	h.devices.RegisterRoutes(mux)
+	h.auth.RegisterRoutes(mux)
 }

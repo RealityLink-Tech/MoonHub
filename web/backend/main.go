@@ -1,6 +1,6 @@
 // MoonHub Web Console - Web-based chat and management interface
 //
-// Provides a web UI for chatting with MoonHub via the Pico Channel WebSocket,
+// Provides a web UI for chatting with MoonHub via the MoonHub WebSocket,
 // with configuration management and gateway process control.
 //
 // Usage:
@@ -23,6 +23,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/RealityLink-Tech/MoonHub/pkg/devices"
 	"github.com/RealityLink-Tech/MoonHub/pkg/provisioning"
 	"github.com/RealityLink-Tech/MoonHub/web/backend/api"
 	"github.com/RealityLink-Tech/MoonHub/web/backend/launcherconfig"
@@ -114,7 +115,16 @@ func main() {
 	// Initialize Server components
 	mux := http.NewServeMux()
 
-	apiHandler := api.NewHandler(absPath)
+	// Initialize device store and pairing manager
+	deviceStoreDir := filepath.Dir(absPath)
+	deviceStore, err := devices.NewDeviceStore(deviceStoreDir)
+	if err != nil {
+		log.Printf("Warning: Failed to initialize device store: %v", err)
+		deviceStore, _ = devices.NewDeviceStore("") // fallback to default
+	}
+	pairingManager := devices.NewPairingManager(deviceStore)
+
+	apiHandler := api.NewHandler(absPath, deviceStore, pairingManager)
 	apiHandler.SetServerOptions(portNum, effectivePublic, explicitPublic, launcherCfg.AllowedCIDRs)
 
 	// Device provisioning: SetProvisioningHandler must run before RegisterRoutes so routes are mounted.
