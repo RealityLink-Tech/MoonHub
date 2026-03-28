@@ -164,3 +164,189 @@ func TestSetDefaultModel_MultipleModels(t *testing.T) {
 		assert.Equal(t, model, cfg.Agents.Defaults.ModelName)
 	}
 }
+
+func TestAddModel_Success(t *testing.T) {
+	h, token, cleanup := setupTestModels(t)
+	defer cleanup()
+
+	body := `{"model_name":"test-model","model":"openai/gpt-4o","api_key":"sk-test1234567890"}`
+	req := httptest.NewRequest("POST", "/api/models", strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	w := httptest.NewRecorder()
+
+	h.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var resp map[string]any
+	json.Unmarshal(w.Body.Bytes(), &resp)
+	assert.Equal(t, "ok", resp["status"])
+	assert.NotNil(t, resp["index"])
+
+	// Verify the model was added
+	cfg, err := config.LoadConfig(h.configPath)
+	assert.NoError(t, err)
+	found := false
+	for _, m := range cfg.ModelList {
+		if m.ModelName == "test-model" {
+			found = true
+			assert.Equal(t, "openai/gpt-4o", m.Model)
+			assert.Equal(t, "sk-test1234567890", m.APIKey)
+		}
+	}
+	assert.True(t, found, "model should be in the list")
+}
+
+func TestAddModel_DuplicateName(t *testing.T) {
+	h, token, cleanup := setupTestModels(t)
+	defer cleanup()
+
+	// First add succeeds
+	body := `{"model_name":"dup-model","model":"openai/gpt-4o"}`
+	req := httptest.NewRequest("POST", "/api/models", strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// Second add with same name fails
+	req2 := httptest.NewRequest("POST", "/api/models", strings.NewReader(body))
+	req2.Header.Set("Content-Type", "application/json")
+	req2.Header.Set("Authorization", "Bearer "+token)
+	w2 := httptest.NewRecorder()
+	h.ServeHTTP(w2, req2)
+	assert.Equal(t, http.StatusConflict, w2.Code)
+
+	var resp map[string]string
+	json.Unmarshal(w2.Body.Bytes(), &resp)
+	assert.Contains(t, resp["error"], "already exists")
+}
+
+func TestAddModel_ValidationError(t *testing.T) {
+	h, token, cleanup := setupTestModels(t)
+	defer cleanup()
+
+	tests := []struct {
+		name string
+		body string
+	}{
+		{"missing model_name", `{"model":"openai/gpt-4o"}`},
+		{"missing model", `{"model_name":"test"}`},
+		{"invalid json", `{invalid}`},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := httptest.NewRequest("POST", "/api/models", strings.NewReader(tc.body))
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "Bearer "+token)
+			w := httptest.NewRecorder()
+
+			h.ServeHTTP(w, req)
+
+			assert.Equal(t, http.StatusBadRequest, w.Code)
+		})
+	}
+}
+
+func TestDeleteModel_Success(t *testing.T) {
+	h, token, cleanup := setupTestModels(t)
+	defer cleanup()
+
+	// First add a model
+	body := `{"model_name":"to-delete","model":"openai/gpt-4o"}`
+	req := httptest.NewRequest("POST", "/api/models", strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, req)
+
+	var addResp map[string]any
+	json.Unmarshal(w.Body.Bytes(), &addResp)
+	idx := int(addResp["index"].(float64))
+
+	// Delete it
+	req2 := httptest.NewRequest("DELETE", fmt.Sprintf("/api/models/%d", idx), nil)
+	req2.Header.Set("Authorization", "Bearer "+token)
+	w2 := httptest.NewRecorder()
+	h.ServeHTTP(w2, req2)
+
+	assert.Equal(t, http.StatusOK, w2.Code)
+
+	var delResp map[string]string
+	json.Unmarshal(w2.Body.Bytes(), &delResp)
+	assert.Equal(t, "ok", delResp["status"])
+
+	// Verify the model is gone
+	cfg, err := config.LoadConfig(h.configPath)
+	assert.NoError(t, err)
+	for _, m := range cfg.ModelList {
+		assert.NotEqual(t, "to-delete", m.ModelName)
+	}
+}
+
+func TestDeleteModel_DefaultCleared(t *testing.T) {
+	h, token, cleanup := setupTestModels(t)
+	defer cleanup()
+
+	// Add a model
+	body := `{"model_name":"default-model","model":"openai/gpt-4o"}`
+	req := httptest.NewRequest("POST", "/api/models", strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, req)
+
+	var addResp map[string]any
+	json.Unmarshal(w.Body.Bytes(), &addResp)
+	idx := int(addResp["index"].(float64))
+
+	// Set it as default
+	setDefBody := `{"model_name":"default-model"}`
+	req2 := httptest.NewRequest("POST", "/api/models/default", strings.NewReader(setDefBody))
+	req2.Header.Set("Content-Type", "application/json")
+	req2.Header.Set("Authorization", "Bearer "+token)
+	w2 := httptest.NewRecorder()
+	h.ServeHTTP(w2, req2)
+	assert.Equal(t, http.StatusOK, w2.Code)
+
+	// Delete it — default should be cleared
+	req3 := httptest.NewRequest("DELETE", fmt.Sprintf("/api/models/%d", idx), nil)
+	req3.Header.Set("Authorization", "Bearer "+token)
+	w3 := httptest.NewRecorder()
+	h.ServeHTTP(w3, req3)
+	assert.Equal(t, http.StatusOK, w3.Code)
+
+	cfg, err := config.LoadConfig(h.configPath)
+	assert.NoError(t, err)
+	assert.Equal(t, "", cfg.Agents.Defaults.ModelName)
+}
+
+func TestDeleteModel_InvalidIndex(t *testing.T) {
+	h, token, cleanup := setupTestModels(t)
+	defer cleanup()
+
+	tests := []struct {
+		name   string
+		index  string
+		status int
+	}{
+		{"negative", "-1", http.StatusBadRequest},
+		{"non-numeric", "abc", http.StatusBadRequest},
+		{"out of range", "9999", http.StatusNotFound},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := httptest.NewRequest("DELETE", fmt.Sprintf("/api/models/%s", tc.index), nil)
+			req.Header.Set("Authorization", "Bearer "+token)
+			w := httptest.NewRecorder()
+
+			h.ServeHTTP(w, req)
+
+			assert.Equal(t, tc.status, w.Code)
+		})
+	}
+}

@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -252,4 +253,103 @@ func (h *Handler) handleSetDefaultModel(w http.ResponseWriter, r *http.Request) 
 		"status":        "ok",
 		"default_model": req.ModelName,
 	})
+}
+
+// handleAddModel appends a new model configuration entry.
+//
+//	POST /api/models
+func (h *Handler) handleAddModel(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(io.LimitReader(r.Body, 1<<20))
+	if err != nil {
+		writeJSONError(w, http.StatusBadRequest, "Failed to read request body")
+		return
+	}
+	defer r.Body.Close()
+
+	var mc config.ModelConfig
+	if err = json.Unmarshal(body, &mc); err != nil {
+		writeJSONError(w, http.StatusBadRequest, "Invalid JSON")
+		return
+	}
+
+	if err = mc.Validate(); err != nil {
+		writeJSONError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	cfg, err := config.LoadConfig(h.configPath)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			writeJSONError(w, http.StatusInternalServerError, "Failed to load config")
+			return
+		}
+		cfg = config.DefaultConfig()
+	}
+
+	// Check for duplicate model_name
+	for _, existing := range cfg.ModelList {
+		if existing.ModelName == mc.ModelName {
+			writeJSONError(w, http.StatusConflict, fmt.Sprintf("Model %q already exists", mc.ModelName))
+			return
+		}
+	}
+
+	cfg.ModelList = append(cfg.ModelList, mc)
+
+	if err := config.SaveConfig(h.configPath, cfg); err != nil {
+		writeJSONError(w, http.StatusInternalServerError, "Failed to save config")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]any{
+		"status": "ok",
+		"index":  len(cfg.ModelList) - 1,
+	})
+}
+
+// handleDeleteModel removes a model configuration entry at the given index.
+//
+//	DELETE /api/models/{index}
+func (h *Handler) handleDeleteModel(w http.ResponseWriter, r *http.Request) {
+	indexStr := r.PathValue("index")
+	index, err := strconv.Atoi(indexStr)
+	if err != nil || index < 0 {
+		writeJSONError(w, http.StatusBadRequest, "Invalid model index")
+		return
+	}
+
+	cfg, err := config.LoadConfig(h.configPath)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			writeJSONError(w, http.StatusInternalServerError, "Failed to load config")
+			return
+		}
+		cfg = config.DefaultConfig()
+	}
+
+	if index >= len(cfg.ModelList) {
+		writeJSONError(w, http.StatusNotFound, fmt.Sprintf("Model index %d out of range", index))
+		return
+	}
+
+	deletedModelName := cfg.ModelList[index].ModelName
+
+	cfg.ModelList = append(cfg.ModelList[:index], cfg.ModelList[index+1:]...)
+
+	// If the deleted model was the default, clear it
+	if cfg.Agents.Defaults.ModelName == deletedModelName {
+		cfg.Agents.Defaults.ModelName = ""
+	}
+	if cfg.Agents.Defaults.Model == deletedModelName {
+		cfg.Agents.Defaults.Model = ""
+	}
+
+	if err := config.SaveConfig(h.configPath, cfg); err != nil {
+		writeJSONError(w, http.StatusInternalServerError, "Failed to save config")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 }
