@@ -200,3 +200,56 @@ func (h *Handler) handleUpdateModel(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 }
+
+// handleSetDefaultModel sets the default model by model_name.
+//
+//	POST /api/models/default
+//	Body: {"model_name": "gpt-4o"}
+func (h *Handler) handleSetDefaultModel(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		ModelName string `json:"model_name"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSONError(w, http.StatusBadRequest, "Invalid JSON")
+		return
+	}
+	if req.ModelName == "" {
+		writeJSONError(w, http.StatusBadRequest, "model_name is required")
+		return
+	}
+
+	cfg, err := config.LoadConfig(h.configPath)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			writeJSONError(w, http.StatusInternalServerError, "Failed to load config")
+			return
+		}
+		cfg = config.DefaultConfig()
+	}
+
+	// Validate model_name exists in model_list
+	found := false
+	for _, m := range cfg.ModelList {
+		if m.ModelName == req.ModelName {
+			found = true
+			break
+		}
+	}
+	if !found {
+		writeJSONError(w, http.StatusNotFound, fmt.Sprintf("Model %q not found in model_list", req.ModelName))
+		return
+	}
+
+	cfg.Agents.Defaults.ModelName = req.ModelName
+
+	if err := config.SaveConfig(h.configPath, cfg); err != nil {
+		writeJSONError(w, http.StatusInternalServerError, "Failed to save config")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"status":        "ok",
+		"default_model": req.ModelName,
+	})
+}

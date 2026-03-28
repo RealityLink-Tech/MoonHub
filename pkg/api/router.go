@@ -71,6 +71,7 @@ func (h *Handler) RegisterOnMux(mux *http.ServeMux) {
 	mux.Handle("PATCH /api/config", h.authMiddleware(http.HandlerFunc(h.handlePatchConfig)))
 	mux.Handle("GET /api/models", h.authMiddleware(http.HandlerFunc(h.handleListModels)))
 	mux.Handle("PATCH /api/models/{index}", h.authMiddleware(http.HandlerFunc(h.handleUpdateModel)))
+	mux.Handle("POST /api/models/default", h.authMiddleware(http.HandlerFunc(h.handleSetDefaultModel)))
 	mux.Handle("GET /api/tools", h.authMiddleware(http.HandlerFunc(h.handleListTools)))
 	mux.Handle("GET /api/channels/catalog", h.authMiddleware(http.HandlerFunc(h.handleChannelCatalog)))
 

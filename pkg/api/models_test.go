@@ -41,14 +41,13 @@ func setupTestModels(t *testing.T) (*Handler, string, func()) {
 	return h, bindResp.Token, func() { os.RemoveAll(tmpDir) }
 }
 
-func TestUpdateModel_APIKey(t *testing.T) {
+func TestSetDefaultModel_Success(t *testing.T) {
 	h, token, cleanup := setupTestModels(t)
 	defer cleanup()
 
-	// Update API key for model at index 0
-	newAPIKey := "sk-test-new-key-1234567890"
-	body := fmt.Sprintf(`{"api_key":"%s"}`, newAPIKey)
-	req := httptest.NewRequest("PATCH", "/api/models/0", strings.NewReader(body))
+	// Set default model to "gpt-5.4" which exists in default config
+	body := `{"model_name":"gpt-5.4"}`
+	req := httptest.NewRequest("POST", "/api/models/default", strings.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+token)
 	w := httptest.NewRecorder()
@@ -60,47 +59,21 @@ func TestUpdateModel_APIKey(t *testing.T) {
 	var resp map[string]string
 	json.Unmarshal(w.Body.Bytes(), &resp)
 	assert.Equal(t, "ok", resp["status"])
+	assert.Equal(t, "gpt-5.4", resp["default_model"])
 
 	// Verify the change was persisted
 	cfg, err := config.LoadConfig(h.configPath)
 	assert.NoError(t, err)
-	assert.Equal(t, newAPIKey, cfg.ModelList[0].APIKey)
+	assert.Equal(t, "gpt-5.4", cfg.Agents.Defaults.ModelName)
 }
 
-func TestUpdateModel_EmptyKeyPreserves(t *testing.T) {
+func TestSetDefaultModel_NotFound(t *testing.T) {
 	h, token, cleanup := setupTestModels(t)
 	defer cleanup()
 
-	// First, set an API key
-	initialKey := "sk-initial-key-1234567890"
-	cfg, _ := config.LoadConfig(h.configPath)
-	cfg.ModelList[0].APIKey = initialKey
-	config.SaveConfig(h.configPath, cfg)
-
-	// Update with empty string - should preserve the existing key
-	body := `{"api_key":""}`
-	req := httptest.NewRequest("PATCH", "/api/models/0", strings.NewReader(body))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+token)
-	w := httptest.NewRecorder()
-
-	h.ServeHTTP(w, req)
-
-	assert.Equal(t, http.StatusOK, w.Code)
-
-	// Verify the key was preserved
-	cfg, err := config.LoadConfig(h.configPath)
-	assert.NoError(t, err)
-	assert.Equal(t, initialKey, cfg.ModelList[0].APIKey)
-}
-
-func TestUpdateModel_InvalidIndex(t *testing.T) {
-	h, token, cleanup := setupTestModels(t)
-	defer cleanup()
-
-	// Try to update a model with an out-of-range index
-	body := `{"api_key":"sk-test-key"}`
-	req := httptest.NewRequest("PATCH", "/api/models/9999", strings.NewReader(body))
+	// Try to set default to a non-existent model
+	body := `{"model_name":"non-existent-model"}`
+	req := httptest.NewRequest("POST", "/api/models/default", strings.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+token)
 	w := httptest.NewRecorder()
@@ -111,15 +84,15 @@ func TestUpdateModel_InvalidIndex(t *testing.T) {
 
 	var resp map[string]string
 	json.Unmarshal(w.Body.Bytes(), &resp)
-	assert.Contains(t, resp["error"], "out of range")
+	assert.Contains(t, resp["error"], "not found in model_list")
 }
 
-func TestUpdateModel_NegativeIndex(t *testing.T) {
+func TestSetDefaultModel_EmptyName(t *testing.T) {
 	h, token, cleanup := setupTestModels(t)
 	defer cleanup()
 
-	body := `{"api_key":"sk-test-key"}`
-	req := httptest.NewRequest("PATCH", "/api/models/-1", strings.NewReader(body))
+	body := `{"model_name":""}`
+	req := httptest.NewRequest("POST", "/api/models/default", strings.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+token)
 	w := httptest.NewRecorder()
@@ -130,72 +103,15 @@ func TestUpdateModel_NegativeIndex(t *testing.T) {
 
 	var resp map[string]string
 	json.Unmarshal(w.Body.Bytes(), &resp)
-	assert.Contains(t, resp["error"], "Invalid model index")
+	assert.Contains(t, resp["error"], "model_name is required")
 }
 
-func TestUpdateModel_PartialUpdate(t *testing.T) {
+func TestSetDefaultModel_InvalidJSON(t *testing.T) {
 	h, token, cleanup := setupTestModels(t)
 	defer cleanup()
 
-	// Update only api_base, leaving other fields intact
-	newAPIBase := "https://custom.example.com/v1"
-	body := fmt.Sprintf(`{"api_base":"%s"}`, newAPIBase)
-	req := httptest.NewRequest("PATCH", "/api/models/0", strings.NewReader(body))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+token)
-	w := httptest.NewRecorder()
-
-	h.ServeHTTP(w, req)
-
-	assert.Equal(t, http.StatusOK, w.Code)
-
-	// Verify only api_base was updated
-	cfg, err := config.LoadConfig(h.configPath)
-	assert.NoError(t, err)
-	assert.Equal(t, newAPIBase, cfg.ModelList[0].APIBase)
-	assert.Equal(t, "", cfg.ModelList[0].APIKey) // Should still be empty
-}
-
-func TestUpdateModel_AllFields(t *testing.T) {
-	h, token, cleanup := setupTestModels(t)
-	defer cleanup()
-
-	// Update all supported fields
-	newRPM := 100
-	newThinkingLevel := "high"
-	body := fmt.Sprintf(`{
-		"api_key": "sk-test-key-1234567890",
-		"api_base": "https://custom.example.com/v1",
-		"proxy": "http://proxy.example.com:8080",
-		"rpm": %d,
-		"thinking_level": "%s"
-	}`, newRPM, newThinkingLevel)
-
-	req := httptest.NewRequest("PATCH", "/api/models/0", strings.NewReader(body))
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+token)
-	w := httptest.NewRecorder()
-
-	h.ServeHTTP(w, req)
-
-	assert.Equal(t, http.StatusOK, w.Code)
-
-	cfg, err := config.LoadConfig(h.configPath)
-	assert.NoError(t, err)
-	m := cfg.ModelList[0]
-	assert.Equal(t, "sk-test-key-1234567890", m.APIKey)
-	assert.Equal(t, "https://custom.example.com/v1", m.APIBase)
-	assert.Equal(t, "http://proxy.example.com:8080", m.Proxy)
-	assert.Equal(t, newRPM, m.RPM)
-	assert.Equal(t, newThinkingLevel, m.ThinkingLevel)
-}
-
-func TestUpdateModel_InvalidJSON(t *testing.T) {
-	h, token, cleanup := setupTestModels(t)
-	defer cleanup()
-
-	body := `{"api_key": invalid json`
-	req := httptest.NewRequest("PATCH", "/api/models/0", strings.NewReader(body))
+	body := `{"model_name": invalid json`
+	req := httptest.NewRequest("POST", "/api/models/default", strings.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+token)
 	w := httptest.NewRecorder()
@@ -209,12 +125,12 @@ func TestUpdateModel_InvalidJSON(t *testing.T) {
 	assert.Contains(t, resp["error"], "Invalid JSON")
 }
 
-func TestUpdateModel_NoAuth(t *testing.T) {
+func TestSetDefaultModel_NoAuth(t *testing.T) {
 	h, _, cleanup := setupTestModels(t)
 	defer cleanup()
 
-	body := `{"api_key":"sk-test-key"}`
-	req := httptest.NewRequest("PATCH", "/api/models/0", strings.NewReader(body))
+	body := `{"model_name":"gpt-5.4"}`
+	req := httptest.NewRequest("POST", "/api/models/default", strings.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	// No Authorization header
 	w := httptest.NewRecorder()
@@ -222,4 +138,29 @@ func TestUpdateModel_NoAuth(t *testing.T) {
 	h.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
+}
+
+func TestSetDefaultModel_MultipleModels(t *testing.T) {
+	h, token, cleanup := setupTestModels(t)
+	defer cleanup()
+
+	// Test setting to different models in the default config
+	models := []string{"glm-4.7", "claude-sonnet-4.6", "deepseek-chat"}
+
+	for _, model := range models {
+		body := fmt.Sprintf(`{"model_name":"%s"}`, model)
+		req := httptest.NewRequest("POST", "/api/models/default", strings.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+token)
+		w := httptest.NewRecorder()
+
+		h.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+
+		// Verify the change was persisted
+		cfg, err := config.LoadConfig(h.configPath)
+		assert.NoError(t, err)
+		assert.Equal(t, model, cfg.Agents.Defaults.ModelName)
+	}
 }
