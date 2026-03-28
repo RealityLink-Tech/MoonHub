@@ -299,7 +299,7 @@ func (m *Manager) SetupHTTPServer(addr string, healthServer *health.Server) {
 
 	m.httpServer = &http.Server{
 		Addr:         addr,
-		Handler:      m.mux,
+		Handler:      withCORS(m.mux),
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}

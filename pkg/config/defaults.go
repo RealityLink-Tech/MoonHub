@@ -166,15 +166,6 @@ func DefaultConfig() *Config {
 				MaxSteps:       10,
 				WelcomeMessage: "Hello! I'm your AI assistant. How can I help you today?",
 			},
-			Pico: PicoConfig{
-				Enabled:        false,
-				Token:          "",
-				PingInterval:   30,
-				ReadTimeout:    60,
-				WriteTimeout:   10,
-				MaxConnections: 100,
-				AllowFrom:      FlexibleStringSlice{},
-			},
 			MoonHub: MoonHubConfig{
 				Enabled:        false,
 				Port:           18801,

@@ -405,7 +405,6 @@ type ChannelsConfig struct {
 	WeCom      WeComConfig      `json:"wecom"`
 	WeComApp   WeComAppConfig   `json:"wecom_app"`
 	WeComAIBot WeComAIBotConfig `json:"wecom_aibot"`
-	Pico       PicoConfig       `json:"pico"`
 	MoonHub    MoonHubConfig    `json:"moonhub"`
 	IRC        IRCConfig        `json:"irc"`
 }
@@ -593,19 +592,6 @@ type WeComAIBotConfig struct {
 	MaxSteps           int                 `json:"max_steps"            env:"MOONHUB_CHANNELS_WECOM_AIBOT_MAX_STEPS"`       // Maximum streaming steps
 	WelcomeMessage     string              `json:"welcome_message"      env:"MOONHUB_CHANNELS_WECOM_AIBOT_WELCOME_MESSAGE"` // Sent on enter_chat event; empty = no welcome
 	ReasoningChannelID string              `json:"reasoning_channel_id" env:"MOONHUB_CHANNELS_WECOM_AIBOT_REASONING_CHANNEL_ID"`
-}
-
-type PicoConfig struct {
-	Enabled         bool                `json:"enabled"                     env:"MOONHUB_CHANNELS_PICO_ENABLED"`
-	Token           string              `json:"token"                       env:"MOONHUB_CHANNELS_PICO_TOKEN"`
-	AllowTokenQuery bool                `json:"allow_token_query,omitempty"`
-	AllowOrigins    []string            `json:"allow_origins,omitempty"`
-	PingInterval    int                 `json:"ping_interval,omitempty"`
-	ReadTimeout     int                 `json:"read_timeout,omitempty"`
-	WriteTimeout    int                 `json:"write_timeout,omitempty"`
-	MaxConnections  int                 `json:"max_connections,omitempty"`
-	AllowFrom       FlexibleStringSlice `json:"allow_from"                  env:"MOONHUB_CHANNELS_PICO_ALLOW_FROM"`
-	Placeholder     PlaceholderConfig   `json:"placeholder,omitempty"`
 }
 
 type MoonHubConfig struct {

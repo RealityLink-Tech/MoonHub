@@ -2,7 +2,7 @@
 
 Paths are `pkg/plugins/.../plugin.go` (package name is typically the directory name, e.g., `telegram`, `openai_compat`).
 
-## Channel (17)
+## Channel (16)
 
 | Directory | Purpose |
 |-----------|---------|
@@ -18,7 +18,6 @@ Paths are `pkg/plugins/.../plugin.go` (package name is typically the directory n
 | `channels/wecom` | WeCom (Enterprise WeChat) |
 | `channels/wecom_app` | WeCom App |
 | `channels/wecom_aibot` | WeCom AI Bot |
-| `channels/pico` | Pico |
 | `channels/irc` | IRC |
 | `channels/maixcam` | MaixCam |
 | `channels/whatsapp` | WhatsApp (Bridge) |
