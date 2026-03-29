@@ -131,7 +131,7 @@ func TestRefresh_Success(t *testing.T) {
 
 	// Refresh with the device ID
 	refreshReq := httptest.NewRequest("POST", "/api/auth/refresh", nil)
-	refreshReq.Header.Set("X-Device-ID", "TEST-001")
+	refreshReq.Header.Set("X-Device-Id", "TEST-001")
 	refreshW := httptest.NewRecorder()
 	h.ServeHTTP(refreshW, refreshReq)
 
@@ -148,7 +148,7 @@ func TestRefresh_UnknownDevice(t *testing.T) {
 	defer cleanup()
 
 	req := httptest.NewRequest("POST", "/api/auth/refresh", nil)
-	req.Header.Set("X-Device-ID", "UNKNOWN")
+	req.Header.Set("X-Device-Id", "UNKNOWN")
 	w := httptest.NewRecorder()
 	h.ServeHTTP(w, req)
 

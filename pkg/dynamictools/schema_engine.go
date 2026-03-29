@@ -120,7 +120,7 @@ func (e *SchemaEngine) fetchData(ctx context.Context, fc *FetchConfig, params ma
 func deepCopyComponent(c *GeneratedComponent) *GeneratedComponent {
 	data, err := json.Marshal(c)
 	if err != nil {
-		// Fallback to shallow copy if marshalling fails (should not happen for valid schemas).
+		// Fallback to shallow copy if marshaling fails (should not happen for valid schemas).
 		cp := &GeneratedComponent{
 			ID:    c.ID,
 			Type:  c.Type,

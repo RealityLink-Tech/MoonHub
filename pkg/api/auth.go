@@ -147,9 +147,9 @@ func (h *Handler) handleBind(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) handleRefresh(w http.ResponseWriter, r *http.Request) {
-	deviceID := r.Header.Get("X-Device-ID")
+	deviceID := r.Header.Get("X-Device-Id")
 	if deviceID == "" {
-		writeJSONError(w, http.StatusBadRequest, "X-Device-ID header required")
+		writeJSONError(w, http.StatusBadRequest, "X-Device-Id header required")
 		return
 	}
 

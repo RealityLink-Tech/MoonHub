@@ -25,7 +25,7 @@ type ToolManager struct {
 }
 
 // NewToolManager opens (or creates) the SQLite database at dbPath, applies WAL/NORMAL
-// pragmas and initialises the schema.
+// pragmas and initializes the schema.
 func NewToolManager(dbPath string) (*ToolManager, error) {
 	dir := filepath.Dir(dbPath)
 	if err := os.MkdirAll(dir, 0755); err != nil {

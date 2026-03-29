@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -10,21 +9,7 @@ import (
 	"github.com/RealityLink-Tech/MoonHub/pkg/agent"
 	"github.com/gorilla/websocket"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
-
-type mockAgentLoop struct {
-	mock.Mock
-}
-
-func (m *mockAgentLoop) ProcessDirectWithChannel(ctx context.Context, content, sessionKey, channel, chatID string) (string, error) {
-	args := m.Called(ctx, content, sessionKey, channel, chatID)
-	return args.String(0), args.Error(1)
-}
-
-func (m *mockAgentLoop) SetEventEmitter(emitter agent.EventEmitter) {
-	m.Called(emitter)
-}
 
 func TestChatWS_UpgradeWithoutToken(t *testing.T) {
 	h := NewHandler(t.TempDir(), nil, nil)
@@ -32,7 +17,10 @@ func TestChatWS_UpgradeWithoutToken(t *testing.T) {
 	defer server.Close()
 
 	wsURL := "ws" + strings.TrimPrefix(server.URL, "http") + "/api/chat/ws"
-	_, _, err := websocket.DefaultDialer.Dial(wsURL, nil)
+	_, httpResp, err := websocket.DefaultDialer.Dial(wsURL, nil)
+	if httpResp != nil {
+		httpResp.Body.Close()
+	}
 	assert.Error(t, err)
 }
 
