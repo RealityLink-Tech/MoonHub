@@ -99,6 +99,10 @@ func (h *DynamicToolsHandler) handleGenerate(w http.ResponseWriter, r *http.Requ
 		writeDynamicError(w, http.StatusBadRequest, "prompt is required")
 		return
 	}
+	if len(req.Prompt) > 1000 {
+		writeDynamicError(w, http.StatusBadRequest, "prompt too long (max 1000 characters)")
+		return
+	}
 
 	category := req.Context
 	if category == "" {
