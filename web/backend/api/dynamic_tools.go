@@ -139,6 +139,19 @@ func (h *DynamicToolsHandler) handleGenerate(w http.ResponseWriter, r *http.Requ
 	}
 
 	if err := h.toolManager.Insert(r.Context(), tool); err != nil {
+		// Concurrent generate with the same content_hash: treat as dedup success.
+		if isSQLiteUniqueConstraintError(err) {
+			if dup, ferr := h.toolManager.FindByHash(r.Context(), hash); ferr == nil && dup != nil {
+				writeDynamicSuccess(w, dynamictools.GenerateResult{
+					ToolID:      dup.ID,
+					Name:        dup.Name,
+					IsNew:       false,
+					ChatSchema:  dup.ChatSchema,
+					SpaceSchema: dup.SpaceSchema,
+				})
+				return
+			}
+		}
 		writeDynamicError(w, http.StatusInternalServerError, "failed to save tool: "+err.Error())
 		return
 	}
@@ -185,9 +198,15 @@ func (h *DynamicToolsHandler) handleExecute(w http.ResponseWriter, r *http.Reque
 		params = make(map[string]any)
 	}
 
+	// Accept mode from query string or request body.
 	mode := r.URL.Query().Get("mode")
 	if mode == "" {
-		mode = "chat"
+		if m, ok := params["mode"].(string); ok {
+			mode = m
+			delete(params, "mode")
+		} else {
+			mode = "chat"
+		}
 	}
 
 	var result *dynamictools.ExecutionResult
@@ -450,7 +469,7 @@ func parseGenerateResponse(content, category, hash string) (*dynamictools.Dynami
 	}
 
 	if raw.ChatSchema.Type == "" {
-		raw.ChatSchema = dynamictools.GeneratedComponent{ID: "root", Type: "text", Props: map[string]any{"text": content}}
+		raw.ChatSchema = dynamictools.GeneratedComponent{ID: "root", Type: "text", Props: map[string]any{"content": content}}
 	}
 	if raw.SpaceSchema.Type == "" {
 		raw.SpaceSchema = dynamictools.GeneratedComponent{ID: "root", Type: "card", Props: map[string]any{"title": raw.Name}, Children: []dynamictools.GeneratedComponent{}}
@@ -488,16 +507,60 @@ func extractJSON(s string) string {
 		}
 	}
 
-	// Try to find the first { and last } to extract the JSON object.
+	// Balanced brace scan from first `{`, respecting JSON string escapes.
+	if obj, ok := extractBalancedJSONObject(s); ok {
+		return obj
+	}
+	return ""
+}
+
+// extractBalancedJSONObject returns the shortest top-level JSON object starting at
+// the first `{`, using a string-aware state machine (handles `}` inside strings).
+func extractBalancedJSONObject(s string) (string, bool) {
 	start := strings.Index(s, "{")
 	if start == -1 {
-		return ""
+		return "", false
 	}
-	end := strings.LastIndex(s, "}")
-	if end <= start {
-		return ""
+	depth := 0
+	inString := false
+	escape := false
+	for i := start; i < len(s); i++ {
+		c := s[i]
+		if inString {
+			if escape {
+				escape = false
+				continue
+			}
+			if c == '\\' {
+				escape = true
+				continue
+			}
+			if c == '"' {
+				inString = false
+			}
+			continue
+		}
+		switch c {
+		case '"':
+			inString = true
+		case '{':
+			depth++
+		case '}':
+			depth--
+			if depth == 0 {
+				return strings.TrimSpace(s[start : i+1]), true
+			}
+		}
 	}
-	return s[start : end+1]
+	return "", false
+}
+
+// isSQLiteUniqueConstraintError reports typical SQLite UNIQUE violations from modernc/mattn drivers.
+func isSQLiteUniqueConstraintError(err error) bool {
+	if err == nil {
+		return false
+	}
+	return strings.Contains(strings.ToLower(err.Error()), "unique constraint")
 }
 
 // inferCategory detects whether the prompt is more suited for a "space" or
