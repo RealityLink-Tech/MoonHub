@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log"
 	"net/http"
 	"sync"
 
@@ -24,6 +25,7 @@ type Handler struct {
 	discover             *DiscoverHandler
 	devices              *DevicesHandler
 	auth                 *AuthHandler
+	dynamicTools         *DynamicToolsHandler
 }
 
 // NewHandler creates an instance of the API handler.
@@ -38,6 +40,7 @@ func NewHandler(configPath string, deviceStore *devices.DeviceStore, pairingMana
 		discover:       NewDiscoverHandler(mdnsClient),
 		devices:        NewDevicesHandler(deviceStore),
 		auth:           NewAuthHandler(pairingManager, deviceStore),
+		dynamicTools:   initDynamicTools(configPath),
 	}
 }
 
@@ -97,4 +100,20 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	h.discover.RegisterRoutes(mux)
 	h.devices.RegisterRoutes(mux)
 	h.auth.RegisterRoutes(mux)
+
+	// Dynamic tools (AI-generated UI components)
+	if h.dynamicTools != nil {
+		h.dynamicTools.RegisterRoutes(mux)
+	}
+}
+
+// initDynamicTools creates the DynamicToolsHandler. If initialisation fails
+// (e.g. SQLite unavailable) the handler is nil and routes are silently skipped.
+func initDynamicTools(configPath string) *DynamicToolsHandler {
+	dth, err := NewDynamicToolsHandler(configPath)
+	if err != nil {
+		log.Printf("dynamic-tools: init skipped: %v", err)
+		return nil
+	}
+	return dth
 }
