@@ -374,24 +374,57 @@ func buildGenerateSystemPrompt() string {
 2. space_schema: A full-width component tree for dashboard/space display.
 
 Available component types:
-CHAT: text, heading, badge, icon, image, progress, stat_card, action_button, divider
-SPACE: stat_card, chart_bar, chart_line, chart_pie, list, grid, card, timeline, counter, status_indicator, markdown_block, iframe
+CHAT CARDS (compact, for inline chat display):
+- metric-summary: A single metric with value, unit, trend direction (up/down/neutral), and optional subtitle
+- status-badge: A status indicator with label, status (success/warning/error/info), and optional icon
+- mini-list: A compact list of 3-5 items, each with a title and optional subtitle/icon
+- quick-action: An action button with label, icon, and optional color
+- chart-preview: A small chart (line or bar), accepts props: type ("line"|"bar"), data (array of {x, y}), height
+
+BASE PRIMITIVES (usable in both chat and space schemas):
+- container: A wrapper div, props: className, style
+- flex: Flexbox container, props: direction ("row"|"column"), gap, justify, align, className
+- grid: CSS grid, props: columns (number), gap, className
+- card: A card container with optional title, props: title, className
+- text: Text display, props: content (string), variant ("title"|"subtitle"|default), className
+- button: Clickable button, props: label, variant, action, className
+- input: Text input, props: placeholder, label, className
+- image: Image display, props: src (URL), alt, width, height
+- icon: Lucide icon by name, props: name (string), size, className
+- divider: Horizontal divider line
+- spacer: Vertical spacing, props: size (number, pixels)
+- metric: A metric display, props: value, label, unit, trend ("up"|"down"|"neutral")
+- progress: Progress bar, props: value (0-100), label, variant
+- list: A generic list, props: items (array of {title, subtitle, icon}), emptyText
+- chart: Chart placeholder, props: type ("line"|"bar"), data (array of {x, y}), title
+
+SPACE COMPONENTS (rich, for dashboard display):
+- metric-card: Large metric card with value, label, unit, trend, supports real-time updates via componentId
+- line-chart: Recharts line chart, props: data (array of {x, y, ...}), xKey, yKey, title, color
+- bar-chart: Recharts bar chart, props: data (array), xKey, yKey, title, color
+- data-table: Sortable data table, props: columns (array of {key, label}), rows (array of objects), title
+- status-list: Status list with icons, props: items (array of {label, status, icon, description}), title
+- action-form: Dynamic form, props: fields (array of {key, label, type, options}), action, title
+- calendar: Calendar view, props: events (array of {date, title, color}), title
+- kanban-board: Kanban board, props: columns (array of {title, items: [{title, description}]}), title
 
 IMPORTANT RULES:
 - Return ONLY valid JSON with no explanation or markdown wrappers.
 - Each schema must have: {"id":"root","type":"<component_type>","props":{...},"children":[...]}
+- You MUST use the exact type names listed above. Unknown types will render as errors.
 - Use "props.title", "props.value", "props.subtitle" for data display.
-- For charts, include "props.data" as an array of objects.
+- For charts, include "props.data" as an array of objects with "x" and "y" keys.
 - Use real, realistic placeholder data so the component is immediately useful.
-- chat_schema should be compact (1-2 components).
-- space_schema can be richer (3-5 components with nested children).
+- chat_schema should be compact (1-2 components). Prefer chat card types.
+- space_schema can be richer (3-5 components with nested children). Use container/flex/grid for layout.
+- Layout components (container, flex, grid) support children; leaf components do not.
 
 RESPONSE FORMAT (JSON):
 {
   "name": "<short english name>",
   "description": "<english description>",
-  "chat_schema": { "id": "root", "type": "stat_card", "props": {...}, "children": [] },
-  "space_schema": { "id": "root", "type": "grid", "props": {...}, "children": [...] }
+  "chat_schema": { "id": "root", "type": "metric-summary", "props": {"value": "42", "unit": "%", "trend": "up", "label": "Completion"}, "children": [] },
+  "space_schema": { "id": "root", "type": "flex", "props": {"direction": "column", "gap": 16}, "children": [...] }
 }`
 }
 

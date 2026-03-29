@@ -2,6 +2,7 @@ package dynamictools
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 )
@@ -114,23 +115,31 @@ func (e *SchemaEngine) fetchData(ctx context.Context, fc *FetchConfig, params ma
 	}
 }
 
-// deepCopyComponent creates a deep clone of a GeneratedComponent tree.
+// deepCopyComponent creates a deep clone of a GeneratedComponent tree using
+// JSON marshal/unmarshal to ensure all nested maps and slices are independent.
 func deepCopyComponent(c *GeneratedComponent) *GeneratedComponent {
-	cp := &GeneratedComponent{
-		ID:   c.ID,
-		Type: c.Type,
-		Props: make(map[string]any, len(c.Props)),
-	}
-	for k, v := range c.Props {
-		cp.Props[k] = v
-	}
-	if len(c.Children) > 0 {
-		cp.Children = make([]GeneratedComponent, len(c.Children))
-		for i, child := range c.Children {
-			cp.Children[i] = *deepCopyComponent(&child)
+	data, err := json.Marshal(c)
+	if err != nil {
+		// Fallback to shallow copy if marshalling fails (should not happen for valid schemas).
+		cp := &GeneratedComponent{
+			ID:   c.ID,
+			Type: c.Type,
+			Props: make(map[string]any, len(c.Props)),
 		}
+		for k, v := range c.Props {
+			cp.Props[k] = v
+		}
+		if len(c.Children) > 0 {
+			cp.Children = make([]GeneratedComponent, len(c.Children))
+			copy(cp.Children, c.Children)
+		}
+		return cp
 	}
-	return cp
+	var cp GeneratedComponent
+	if err := json.Unmarshal(data, &cp); err != nil {
+		return &GeneratedComponent{ID: c.ID, Type: c.Type}
+	}
+	return &cp
 }
 
 // injectData recursively merges data map keys into component props (only
