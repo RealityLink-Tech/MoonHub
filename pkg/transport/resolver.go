@@ -10,7 +10,7 @@ import (
 type ConnectionMode int
 
 const (
-	ModeLAN   ConnectionMode = iota
+	ModeLAN ConnectionMode = iota
 	ModeCloud
 )
 

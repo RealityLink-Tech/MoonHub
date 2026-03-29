@@ -4,6 +4,42 @@ All notable changes to MoonHub will be documented in this file.
 
 ---
 
+## 2026-03-30 — Dynamic tools (schema engine, LAN API, SQLite)
+
+### Summary
+
+Shipped **dynamic tools**: AI-assisted generation of **chat + space** UI schemas, **SQLite** persistence with content-hash deduplication, **SchemaEngine** execution with sandboxed **HTTPFetch**, and **LAN-only** REST endpoints under `/api/dynamic-tools`. The companion PWA lists, pins, executes, and renders tools via **DynamicRenderer** and dedicated chat/space component sets.
+
+### New Features
+
+**Dynamic tools** (`pkg/dynamictools/`, `web/backend/api/dynamic_tools.go`)
+- `ToolManager` — `dynamic_tools` table in `<MOONHUB_HOME>/dynamic_tools.db`
+- `SchemaEngine` — `Execute` / `ExecuteSpace`, optional `FetchConfig` (e.g. `api` source + URL templating)
+- `HostFunctions` — bounded HTTP responses; `ReadChannel` stub
+- HTTP: `GET /api/dynamic-tools`, `POST /api/dynamic-tools/generate`, `POST /api/dynamic-tools/{id}/execute`, `GET /api/dynamic-tools/{id}/schema`, `DELETE /api/dynamic-tools/{id}`, `PATCH /api/dynamic-tools/{id}/home` (all LAN-restricted; handler omitted if DB init fails)
+
+### Files Changed
+
+- `pkg/dynamictools/` — New package (types, tool manager, schema engine, host functions, fetch URL validation, tests)
+- `web/backend/api/router.go` — Optional `dynamicTools` registration
+- `web/backend/api/dynamic_tools.go` — Handler implementation
+- `pkg/dynamictools/docs/README.md`, `pkg/dynamictools/README.md` — Package documentation
+- `docs/implementation/dynamic-tools-status.md` — Implementation status
+- `docs/README.md` — Subsystem table, package row, reading order step 10
+- `web/backend/api/README.md` — Dynamic tools endpoint section
+- `README.md` / `README_CN.md` — Feature bullets; planned Wasm line narrowed
+- `web/README.md` — Cross-link to dynamic tools docs
+- `CLAUDE.md` — Architecture pointer for `dynamictools/`
+- `CHANGELOG.md` — This entry
+
+### Documentation
+
+- [`pkg/dynamictools/docs/README.md`](pkg/dynamictools/docs/README.md)
+- [`docs/implementation/dynamic-tools-status.md`](docs/implementation/dynamic-tools-status.md)
+- [`web/backend/api/README.md`](web/backend/api/README.md)
+
+---
+
 ## 2026-03-29 — PWA companion LAN APIs (discover, devices, channels)
 
 ### Summary

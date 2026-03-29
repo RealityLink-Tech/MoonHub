@@ -29,4 +29,3 @@ func GetConfigPath() string {
 func LoadConfig() (*config.Config, error) {
 	return config.LoadConfig(GetConfigPath())
 }
-

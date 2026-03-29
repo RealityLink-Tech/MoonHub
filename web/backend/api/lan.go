@@ -10,11 +10,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/RealityLink-Tech/MoonHub/pkg/agent"
 	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 	"github.com/RealityLink-Tech/MoonHub/pkg/devices"
 	"github.com/RealityLink-Tech/MoonHub/pkg/social"
+	"github.com/google/uuid"
 )
 
 // LANHandler handles LAN API requests for chat functionality.
@@ -105,7 +105,7 @@ func getDeviceID(ctx context.Context) string {
 // handleInfo handles GET /api/lan/info - returns device information.
 func (h *LANHandler) handleInfo(w http.ResponseWriter, r *http.Request) {
 	response := struct {
-		Success bool             `json:"success"`
+		Success bool               `json:"success"`
 		Data    *social.DeviceInfo `json:"data"`
 	}{
 		Success: true,
@@ -170,7 +170,7 @@ func (h *LANHandler) handleChat(w http.ResponseWriter, r *http.Request) {
 
 	// Build response
 	chatResponse := struct {
-		Success bool               `json:"success"`
+		Success bool                 `json:"success"`
 		Data    *social.ChatResponse `json:"data"`
 	}{
 		Success: true,

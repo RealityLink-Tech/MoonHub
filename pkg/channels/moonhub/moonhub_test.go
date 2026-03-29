@@ -189,10 +189,10 @@ func TestMoonHubChannel_ConnectionLimit(t *testing.T) {
 	msgBus := bus.NewMessageBus()
 
 	ch, _ := NewMoonHubChannel(config.MoonHubConfig{
-		Enabled:         true,
-		Port:            0,
-		Token:           "test-token",
-		MaxConnections:  1,
+		Enabled:        true,
+		Port:           0,
+		Token:          "test-token",
+		MaxConnections: 1,
 	}, priv, msgBus)
 
 	ctx, cancel := context.WithCancel(context.Background())

@@ -10,7 +10,7 @@ import (
 type HandlerResult int
 
 const (
-	HandlerAccepted  HandlerResult = iota
+	HandlerAccepted HandlerResult = iota
 	HandlerRejected
 	HandlerDeduped
 )

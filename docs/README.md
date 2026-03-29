@@ -13,6 +13,7 @@ This page is the **entry point and reading guide** for the repository documentat
 7. If you enable **device provisioning** on the web launcher (`MOONHUB_PROVISIONING_ENABLED=1`): [pkg/provisioning/docs/README.md](../pkg/provisioning/docs/README.md) → [CONFIG.md](../pkg/provisioning/docs/CONFIG.md) → [implementation status](./implementation/provisioning-status.md) (detailed reference)
 8. If you deploy **cloud directory + relay** (optional Phase 3 services): [cloud/directory/docs/README.md](../cloud/directory/docs/README.md) → [CONFIG.md](../cloud/directory/docs/CONFIG.md) → [cloud/relay/docs/README.md](../cloud/relay/docs/README.md) → [CONFIG.md](../cloud/relay/docs/CONFIG.md) → [pkg/transport/docs/README.md](../pkg/transport/docs/README.md) → [implementation status](./implementation/cloud-directory-relay-status.md)
 9. If you integrate or debug the **companion PWA** (LAN discovery, pairing, channel settings, chat): [web/backend/api/README.md](../web/backend/api/README.md) (authoritative HTTP contract) → companion app index `MoonHub-PWA/docs/README.md` when using the split-repo layout → [LAN discovery](./implementation/lan-discovery-status.md) / [LAN pairing](./implementation/lan-pairing-status.md) on the device side
+10. If you work on **AI-generated dynamic UI** (Space home tools, schema execution): [pkg/dynamictools/docs/README.md](../pkg/dynamictools/docs/README.md) → [web/backend/api/README.md](../web/backend/api/README.md) ( `/api/dynamic-tools` ) → [implementation status](./implementation/dynamic-tools-status.md) → PWA `MoonHub-PWA/docs/ARCHITECTURE.md` / `docs/services.md`
 
 ## Documentation Flow by Subsystem
 
@@ -118,7 +119,14 @@ Channel architecture, migration, and how to implement a channel: [`pkg/channels/
 | Document | Description |
 | --- | --- |
 | [`web/README.md`](../web/README.md) | Web interface development (React + Vite frontend, Go backend); includes device provisioning UI and API notes |
-| [`web/backend/api/README.md`](../web/backend/api/README.md) | **HTTP API reference** for the Go backend: LAN discovery (`/api/discover`), paired devices (`/api/devices`), auth, channel CRUD, config, chat, gateway, etc. Companion app: **MoonHub-PWA** (`MoonHub-PWA/docs/README.md` when using the split-repo layout). |
+| [`web/backend/api/README.md`](../web/backend/api/README.md) | **HTTP API reference** for the Go backend: LAN discovery (`/api/discover`), paired devices (`/api/devices`), auth, channel CRUD, **dynamic tools** (`/api/dynamic-tools`), config, chat, gateway, etc. Companion app: **MoonHub-PWA** (`MoonHub-PWA/docs/README.md` when using the split-repo layout). |
+
+### Dynamic tools (AI-generated UI)
+
+| Order | Document | Description |
+| --- | --- | --- |
+| 1 | [`pkg/dynamictools/docs/README.md`](../pkg/dynamictools/docs/README.md) | Package scope, files, persistence path, integration with HTTP API and PWA |
+| Status | [`docs/implementation/dynamic-tools-status.md`](./implementation/dynamic-tools-status.md) | Shipped vs roadmap (Wasm engine, ReadChannel, etc.) |
 
 ---
 
@@ -137,6 +145,7 @@ Channel architecture, migration, and how to implement a channel: [`pkg/channels/
 | [`lan-discovery-status.md`](./implementation/lan-discovery-status.md) | LAN mDNS discovery implementation status |
 | [`lan-pairing-status.md`](./implementation/lan-pairing-status.md) | LAN device pairing implementation status |
 | [`cloud-directory-relay-status.md`](./implementation/cloud-directory-relay-status.md) | Cloud directory, WebSocket relay, and `pkg/transport` cloud path |
+| [`dynamic-tools-status.md`](./implementation/dynamic-tools-status.md) | Dynamic tools: schema engine, SQLite, LAN HTTP API, PWA renderer |
 
 ---
 
@@ -192,6 +201,7 @@ Per-channel specific documentation:
 | `devices/` | Hardware device interfaces (I2C, SPI) |
 | `provisioning/` | Device WiFi provisioning, hotspot, recovery, auth code (opt-in via launcher env) |
 | `transport/` | Agent-to-agent connections: `Manager`, `Resolver` (LAN vs cloud), `CloudClient` for directory HTTP; see [pkg/transport/docs/README.md](../pkg/transport/docs/README.md) |
+| `dynamictools/` | AI-generated dynamic tools: SQLite `ToolManager`, `SchemaEngine`, host HTTP fetch; LAN `/api/dynamic-tools`; see [pkg/dynamictools/docs/README.md](../pkg/dynamictools/docs/README.md) |
 | `fileutil/` | File operation utilities |
 | `constants/` | Shared constants |
 

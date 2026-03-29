@@ -10,11 +10,14 @@ func testDBPath(t *testing.T) string {
 }
 
 func TestManager_SendFriendRequest(t *testing.T) {
-	store, _ := NewStore(testDBPath(t))
+	store, err := NewStore(testDBPath(t))
+	if err != nil {
+		t.Skip("sqlite not available:", err)
+	}
 	defer store.Close()
 	mgr := NewManager(store)
 
-	err := mgr.SendRequest("mh_sender11111111", "TestSender", []byte("sender-key"), "Let's collaborate!")
+	err = mgr.SendRequest("mh_sender11111111", "TestSender", []byte("sender-key"), "Let's collaborate!")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,12 +35,15 @@ func TestManager_SendFriendRequest(t *testing.T) {
 }
 
 func TestManager_SendFriendRequest_Duplicate(t *testing.T) {
-	store, _ := NewStore(testDBPath(t))
+	store, err := NewStore(testDBPath(t))
+	if err != nil {
+		t.Skip("sqlite not available:", err)
+	}
 	defer store.Close()
 	mgr := NewManager(store)
 
 	_ = mgr.SendRequest("mh_sender11111111", "Test", nil, "hi")
-	err := mgr.SendRequest("mh_sender11111111", "Test", nil, "hi again")
+	err = mgr.SendRequest("mh_sender11111111", "Test", nil, "hi again")
 	if err == nil {
 		t.Error("expected error for duplicate request")
 	}
@@ -47,7 +53,10 @@ func TestManager_SendFriendRequest_Duplicate(t *testing.T) {
 }
 
 func TestManager_AcceptFriendRequest(t *testing.T) {
-	store, _ := NewStore(testDBPath(t))
+	store, err := NewStore(testDBPath(t))
+	if err != nil {
+		t.Skip("sqlite not available:", err)
+	}
 	defer store.Close()
 	mgr := NewManager(store)
 
@@ -63,18 +72,24 @@ func TestManager_AcceptFriendRequest(t *testing.T) {
 }
 
 func TestManager_AcceptFriendRequest_NotFound(t *testing.T) {
-	store, _ := NewStore(testDBPath(t))
+	store, err := NewStore(testDBPath(t))
+	if err != nil {
+		t.Skip("sqlite not available:", err)
+	}
 	defer store.Close()
 	mgr := NewManager(store)
 
-	_, err := mgr.AcceptRequest("mh_nonexistent", "Me", nil)
+	_, err = mgr.AcceptRequest("mh_nonexistent", "Me", nil)
 	if err == nil {
 		t.Error("expected error for nonexistent request")
 	}
 }
 
 func TestManager_RejectFriendRequest(t *testing.T) {
-	store, _ := NewStore(testDBPath(t))
+	store, err := NewStore(testDBPath(t))
+	if err != nil {
+		t.Skip("sqlite not available:", err)
+	}
 	defer store.Close()
 	mgr := NewManager(store)
 
@@ -90,14 +105,17 @@ func TestManager_RejectFriendRequest(t *testing.T) {
 }
 
 func TestManager_RevokeFriend(t *testing.T) {
-	store, _ := NewStore(testDBPath(t))
+	store, err := NewStore(testDBPath(t))
+	if err != nil {
+		t.Skip("sqlite not available:", err)
+	}
 	defer store.Close()
 	mgr := NewManager(store)
 
 	_ = mgr.SendRequest("mh_sender11111111", "Test", nil, "hi")
 	_, _ = mgr.AcceptRequest("mh_sender11111111", "Me", nil)
 
-	err := mgr.RevokeFriend("mh_sender11111111")
+	err = mgr.RevokeFriend("mh_sender11111111")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -109,7 +127,10 @@ func TestManager_RevokeFriend(t *testing.T) {
 }
 
 func TestManager_GetPendingRequests(t *testing.T) {
-	store, _ := NewStore(testDBPath(t))
+	store, err := NewStore(testDBPath(t))
+	if err != nil {
+		t.Skip("sqlite not available:", err)
+	}
 	defer store.Close()
 	mgr := NewManager(store)
 
@@ -127,7 +148,10 @@ func TestManager_GetPendingRequests(t *testing.T) {
 }
 
 func TestManager_ListAcceptedFriends(t *testing.T) {
-	store, _ := NewStore(testDBPath(t))
+	store, err := NewStore(testDBPath(t))
+	if err != nil {
+		t.Skip("sqlite not available:", err)
+	}
 	defer store.Close()
 	mgr := NewManager(store)
 

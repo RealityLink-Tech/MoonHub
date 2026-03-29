@@ -82,10 +82,11 @@ Your imagination is MoonHub's only boundary.
 - **Device Provisioning** — Zero-config WiFi setup (hotspot, scan/connect, diagnostics, automatic and manual recovery, factory reset, auth code, SSE). Opt-in on the web launcher via `MOONHUB_PROVISIONING_ENABLED=1`; includes React provisioning wizard and optional PWA offline cache for that flow. See [`pkg/provisioning/docs/README.md`](pkg/provisioning/docs/README.md), [`pkg/provisioning/docs/CONFIG.md`](pkg/provisioning/docs/CONFIG.md), and [`docs/implementation/provisioning-status.md`](docs/implementation/provisioning-status.md).
 - **Cloud directory & relay** — Optional HTTP directory (PostgreSQL + Redis) for agent registration and online relay endpoints, plus a WebSocket relay with directory-backed Ed25519 auth; device-side [`pkg/transport`](pkg/transport/cloud.go) `CloudClient` and `Resolver` (LAN-first, then cloud). See [`docs/implementation/cloud-directory-relay-status.md`](docs/implementation/cloud-directory-relay-status.md), [`cloud/directory/docs/README.md`](cloud/directory/docs/README.md), [`cloud/relay/docs/README.md`](cloud/relay/docs/README.md), and [`pkg/transport/docs/README.md`](pkg/transport/docs/README.md).
 - **MoonHub PWA (companion app)** — Installable progressive web app for LAN discovery, pairing, chat, Space, and settings; uses backend APIs such as `GET /api/discover`, `GET /api/devices`, and channel CRUD on `/api/channels`. Backend contract: [`web/backend/api/README.md`](web/backend/api/README.md). Frontend docs (split layout): `MoonHub-PWA/docs/README.md`.
+- **Dynamic tools (AI-generated UI)** — Schema-driven tools persisted in SQLite (`dynamic_tools.db`), generated via LLM from natural language, executed server-side with optional HTTP fetch injection, exposed as LAN `/api/dynamic-tools`; PWA renders with **DynamicRenderer** and chat/space dynamic components. See [`pkg/dynamictools/docs/README.md`](pkg/dynamictools/docs/README.md), [`docs/implementation/dynamic-tools-status.md`](docs/implementation/dynamic-tools-status.md), and [`web/backend/api/README.md`](web/backend/api/README.md).
 
 ### Planned
 
-- **Dynamic UI Generation** — Real-time visual component generation based on user needs (dashboards, task managers, data visualizations); server-side Wasm tool runtime for chat-driven UI remains on the roadmap
+- **Wasm tool engine** — Execute `engine: wasm` dynamic tools (wazero or equivalent); schema path is already shipped
 - **Native APP** — Native mobile applications for iOS and Android platforms
 
 <details>
@@ -100,5 +101,6 @@ Your imagination is MoonHub's only boundary.
 - ~~**Inter-Agent Comms** — Lightweight pub/sub event bus for real-time inter-agent communication with wildcard subscriptions and bounded history.~~ → **Implemented** (delegation **Intercom** in [`pkg/delegation/intercom.go`](pkg/delegation/intercom.go); enabled with delegation)
 - ~~**Device Provisioning** — Zero-config WiFi setup, recovery, factory reset, provisioning UI.~~ → **Implemented** (launcher opt-in; see [`pkg/provisioning/docs/README.md`](pkg/provisioning/docs/README.md) and [`docs/implementation/provisioning-status.md`](docs/implementation/provisioning-status.md))
 - ~~**PWA Frontend** — Companion PWA for discovery, pairing, chat, Space, and settings.~~ → **Implemented** (LAN APIs documented in [`web/backend/api/README.md`](web/backend/api/README.md); app repo `MoonHub-PWA`.)
+- ~~**Dynamic UI Generation** — Real-time visual components from AI (dashboards, Space, chat cards).~~ → **Implemented** (schema phase: [`pkg/dynamictools/docs/README.md`](pkg/dynamictools/docs/README.md); Wasm execution still planned.)
 
 </details>

@@ -7,8 +7,10 @@ import (
 	"io"
 	"net/http"
 	"strings"
-	"time"
 )
+
+// maxHTTPFetchBody limits response size for schema-driven fetches (memory safety).
+const maxHTTPFetchBody = 2 << 20 // 2 MiB
 
 // HostFunctions 提供受控的数据访问能力。
 type HostFunctions struct {
@@ -18,12 +20,16 @@ type HostFunctions struct {
 // NewHostFunctions 创建 HostFunctions 实例。
 func NewHostFunctions() *HostFunctions {
 	return &HostFunctions{
-		httpClient: &http.Client{Timeout: 15 * time.Second},
+		httpClient: newFetchHTTPClient(),
 	}
 }
 
 // HTTPFetch 发起 HTTP 请求获取数据。
 func (hf *HostFunctions) HTTPFetch(ctx context.Context, method, url string, headers map[string]string, body string) (map[string]any, error) {
+	if err := validateFetchURL(ctx, url); err != nil {
+		return nil, fmt.Errorf("fetch url: %w", err)
+	}
+
 	var reqBody io.Reader
 	if body != "" {
 		reqBody = strings.NewReader(body)
@@ -51,9 +57,16 @@ func (hf *HostFunctions) HTTPFetch(ctx context.Context, method, url string, head
 		return nil, fmt.Errorf("http %d", resp.StatusCode)
 	}
 
+	bodyBytes, err := io.ReadAll(io.LimitReader(resp.Body, maxHTTPFetchBody+1))
+	if err != nil {
+		return nil, fmt.Errorf("read body: %w", err)
+	}
+	if len(bodyBytes) > maxHTTPFetchBody {
+		return nil, fmt.Errorf("response body exceeds limit (%d bytes)", maxHTTPFetchBody)
+	}
+
 	var result map[string]any
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		bodyBytes, _ := io.ReadAll(resp.Body)
+	if err := json.Unmarshal(bodyBytes, &result); err != nil {
 		return map[string]any{"text": string(bodyBytes)}, nil
 	}
 

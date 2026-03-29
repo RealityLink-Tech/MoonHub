@@ -90,12 +90,12 @@ async function readProvisioningSSE(
 
 export function useProvisioningSSE(options: UseProvisioningSSEOptions = {}) {
   const optsRef = useRef(options)
-  optsRef.current = options
 
   const [isConnected, setIsConnected] = useState(false)
   const eventSourceRef = useRef<EventSource | null>(null)
   const fetchAbortRef = useRef<AbortController | null>(null)
   const reconnectTimeoutRef = useRef<number | null>(null)
+  const connectRef = useRef<() => (() => void) | void>(() => {})
 
   const connect = useCallback(() => {
     if (reconnectTimeoutRef.current) {
@@ -147,14 +147,14 @@ export function useProvisioningSSE(options: UseProvisioningSSEOptions = {}) {
             e instanceof Error ? e : new Error("SSE connection failed")
           )
           reconnectTimeoutRef.current = window.setTimeout(() => {
-            connect()
+            connectRef.current()
           }, 3000)
           return
         }
         if (!ac.signal.aborted) {
           setIsConnected(false)
           reconnectTimeoutRef.current = window.setTimeout(() => {
-            connect()
+            connectRef.current()
           }, 3000)
         }
       })()
@@ -179,7 +179,7 @@ export function useProvisioningSSE(options: UseProvisioningSSEOptions = {}) {
         clearTimeout(reconnectTimeoutRef.current)
       }
       reconnectTimeoutRef.current = window.setTimeout(() => {
-        connect()
+        connectRef.current()
       }, 3000)
 
       optsRef.current.onError?.(new Error("SSE connection failed"))
@@ -206,6 +206,11 @@ export function useProvisioningSSE(options: UseProvisioningSSEOptions = {}) {
       setIsConnected(false)
     }
   }, [])
+
+  useEffect(() => {
+    optsRef.current = options
+    connectRef.current = connect
+  }, [options, connect])
 
   useEffect(() => {
     const cleanup = connect()

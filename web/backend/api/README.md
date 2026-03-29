@@ -20,11 +20,12 @@ MoonHub Web 后端 HTTP API 实现。路由由 [`router.go`](router.go) 中的 `
 | `session.go` | 对话与会话历史 |
 | `gateway.go` / `events.go` | 网关生命周期与 SSE |
 | `models.go` / `skills.go` / `tools.go` | 模型、技能、工具 API |
+| `dynamic_tools.go` | 动态工具：`/api/dynamic-tools`（SQLite + SchemaEngine，LAN 限定） |
 | `oauth.go` / `provisioning.go` / `startup.go` / … | 其余子系统 |
 
 ## 局域网访问控制
 
-与发现、配对、设备列表、频道 CRUD 等相关的多个端点通过 `requireLANClient` / `lan.go` **仅允许来自私网或本机的请求**。允许的地址范围与实现细节见 [`lan.go`](lan.go)。
+与发现、配对、设备列表、频道 CRUD、**动态工具** 等相关的多个端点通过 `requireLANClient` / `lan.go` **仅允许来自私网或本机的请求**。允许的地址范围与实现细节见 [`lan.go`](lan.go)。
 
 ## API 端点分类
 
@@ -62,6 +63,21 @@ MoonHub Web 后端 HTTP API 实现。路由由 [`router.go`](router.go) 中的 `
 
 目录类接口（与具体实现对齐）见 `channels.go`（例如 `GET /api/channels/catalog`）。
 
+### 动态工具（LAN 限定）
+
+由 [`dynamic_tools.go`](dynamic_tools.go) 注册；数据库位于 `<MOONHUB_HOME>/dynamic_tools.db`。若初始化失败（如 SQLite 不可用），`router.go` 中 **不注册** 下列路由。
+
+| 端点 | 方法 | 说明 |
+| --- | --- | --- |
+| `/api/dynamic-tools` | GET | 列表；可选查询参数 `source`（如 `source=ai`） |
+| `/api/dynamic-tools/generate` | POST | 根据自然语言 prompt 生成或复用（按 content hash 去重）工具定义 |
+| `/api/dynamic-tools/{id}/execute` | POST | 执行工具；请求体含 `mode`（`chat` / `space`）与可选 `params` |
+| `/api/dynamic-tools/{id}/schema` | GET | 获取指定 `mode` 下的 UI schema |
+| `/api/dynamic-tools/{id}` | DELETE | 删除工具 |
+| `/api/dynamic-tools/{id}/home` | PATCH | 设置是否在 Space 首页展示（`is_on_home`） |
+
+实现细节与状态见 [`pkg/dynamictools/docs/README.md`](../../pkg/dynamictools/docs/README.md)、[`docs/implementation/dynamic-tools-status.md`](../../docs/implementation/dynamic-tools-status.md)。
+
 ### 配置与其它（需 Token 或按各 handler 约定）
 
 | 区域 | 端点示例 | 文件 |
@@ -73,7 +89,7 @@ MoonHub Web 后端 HTTP API 实现。路由由 [`router.go`](router.go) 中的 `
 
 ## 路由注册说明
 
-`Handler.RegisterRoutes` 在内部依次调用 `registerConfigRoutes`、`registerGatewayRoutes`、`registerChannelCRUDRoutes` 等，并在末尾注册 `discovery`、`discover`、`devices`、`auth` 的 LAN 相关路由。配网相关路由在设置了 `SetProvisioningHandler` 时由 `provisioning` 子 handler 注册。
+`Handler.RegisterRoutes` 在内部依次调用 `registerConfigRoutes`、`registerGatewayRoutes`、`registerChannelCRUDRoutes` 等，并在末尾注册 `discovery`、`discover`、`devices`、`auth` 的 LAN 相关路由；若 `dynamicTools != nil`，再注册动态工具路由。配网相关路由在设置了 `SetProvisioningHandler` 时由 `provisioning` 子 handler 注册。
 
 ## 认证示例
 
@@ -103,3 +119,4 @@ go test ./web/backend/api/... -v
 
 - [局域网发现实现](../../docs/implementation/lan-discovery-status.md)
 - [配对认证实现](../../docs/implementation/lan-pairing-status.md)
+- [动态工具实现状态](../../docs/implementation/dynamic-tools-status.md)

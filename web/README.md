@@ -25,7 +25,7 @@ Edge-style **WiFi provisioning** (hotspot, scan/connect, recovery, auth code, fa
 
 ### Companion PWA & LAN HTTP API
 
-The installable **MoonHub-PWA** client (separate repository; often checked out beside this repo as `MoonHub-PWA/`) talks to the device over **LAN** using the Go API under [`backend/api/`](backend/api/). Operator-facing endpoint tables (mDNS `GET /api/discover`, paired list `GET /api/devices`, channel CRUD, auth, config, chat, gateway) live in [`backend/api/README.md`](backend/api/README.md).
+The installable **MoonHub-PWA** client (separate repository; often checked out beside this repo as `MoonHub-PWA/`) talks to the device over **LAN** using the Go API under [`backend/api/`](backend/api/). Operator-facing endpoint tables (mDNS `GET /api/discover`, paired list `GET /api/devices`, channel CRUD, **dynamic tools** `/api/dynamic-tools`, auth, config, chat, gateway) live in [`backend/api/README.md`](backend/api/README.md). Package-level design: [pkg/dynamictools/docs/README.md](../pkg/dynamictools/docs/README.md).
 
 ## Getting Started
 

@@ -56,7 +56,7 @@ type AgentLoop struct {
 	// pluginToolReg holds tools from plugin manager; used when reloading registry
 	pluginToolReg *tools.ToolRegistry
 	// eventEmitter is the callback for agent activity events (nil-safe).
-	eventEmitter   EventEmitter
+	eventEmitter EventEmitter
 	// Track active requests for safe provider cleanup
 	activeRequests sync.WaitGroup
 }
@@ -1522,16 +1522,6 @@ func (al *AgentLoop) runLLMIteration(
 								"match_value": decision.MatchValue,
 							})
 						agentResults[idx].result = toolResult
-						al.emitEvent(AgentEvent{
-							Kind:       EventToolEnd,
-							ToolName:   tc.Name,
-							ToolError:  fmt.Sprintf("blocked: %s", decision.Reason),
-							SessionKey: opts.SessionKey,
-							Channel:    opts.Channel,
-							ChatID:     opts.ChatID,
-							Iteration:  iteration,
-						})
-						return
 						// Create approval request
 						req := agent.ApprovalManager.CreateRequest(shield.ShieldEvent{
 							Scope:    shield.ScopeToolCall,

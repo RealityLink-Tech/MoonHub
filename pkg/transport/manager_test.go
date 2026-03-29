@@ -7,8 +7,8 @@ import (
 	_ "strings"
 	"testing"
 
-	_ "github.com/gorilla/websocket"
 	_ "github.com/RealityLink-Tech/MoonHub/pkg/protocol/mhp"
+	_ "github.com/gorilla/websocket"
 )
 
 func TestManager_GetOrCreate(t *testing.T) {

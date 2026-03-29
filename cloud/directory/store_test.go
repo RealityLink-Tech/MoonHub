@@ -46,10 +46,10 @@ func TestMemoryStore_UpsertAndGet(t *testing.T) {
 	ctx := context.Background()
 
 	agent := &AgentRecord{
-		AgentID:    "mh_aaaa1111bbbb2222",
-		AgentName:  "Test Agent",
-		PublicKey:  []byte("test-pubkey"),
-		Endpoint:   "wss://relay.example.com",
+		AgentID:   "mh_aaaa1111bbbb2222",
+		AgentName: "Test Agent",
+		PublicKey: []byte("test-pubkey"),
+		Endpoint:  "wss://relay.example.com",
 	}
 
 	if err := store.UpsertAgent(ctx, agent); err != nil {
@@ -97,10 +97,10 @@ func TestMemoryStore_GetPublicKey(t *testing.T) {
 	ctx := context.Background()
 
 	store.UpsertAgent(ctx, &AgentRecord{
-		AgentID:    "mh_aaaa1111bbbb2222",
-		PublicKey:  []byte("my-public-key"),
-		AgentName:  "Agent",
-		Endpoint:   "wss://relay.example.com",
+		AgentID:   "mh_aaaa1111bbbb2222",
+		PublicKey: []byte("my-public-key"),
+		AgentName: "Agent",
+		Endpoint:  "wss://relay.example.com",
 	})
 
 	key, err := store.GetPublicKey(ctx, "mh_aaaa1111bbbb2222")

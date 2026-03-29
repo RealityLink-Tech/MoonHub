@@ -595,13 +595,13 @@ type WeComAIBotConfig struct {
 }
 
 type MoonHubConfig struct {
-	Enabled         bool                `json:"enabled"                     env:"MOONHUB_CHANNELS_MOONHUB_ENABLED"`
-	Port            int                 `json:"port,omitempty"              env:"MOONHUB_CHANNELS_MOONHUB_PORT"`
-	Token           string              `json:"token"                       env:"MOONHUB_CHANNELS_MOONHUB_TOKEN"`
-	AllowFrom       FlexibleStringSlice `json:"allow_from"                  env:"MOONHUB_CHANNELS_MOONHUB_ALLOW_FROM"`
-	PingInterval    int                 `json:"ping_interval,omitempty"`
-	ReadTimeout     int                 `json:"read_timeout,omitempty"`
-	MaxConnections  int                 `json:"max_connections,omitempty"`
+	Enabled        bool                `json:"enabled"                     env:"MOONHUB_CHANNELS_MOONHUB_ENABLED"`
+	Port           int                 `json:"port,omitempty"              env:"MOONHUB_CHANNELS_MOONHUB_PORT"`
+	Token          string              `json:"token"                       env:"MOONHUB_CHANNELS_MOONHUB_TOKEN"`
+	AllowFrom      FlexibleStringSlice `json:"allow_from"                  env:"MOONHUB_CHANNELS_MOONHUB_ALLOW_FROM"`
+	PingInterval   int                 `json:"ping_interval,omitempty"`
+	ReadTimeout    int                 `json:"read_timeout,omitempty"`
+	MaxConnections int                 `json:"max_connections,omitempty"`
 }
 
 type IRCConfig struct {

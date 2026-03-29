@@ -366,12 +366,12 @@ func TestGatewayStartReady_OAuthModelRequiresStoredCredential(t *testing.T) {
 
 func TestGatewayStatusIncludesStartConditionWhenNotReady(t *testing.T) {
 	configPath := filepath.Join(t.TempDir(), "config.json")
-		deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
 	if err != nil {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
-h := NewHandler(configPath, deviceStore, pairingManager)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -404,12 +404,12 @@ func TestGatewayStatusKeepsRunningWhenHealthProbeFailsAfterRunning(t *testing.T)
 	resetGatewayTestState(t)
 
 	configPath := filepath.Join(t.TempDir(), "config.json")
-		deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
 	if err != nil {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
-h := NewHandler(configPath, deviceStore, pairingManager)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -454,12 +454,12 @@ func TestGatewayStatusReturnsErrorAfterStartupWindowExpires(t *testing.T) {
 	resetGatewayTestState(t)
 
 	configPath := filepath.Join(t.TempDir(), "config.json")
-		deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
 	if err != nil {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
-h := NewHandler(configPath, deviceStore, pairingManager)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -504,12 +504,12 @@ func TestGatewayStatusReturnsRestartingDuringRestartGap(t *testing.T) {
 	resetGatewayTestState(t)
 
 	configPath := filepath.Join(t.TempDir(), "config.json")
-		deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
 	if err != nil {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
-h := NewHandler(configPath, deviceStore, pairingManager)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -770,12 +770,12 @@ func TestGatewayRestartReturnsErrorStatusWhenReplacementFailsToStart(t *testing.
 
 func TestGatewayStatusExcludesLogsFields(t *testing.T) {
 	configPath := filepath.Join(t.TempDir(), "config.json")
-		deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
 	if err != nil {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
-h := NewHandler(configPath, deviceStore, pairingManager)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -805,12 +805,12 @@ h := NewHandler(configPath, deviceStore, pairingManager)
 
 func TestGatewayLogsReturnsIncrementalHistory(t *testing.T) {
 	configPath := filepath.Join(t.TempDir(), "config.json")
-		deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
 	if err != nil {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
-h := NewHandler(configPath, deviceStore, pairingManager)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
@@ -853,12 +853,12 @@ h := NewHandler(configPath, deviceStore, pairingManager)
 
 func TestGatewayClearLogsResetsBufferedHistory(t *testing.T) {
 	configPath := filepath.Join(t.TempDir(), "config.json")
-		deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
+	deviceStore, err := devices.NewDeviceStore(filepath.Dir(configPath))
 	if err != nil {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
-h := NewHandler(configPath, deviceStore, pairingManager)
+	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 

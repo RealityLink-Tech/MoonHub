@@ -59,10 +59,10 @@ func TestCloudClient_LookupAgent(t *testing.T) {
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"agentID":              "mh_cccc3333dddd4444",
-				"agentName":           "RemoteAgent",
-				"online":              true,
+				"agentName":            "RemoteAgent",
+				"online":               true,
 				"publicKeyFingerprint": "abcd1234",
-				"relayEndpoint":       "wss://relay.example.com",
+				"relayEndpoint":        "wss://relay.example.com",
 			})
 			return
 		}

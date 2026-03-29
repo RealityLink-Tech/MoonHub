@@ -32,15 +32,15 @@ type Handler struct {
 func NewHandler(configPath string, deviceStore *devices.DeviceStore, pairingManager *devices.PairingManager) *Handler {
 	mdnsClient := mdns.NewClient()
 	return &Handler{
-		configPath:     configPath,
-		serverPort:     launcherconfig.DefaultPort,
-		oauthFlows:     make(map[string]*oauthFlow),
-		oauthState:     make(map[string]string),
-		discovery:      NewDiscoveryHandler(deviceStore),
-		discover:       NewDiscoverHandler(mdnsClient),
-		devices:        NewDevicesHandler(deviceStore),
-		auth:           NewAuthHandler(pairingManager, deviceStore),
-		dynamicTools:   initDynamicTools(configPath),
+		configPath:   configPath,
+		serverPort:   launcherconfig.DefaultPort,
+		oauthFlows:   make(map[string]*oauthFlow),
+		oauthState:   make(map[string]string),
+		discovery:    NewDiscoveryHandler(deviceStore),
+		discover:     NewDiscoverHandler(mdnsClient),
+		devices:      NewDevicesHandler(deviceStore),
+		auth:         NewAuthHandler(pairingManager, deviceStore),
+		dynamicTools: initDynamicTools(configPath),
 	}
 }
 

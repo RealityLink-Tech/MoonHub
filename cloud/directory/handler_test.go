@@ -257,7 +257,7 @@ func TestHandler_Register_PreventsKeyReplacement(t *testing.T) {
 	reRegBody := RegisterRequest{
 		AgentID:   identity.AgentID, // Same agent ID
 		AgentName: "TestAgent",
-		PublicKey: fakePubB64,        // Different public key
+		PublicKey: fakePubB64, // Different public key
 		Endpoint:  "wss://evil.example.com",
 		Timestamp: time.Now().Unix(),
 		// Sign with fake key — should fail because stored key doesn't match

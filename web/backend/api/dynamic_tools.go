@@ -459,8 +459,8 @@ func parseGenerateResponse(content, category, hash string) (*dynamictools.Dynami
 	}
 
 	var raw struct {
-		Name        string                    `json:"name"`
-		Description string                    `json:"description"`
+		Name        string                          `json:"name"`
+		Description string                          `json:"description"`
 		ChatSchema  dynamictools.GeneratedComponent `json:"chat_schema"`
 		SpaceSchema dynamictools.GeneratedComponent `json:"space_schema"`
 	}
@@ -479,14 +479,14 @@ func parseGenerateResponse(content, category, hash string) (*dynamictools.Dynami
 	}
 
 	return &dynamictools.DynamicTool{
-		ID:           dynamictools.GenerateID(category),
-		Name:         raw.Name,
-		Description:  raw.Description,
-		Category:     category,
-		ChatSchema:   raw.ChatSchema,
-		SpaceSchema:  raw.SpaceSchema,
-		Engine:       "schema",
-		ContentHash:  hash,
+		ID:            dynamictools.GenerateID(category),
+		Name:          raw.Name,
+		Description:   raw.Description,
+		Category:      category,
+		ChatSchema:    raw.ChatSchema,
+		SpaceSchema:   raw.SpaceSchema,
+		Engine:        "schema",
+		ContentHash:   hash,
 		IsAIGenerated: true,
 	}, nil
 }

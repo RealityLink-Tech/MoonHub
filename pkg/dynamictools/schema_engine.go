@@ -122,8 +122,8 @@ func deepCopyComponent(c *GeneratedComponent) *GeneratedComponent {
 	if err != nil {
 		// Fallback to shallow copy if marshalling fails (should not happen for valid schemas).
 		cp := &GeneratedComponent{
-			ID:   c.ID,
-			Type: c.Type,
+			ID:    c.ID,
+			Type:  c.Type,
 			Props: make(map[string]any, len(c.Props)),
 		}
 		for k, v := range c.Props {
@@ -137,7 +137,14 @@ func deepCopyComponent(c *GeneratedComponent) *GeneratedComponent {
 	}
 	var cp GeneratedComponent
 	if err := json.Unmarshal(data, &cp); err != nil {
-		return &GeneratedComponent{ID: c.ID, Type: c.Type}
+		return &GeneratedComponent{
+			ID:    c.ID,
+			Type:  c.Type,
+			Props: make(map[string]any),
+		}
+	}
+	if cp.Props == nil {
+		cp.Props = make(map[string]any)
 	}
 	return &cp
 }
@@ -145,6 +152,9 @@ func deepCopyComponent(c *GeneratedComponent) *GeneratedComponent {
 // injectData recursively merges data map keys into component props (only
 // keys that don't already exist in props).
 func injectData(component *GeneratedComponent, data map[string]any) {
+	if component.Props == nil {
+		component.Props = make(map[string]any)
+	}
 	for k, v := range data {
 		if _, exists := component.Props[k]; !exists {
 			component.Props[k] = v

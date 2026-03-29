@@ -49,7 +49,7 @@ func (ac *agentConn) close() {
 // noopFriendStore accepts all friend requests (for initial handshake).
 type noopFriendStore struct{}
 
-func (s *noopFriendStore) IsFriend(agentID string) bool        { return false }
+func (s *noopFriendStore) IsFriend(agentID string) bool       { return false }
 func (s *noopFriendStore) GetPublicKey(agentID string) []byte { return nil }
 
 // MoonHubChannel implements the agent-to-agent channel via WebSocket.

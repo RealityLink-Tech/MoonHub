@@ -80,4 +80,3 @@ func (s *postgresStore) GetPublicKey(ctx context.Context, agentID string) ([]byt
 	}
 	return pubKey, nil
 }
-

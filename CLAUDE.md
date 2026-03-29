@@ -111,6 +111,7 @@ make docker-test
 - **mcp/** - Model Context Protocol integration
 - **provisioning/** - Optional device WiFi provisioning, hotspot, recovery, auth code (used by web launcher when enabled)
 - **transport/** - Agent-to-agent WebSocket paths: `Manager`, `Resolver` (LAN-first then cloud directory), `CloudClient` for directory HTTP; see [pkg/transport/docs/README.md](pkg/transport/docs/README.md)
+- **dynamictools/** - AI-generated dynamic tools (SQLite `ToolManager`, `SchemaEngine`, LAN `/api/dynamic-tools`); see [pkg/dynamictools/docs/README.md](pkg/dynamictools/docs/README.md)
 
 ### Optional cloud services (`cloud/`, `cmd/`)
 
@@ -131,7 +132,7 @@ make docker-test
 ### Web Interface (web/)
 
 - **frontend/** - React + Vite + TanStack Router dashboard
-- **backend/** - Go web server with embedded frontend; optional `/api/provisioning/*` and `/provisioning` UI when `MOONHUB_PROVISIONING_ENABLED=1`
+- **backend/** - Go web server with embedded frontend; optional `/api/provisioning/*` and `/provisioning` UI when `MOONHUB_PROVISIONING_ENABLED=1`; optional `/api/dynamic-tools` when SQLite opens `<MOONHUB_HOME>/dynamic_tools.db` (see `pkg/dynamictools`)
 
 ### Key Entry Points
 
@@ -248,3 +249,6 @@ Follow the [Clean Commit](https://github.com/wgtechlabs/clean-commit) standard.
 📖 docs: update installation guide
 🚀 release: version 1.0.0
 ```
+
+## Don't add it to the commit.
+Co-Authored-By: Claude Opus 4.6 noreply@anthropic.com
