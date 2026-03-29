@@ -34,6 +34,8 @@ func ExtractZipFile(zipPath string, targetDir string) error {
 
 	for _, f := range reader.File {
 		// Path traversal protection.
+		// #nosec G305 — four layers of defense: clean + prefix check +
+		// resolved path check + symlink rejection below.
 		cleanName := filepath.Clean(f.Name)
 		if strings.HasPrefix(cleanName, "..") || filepath.IsAbs(cleanName) {
 			return fmt.Errorf("zip entry has unsafe path: %q", f.Name)

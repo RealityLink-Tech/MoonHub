@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"net/url"
@@ -58,13 +59,23 @@ type DownloadOptions struct {
 
 // DownloadFile downloads a file from URL to a local temp directory.
 // Returns the local file path or empty string on error.
-func DownloadFile(urlStr, filename string, opts DownloadOptions) string {
+func DownloadFile(ctx context.Context, urlStr, filename string, opts DownloadOptions) string {
 	// Set defaults
 	if opts.Timeout == 0 {
 		opts.Timeout = 60 * time.Second
 	}
 	if opts.LoggerPrefix == "" {
 		opts.LoggerPrefix = "utils"
+	}
+
+	// SSRF protection: validate URL before making the request.
+	safeURL, err := ValidateURLForRequest(ctx, urlStr)
+	if err != nil {
+		logger.ErrorCF(opts.LoggerPrefix, "URL validation failed", map[string]any{
+			"error": err.Error(),
+			"url":   urlStr,
+		})
+		return ""
 	}
 
 	mediaDir := filepath.Join(os.TempDir(), "moonhub_media")
@@ -79,8 +90,8 @@ func DownloadFile(urlStr, filename string, opts DownloadOptions) string {
 	safeName := SanitizeFilename(filename)
 	localPath := filepath.Join(mediaDir, uuid.New().String()[:8]+"_"+safeName)
 
-	// Create HTTP request
-	req, err := http.NewRequest("GET", urlStr, nil)
+	// Create HTTP request using the validated URL
+	req, err := http.NewRequestWithContext(ctx, "GET", safeURL.String(), nil)
 	if err != nil {
 		logger.ErrorCF(opts.LoggerPrefix, "Failed to create download request", map[string]any{
 			"error": err.Error(),
@@ -151,8 +162,8 @@ func DownloadFile(urlStr, filename string, opts DownloadOptions) string {
 }
 
 // DownloadFileSimple is a simplified version of DownloadFile without options
-func DownloadFileSimple(url, filename string) string {
-	return DownloadFile(url, filename, DownloadOptions{
+func DownloadFileSimple(ctx context.Context, url, filename string) string {
+	return DownloadFile(ctx, url, filename, DownloadOptions{
 		LoggerPrefix: "media",
 	})
 }

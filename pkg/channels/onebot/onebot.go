@@ -790,7 +790,7 @@ func (c *OneBotChannel) parseMessageSegments(
 					} else if n, ok := data["name"].(string); ok && n != "" {
 						filename = n
 					}
-					localPath := utils.DownloadFile(url, filename, utils.DownloadOptions{
+					localPath := utils.DownloadFile(c.ctx, url, filename, utils.DownloadOptions{
 						LoggerPrefix: "onebot",
 					})
 					if localPath != "" {
@@ -804,7 +804,7 @@ func (c *OneBotChannel) parseMessageSegments(
 			if data != nil {
 				url, _ := data["url"].(string)
 				if url != "" {
-					localPath := utils.DownloadFile(url, "voice.amr", utils.DownloadOptions{
+					localPath := utils.DownloadFile(c.ctx, url, "voice.amr", utils.DownloadOptions{
 						LoggerPrefix: "onebot",
 					})
 					if localPath != "" {

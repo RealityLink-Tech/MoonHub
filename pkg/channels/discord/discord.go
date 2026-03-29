@@ -30,7 +30,7 @@ const (
 var (
 	// Pre-compiled regexes for resolveDiscordRefs (avoid re-compiling per call)
 	channelRefRe = regexp.MustCompile(`<#(\d+)>`)
-	msgLinkRe    = regexp.MustCompile(`https://(?:discord\.com|discordapp\.com)/channels/(\d+)/(\d+)/(\d+)`)
+	msgLinkRe    = regexp.MustCompile(`\bhttps://(?:discord\.com|discordapp\.com)/channels/(\d+)/(\d+)/(\d+)`)
 )
 
 type DiscordChannel struct {
@@ -410,7 +410,7 @@ func (c *DiscordChannel) handleMessage(s *discordgo.Session, m *discordgo.Messag
 		isAudio := utils.IsAudioFile(attachment.Filename, attachment.ContentType)
 
 		if isAudio {
-			localPath := c.downloadAttachment(attachment.URL, attachment.Filename)
+			localPath := c.downloadAttachment(c.ctx, attachment.URL, attachment.Filename)
 			if localPath != "" {
 				mediaPaths = append(mediaPaths, storeMedia(localPath, attachment.Filename))
 				content = appendContent(content, fmt.Sprintf("[audio: %s]", attachment.Filename))
@@ -516,8 +516,8 @@ func (c *DiscordChannel) StartTyping(ctx context.Context, chatID string) (func()
 	return func() { c.stopTyping(chatID) }, nil
 }
 
-func (c *DiscordChannel) downloadAttachment(url, filename string) string {
-	return utils.DownloadFile(url, filename, utils.DownloadOptions{
+func (c *DiscordChannel) downloadAttachment(ctx context.Context, url, filename string) string {
+	return utils.DownloadFile(ctx, url, filename, utils.DownloadOptions{
 		LoggerPrefix: "discord",
 		ProxyURL:     c.config.Proxy,
 	})

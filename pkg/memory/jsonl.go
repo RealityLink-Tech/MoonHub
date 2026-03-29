@@ -77,11 +77,25 @@ func (s *JSONLStore) sessionLock(key string) *sync.Mutex {
 }
 
 func (s *JSONLStore) jsonlPath(key string) string {
-	return filepath.Join(s.dir, sanitizeKey(key)+".jsonl")
+	safe := sanitizeKey(key)
+	candidate := filepath.Join(s.dir, safe+".jsonl")
+	if !filepath.IsLocal(safe + ".jsonl") {
+		h := fnv.New32a()
+		h.Write([]byte(key))
+		candidate = filepath.Join(s.dir, fmt.Sprintf("%x.jsonl", h.Sum32()))
+	}
+	return candidate
 }
 
 func (s *JSONLStore) metaPath(key string) string {
-	return filepath.Join(s.dir, sanitizeKey(key)+".meta.json")
+	safe := sanitizeKey(key)
+	candidate := filepath.Join(s.dir, safe+".meta.json")
+	if !filepath.IsLocal(safe + ".meta.json") {
+		h := fnv.New32a()
+		h.Write([]byte(key))
+		candidate = filepath.Join(s.dir, fmt.Sprintf("%x.meta.json", h.Sum32()))
+	}
+	return candidate
 }
 
 // sanitizeKey converts a session key to a safe filename component.
@@ -89,10 +103,14 @@ func (s *JSONLStore) metaPath(key string) string {
 // Replaces ':' with '_' (session key separator) and '/' and '\' with '_'
 // so composite IDs (e.g. Telegram forum "chatID/threadID", Slack "channel/thread_ts")
 // do not create subdirectories or break on Windows.
+// Also applies filepath.Base to strip any remaining path components, and
+// explicitly removes ".." sequences for defense-in-depth.
 func sanitizeKey(key string) string {
 	s := strings.ReplaceAll(key, ":", "_")
 	s = strings.ReplaceAll(s, "/", "_")
 	s = strings.ReplaceAll(s, "\\", "_")
+	s = filepath.Base(s)
+	s = strings.ReplaceAll(s, "..", "_")
 	return s
 }
 

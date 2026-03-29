@@ -319,19 +319,19 @@ func (c *LINEChannel) processEvent(event lineEvent) {
 			content = c.stripBotMention(content, msg)
 		}
 	case "image":
-		localPath := c.downloadContent(msg.ID, "image.jpg")
+		localPath := c.downloadContent(c.ctx, msg.ID, "image.jpg")
 		if localPath != "" {
 			mediaPaths = append(mediaPaths, storeMedia(localPath, "image.jpg"))
 			content = "[image]"
 		}
 	case "audio":
-		localPath := c.downloadContent(msg.ID, "audio.m4a")
+		localPath := c.downloadContent(c.ctx, msg.ID, "audio.m4a")
 		if localPath != "" {
 			mediaPaths = append(mediaPaths, storeMedia(localPath, "audio.m4a"))
 			content = "[audio]"
 		}
 	case "video":
-		localPath := c.downloadContent(msg.ID, "video.mp4")
+		localPath := c.downloadContent(c.ctx, msg.ID, "video.mp4")
 		if localPath != "" {
 			mediaPaths = append(mediaPaths, storeMedia(localPath, "video.mp4"))
 			content = "[video]"
@@ -674,9 +674,9 @@ func (c *LINEChannel) callAPI(ctx context.Context, endpoint string, payload any)
 }
 
 // downloadContent downloads media content from the LINE API.
-func (c *LINEChannel) downloadContent(messageID, filename string) string {
+func (c *LINEChannel) downloadContent(ctx context.Context, messageID, filename string) string {
 	url := fmt.Sprintf(lineContentEndpoint, messageID)
-	return utils.DownloadFile(url, filename, utils.DownloadOptions{
+	return utils.DownloadFile(ctx, url, filename, utils.DownloadOptions{
 		LoggerPrefix: "line",
 		ExtraHeaders: map[string]string{
 			"Authorization": "Bearer " + c.config.ChannelAccessToken,

@@ -231,10 +231,7 @@ func TestNewDevicesHandler(t *testing.T) {
 		deviceStore: store,
 	}
 
-	if handler == nil {
-		t.Fatal("DevicesHandler is nil")
-	}
-
+	// Assert the deviceStore field was set correctly
 	if handler.deviceStore != store {
 		t.Error("deviceStore field not set correctly")
 	}

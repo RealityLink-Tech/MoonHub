@@ -594,10 +594,10 @@ func (c *TelegramChannel) downloadPhoto(ctx context.Context, fileID string) stri
 		return ""
 	}
 
-	return c.downloadFileWithInfo(file, ".jpg")
+	return c.downloadFileWithInfo(ctx, file, ".jpg")
 }
 
-func (c *TelegramChannel) downloadFileWithInfo(file *telego.File, ext string) string {
+func (c *TelegramChannel) downloadFileWithInfo(ctx context.Context, file *telego.File, ext string) string {
 	if file.FilePath == "" {
 		return ""
 	}
@@ -607,7 +607,7 @@ func (c *TelegramChannel) downloadFileWithInfo(file *telego.File, ext string) st
 
 	// Use FilePath as filename for better identification
 	filename := file.FilePath + ext
-	return utils.DownloadFile(url, filename, utils.DownloadOptions{
+	return utils.DownloadFile(ctx, url, filename, utils.DownloadOptions{
 		LoggerPrefix: "telegram",
 	})
 }
@@ -621,7 +621,7 @@ func (c *TelegramChannel) downloadFile(ctx context.Context, fileID, ext string) 
 		return ""
 	}
 
-	return c.downloadFileWithInfo(file, ext)
+	return c.downloadFileWithInfo(ctx, file, ext)
 }
 
 // parseTelegramChatID splits "chatID/threadID" into its components.

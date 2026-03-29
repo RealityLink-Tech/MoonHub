@@ -250,5 +250,4 @@ Follow the [Clean Commit](https://github.com/wgtechlabs/clean-commit) standard.
 🚀 release: version 1.0.0
 ```
 
-## Don't add it to the commit.
-Co-Authored-By: Claude Opus 4.6 noreply@anthropic.com
+## Don't add it to the commit：![1774768111676](image/CLAUDE/1774768111676.png)![1774768117875](image/CLAUDE/1774768117875.png)![1774768132477](image/CLAUDE/1774768132477.png)Co-Authored-By: Claude Opus 4.6 noreply@anthropic.com

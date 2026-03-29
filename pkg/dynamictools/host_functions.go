@@ -7,6 +7,8 @@ import (
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/RealityLink-Tech/MoonHub/pkg/utils"
 )
 
 // maxHTTPFetchBody limits response size for schema-driven fetches (memory safety).
@@ -25,8 +27,9 @@ func NewHostFunctions() *HostFunctions {
 }
 
 // HTTPFetch 发起 HTTP 请求获取数据。
-func (hf *HostFunctions) HTTPFetch(ctx context.Context, method, url string, headers map[string]string, body string) (map[string]any, error) {
-	if err := validateFetchURL(ctx, url); err != nil {
+func (hf *HostFunctions) HTTPFetch(ctx context.Context, method, rawURL string, headers map[string]string, body string) (map[string]any, error) {
+	safeURL, err := utils.ValidateURLForRequest(ctx, rawURL)
+	if err != nil {
 		return nil, fmt.Errorf("fetch url: %w", err)
 	}
 
@@ -35,7 +38,7 @@ func (hf *HostFunctions) HTTPFetch(ctx context.Context, method, url string, head
 		reqBody = strings.NewReader(body)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, url, reqBody)
+	req, err := http.NewRequestWithContext(ctx, method, safeURL.String(), reqBody)
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}

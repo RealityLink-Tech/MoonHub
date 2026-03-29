@@ -339,7 +339,7 @@ func (c *SlackChannel) handleMessageEvent(ev *slackevents.MessageEvent) {
 
 	if ev.Message != nil && len(ev.Message.Files) > 0 {
 		for _, file := range ev.Message.Files {
-			localPath := c.downloadSlackFile(file)
+			localPath := c.downloadSlackFile(c.ctx, file)
 			if localPath == "" {
 				continue
 			}
@@ -502,7 +502,7 @@ func (c *SlackChannel) handleSlashCommand(event socketmode.Event) {
 	)
 }
 
-func (c *SlackChannel) downloadSlackFile(file slack.File) string {
+func (c *SlackChannel) downloadSlackFile(ctx context.Context, file slack.File) string {
 	downloadURL := file.URLPrivateDownload
 	if downloadURL == "" {
 		downloadURL = file.URLPrivate
@@ -512,7 +512,7 @@ func (c *SlackChannel) downloadSlackFile(file slack.File) string {
 		return ""
 	}
 
-	return utils.DownloadFile(downloadURL, file.Name, utils.DownloadOptions{
+	return utils.DownloadFile(ctx, downloadURL, file.Name, utils.DownloadOptions{
 		LoggerPrefix: "slack",
 		ExtraHeaders: map[string]string{
 			"Authorization": "Bearer " + c.config.BotToken,

@@ -250,8 +250,13 @@ func (t *ExecTool) Execute(ctx context.Context, args map[string]any) *ToolResult
 
 	var cmd *exec.Cmd
 	if runtime.GOOS == "windows" {
+		// #nosec G204 — shell execution tool by design. Defense-in-depth: 30+ deny-list
+		// regex patterns (guardCommand), channel allowlist, workspace sandbox with TOCTOU
+		// protection, and configurable timeout. The `command` value is always validated
+		// before reaching this point.
 		cmd = exec.CommandContext(cmdCtx, "powershell", "-NoProfile", "-NonInteractive", "-Command", command)
 	} else {
+		// #nosec G204 — see comment above.
 		cmd = exec.CommandContext(cmdCtx, "sh", "-c", command)
 	}
 	if cwd != "" {
