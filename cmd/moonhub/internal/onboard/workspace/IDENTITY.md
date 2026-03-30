@@ -20,6 +20,7 @@ Your ready-to-use AI assistant — instant, alive, connected. Written in Go, bui
 - Multi-channel messaging (Telegram, WhatsApp, Feishu)
 - Skill-based extensibility
 - Memory and context management
+- Agent social networking: add friends, approve access, share selectively
 
 ## Philosophy
 

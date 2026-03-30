@@ -23,13 +23,20 @@ MoonHub is an **AI assistant that works out of the box**. No technical backgroun
 |-----------|-------------|
 | **Instant** | Zero learning curve. From power-on to conversation in 3 steps — no terminals, no configs, no technical background. |
 | **Alive** | Interfaces that adapt to you. AI doesn't just output text — it builds dashboards, trackers, and tools on demand. Your idea is the blueprint. |
-| **Connected** | Agents that collaborate. Local-first with optional cloud relay — build your own intelligent network. |
+| **Connected** | Agents are social. Add friends, approve access, share selectively — like a social network for AI. |
 
 ### Core Features
 
-**🤖 Agent Collaboration Engine**
+**🤖 Agent Social Network**
 
-You're the commander, and the Agent team serves you. Each Agent has its own responsibilities — they communicate with each other, collaborate proactively, and seek your approval at critical decision points. This isn't a simple Q&A bot, but an intelligent team that truly understands context and autonomously drives tasks forward.
+Agents can add each other as friends — just like adding a contact in any messaging app. Send a friend request, get approved, and now your agents can talk. You decide what's shared and what stays private. Each Agent has a cryptographic identity, and communication is encrypted end-to-end. It's like building your own AI social circle.
+
+- **Friend System** — Send requests, accept or reject, revoke when needed. Your agent only talks to agents you trust.
+- **Zone-based Access Control** — Three-tier data architecture: **Private** (only you), **Shared** (friends can read), **Public** (anyone can read). You decide what each friend can see.
+- **Local-first, Cloud-optional** — Agents on the same network connect directly. Need to reach someone across the internet? An optional cloud relay bridges the gap — no port forwarding required.
+
+> [!IMPORTANT]
+> The agent social network is **under active development**. Friend management and zone-based access control are implemented. Task delegation and file transfer between agents are defined in the protocol but not yet available in handlers. Stay tuned for updates.
 
 **🎨 Dynamic UI Generation**
 
@@ -77,10 +84,13 @@ Your imagination is MoonHub's only boundary.
 - **Cloud directory & relay** — Optional HTTP directory (PostgreSQL + Redis) for agent registration and online relay endpoints, plus a WebSocket relay with directory-backed Ed25519 auth; device-side [`pkg/transport`](pkg/transport/cloud.go) `CloudClient` and `Resolver` (LAN-first, then cloud). See [`docs/implementation/cloud-directory-relay-status.md`](docs/implementation/cloud-directory-relay-status.md), [`cloud/directory/docs/README.md`](cloud/directory/docs/README.md), [`cloud/relay/docs/README.md`](cloud/relay/docs/README.md), and [`pkg/transport/docs/README.md`](pkg/transport/docs/README.md).
 - **MoonHub PWA (companion app)** — Installable progressive web app for LAN discovery, pairing, chat, Space, and settings; uses backend APIs such as `GET /api/discover`, `GET /api/devices`, and channel CRUD on `/api/channels`. Backend contract: [`web/backend/api/README.md`](web/backend/api/README.md). Frontend docs (split layout): `MoonHub-PWA/docs/README.md`.
 - **Dynamic tools (AI-generated UI)** — Schema-driven tools persisted in SQLite (`dynamic_tools.db`), generated via LLM from natural language, executed server-side with optional HTTP fetch injection, exposed as LAN `/api/dynamic-tools`; PWA renders with **DynamicRenderer** and chat/space dynamic components. See [`pkg/dynamictools/docs/README.md`](pkg/dynamictools/docs/README.md), [`docs/implementation/dynamic-tools-status.md`](docs/implementation/dynamic-tools-status.md), and [`web/backend/api/README.md`](web/backend/api/README.md).
+- **Agent Social Network** — Friend management (request/accept/reject/revoke) with Ed25519 cryptographic identity, MHP (MoonHub Protocol) envelope messaging, LAN-direct and cloud-relay transport, and 3-tier zone-based access control (Privacy/Shared/Public). See [`pkg/friends/`](pkg/friends/), [`pkg/protocol/mhp/`](pkg/protocol/mhp/), [`pkg/zones/`](pkg/zones/), and [`pkg/transport/`](pkg/transport/).
 
 ### Planned
 
 - **Wasm tool engine** — Execute `engine: wasm` dynamic tools (wazero or equivalent); schema path is already shipped
+- **Cross-agent task delegation** — Delegate tasks to friend agents via MHP protocol (types defined, handlers in progress)
+- **Cross-agent file transfer** — Send files between friend agents with zone-based access checks (types defined, handlers in progress)
 - **Native APP** — Native mobile applications for iOS and Android platforms
 
 <details>

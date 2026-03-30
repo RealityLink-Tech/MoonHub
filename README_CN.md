@@ -23,13 +23,20 @@ MoonHub 是一款**开箱即用的 AI 助手**。无需技术背景——插电�
 |------|------|
 | **Instant** | 零学习曲线。从上电到对话只需 3 步，无需终端、无需配置、无需技术背景。 |
 | **Alive** | 界面随需而变。AI 不只输出文字，还能实时生成交互界面，你的需求就是它的蓝图。 |
-| **Connected** | 万物互联。Agent 之间可以通信协作，局域网直连 + 云端中继，构建属于你的智能网络。 |
+| **Connected** | Agent 也有社交圈。加好友、审批访问、选择性共享——像社交软件一样连接 AI。 |
 
 ### 核心特性
 
-**🤖 Agent 协作引擎**
+**🤖 Agent 社交网络**
 
-你是指挥官，Agent 团队为你服务。每个 Agent 各司其职，它们可以彼此通信、主动协作，在关键决策点向你请示。这不是简单的问答机器人，而是一个真正理解上下文、能自主推进任务的智能团队。
+Agent 之间可以互相添加好友——就像在聊天软件里加联系人一样。发送好友请求、通过审批，你的 Agent 就可以和对方通信了。你能决定哪些数据可以共享、哪些保持私密。每个 Agent 都有加密身份，通信端到端加密。就像在搭建属于你自己的 AI 社交圈。
+
+- **好友系统** — 发送请求、接受或拒绝、随时撤销。你的 Agent 只和你信任的 Agent 对话。
+- **三层数据架构** — 数据按访问权限分为三层：**私密**（仅自己可见）、**共享**（好友可读）、**公开**（任何人可读）。你来决定每个好友能看什么。
+- **局域网优先，云端可选** — 同一网络内的 Agent 直连互通。需要跨网络通信？可选的云端中继帮你桥接，无需公网 IP。
+
+> [!IMPORTANT]
+> Agent 社交网络功能**正在积极开发中**。好友管理和三层数据权限控制已实现。Agent 之间的任务委托和文件传输功能已在协议中定义，处理程序尚在开发。请关注后续更新。
 
 **🎨 动态 UI 生成**
 
@@ -77,10 +84,13 @@ MoonHub 适应你的生活，而不是让你适应它。以下是一些常见的
 - **云目录与中继** — 可选 HTTP 目录（PostgreSQL + Redis）用于代理注册与中继端点，以及带目录侧 Ed25519 鉴权的 WebSocket 中继；设备侧 [`pkg/transport`](pkg/transport/cloud.go) 提供 `CloudClient` 与 `Resolver`（优先局域网、其次云端）。参见 [`docs/implementation/cloud-directory-relay-status.md`](docs/implementation/cloud-directory-relay-status.md)、[`cloud/directory/docs/README.md`](cloud/directory/docs/README.md)、[`cloud/relay/docs/README.md`](cloud/relay/docs/README.md)、[`pkg/transport/docs/README.md`](pkg/transport/docs/README.md)。
 - **MoonHub PWA（配套客户端）** — 可安装的渐进式 Web 应用，用于局域网发现、配对、对话、Space 与设置；调用后端如 `GET /api/discover`、`GET /api/devices` 及 `/api/channels` 等频道 CRUD。后端契约见 [`web/backend/api/README.md`](web/backend/api/README.md)；前端文档（分仓布局）见 `MoonHub-PWA/docs/README.md`。
 - **动态工具（AI 生成 UI）** — 基于 Schema 的动态工具，SQLite 持久化（`dynamic_tools.db`），自然语言经 LLM 生成或按内容哈希去重，服务端可选 HTTP 拉数并注入 schema，局域网 `/api/dynamic-tools`；PWA 通过 **DynamicRenderer** 与 chat/space 动态组件集渲染。参见 [`pkg/dynamictools/docs/README.md`](pkg/dynamictools/docs/README.md)、[`docs/implementation/dynamic-tools-status.md`](docs/implementation/dynamic-tools-status.md)、[`web/backend/api/README.md`](web/backend/api/README.md)。
+- **Agent 社交网络** — 好友管理（请求/接受/拒绝/撤销），Ed25519 加密身份，MHP（MoonHub Protocol）信封消息，局域网直连与云端中继传输，三层数据权限控制（私密/共享/公开）。参见 [`pkg/friends/`](pkg/friends/)、[`pkg/protocol/mhp/`](pkg/protocol/mhp/)、[`pkg/zones/`](pkg/zones/)、[`pkg/transport/`](pkg/transport/)。
 
 ### 计划中
 
 - **Wasm 工具引擎** — 执行 `engine: wasm` 的动态工具（如 wazero）；Schema 路径已交付
+- **跨 Agent 任务委托** — 通过 MHP 协议向好友 Agent 委托任务（类型已定义，处理程序开发中）
+- **跨 Agent 文件传输** — 在好友 Agent 之间传输文件，带数据权限检查（类型已定义，处理程序开发中）
 - **原生 APP** — iOS 和 Android 原生移动应用
 
 <details>
