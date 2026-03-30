@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MoonHub is an ultra-lightweight personal AI assistant written in Go, designed to run on minimal hardware (<10MB RAM, 1-second startup). It's a multi-channel chat bot framework supporting Telegram, Discord, Slack, Matrix, QQ, WeChat, and more.
+MoonHub is an AI assistant that works out of the box — instant, alive, connected. Written in Go as a single binary for easy deployment. It's a multi-channel AI assistant framework supporting Telegram, Discord, Slack, Matrix, QQ, WeChat, and more, with dynamic UI generation and a global agent network.
 
 ## Build Commands
 
@@ -196,7 +196,7 @@ Skills are defined in `workspace/skills/<skill-name>/SKILL.md` with optional com
 
 ## Key Design Principles
 
-- Ultra-lightweight: Target <10MB RAM usage
+- Lightweight by design: Target <10MB RAM usage, single binary, minimal deployment cost
 - Single binary deployment across platforms
 - No external runtime dependencies (pure Go)
 - Workspace-based state management

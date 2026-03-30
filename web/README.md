@@ -12,7 +12,7 @@ The service is structured as a monorepo containing both the backend and frontend
 
 ### Device provisioning (optional)
 
-Edge-style **WiFi provisioning** (hotspot, scan/connect, recovery, auth code, factory reset) is implemented in `pkg/provisioning/` and exposed by the launcher when `MOONHUB_PROVISIONING_ENABLED=1`.
+Edge-style **WiFi provisioning** (hotspot, scan/connect, recovery, auth code, factory reset) is implemented in `pkg/provisioning/` and exposed by the launcher when `MOONHUB_PROVISIONING_ENABLED=1`. This enables zero-config setup for headless devices — no terminal or SSH required.
 
 | Area | Location |
 | --- | --- |

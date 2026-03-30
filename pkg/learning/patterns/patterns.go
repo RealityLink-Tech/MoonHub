@@ -1,4 +1,4 @@
-// MoonHub - Ultra-lightweight personal AI agent
+// MoonHub - Your ready-to-use AI assistant
 // Pattern management for multi-language support
 // License: MIT
 

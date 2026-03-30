@@ -1,4 +1,4 @@
-// MoonHub - Ultra-lightweight personal AI agent
+// MoonHub - Your ready-to-use AI assistant
 // Adaptive Memory System - SQLite Store
 // License: MIT
 

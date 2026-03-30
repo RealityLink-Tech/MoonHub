@@ -1,4 +1,4 @@
-// MoonHub - Ultra-lightweight personal AI agent
+// MoonHub - Your ready-to-use AI assistant
 // Context Compactor - Configuration
 // License: MIT
 

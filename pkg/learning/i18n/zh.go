@@ -1,4 +1,4 @@
-// MoonHub - Ultra-lightweight personal AI agent
+// MoonHub - Your ready-to-use AI assistant
 // Chinese text resources for learning system
 // License: MIT
 

@@ -1,4 +1,4 @@
-// MoonHub - Ultra-lightweight personal AI agent
+// MoonHub - Your ready-to-use AI assistant
 // Plugin Architecture - Core Types
 //
 // Copyright (c) 2026 MoonHub contributors

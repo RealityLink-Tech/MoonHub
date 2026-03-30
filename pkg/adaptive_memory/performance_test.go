@@ -1,4 +1,4 @@
-// MoonHub - Ultra-lightweight personal AI agent
+// MoonHub - Your ready-to-use AI assistant
 // Adaptive Memory System - Performance and Memory Tests
 // License: MIT
 
