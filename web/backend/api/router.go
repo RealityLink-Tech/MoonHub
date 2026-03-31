@@ -5,8 +5,10 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/RealityLink-Tech/MoonHub/pkg/agent"
 	"github.com/RealityLink-Tech/MoonHub/pkg/devices"
 	"github.com/RealityLink-Tech/MoonHub/pkg/mdns"
+	pkgapi "github.com/RealityLink-Tech/MoonHub/pkg/api"
 	"github.com/RealityLink-Tech/MoonHub/web/backend/launcherconfig"
 )
 
@@ -26,12 +28,14 @@ type Handler struct {
 	devices              *DevicesHandler
 	auth                 *AuthHandler
 	dynamicTools         *DynamicToolsHandler
+	agentLoop            *agent.AgentLoop
+	chatHub              *pkgapi.ChatHub
 }
 
 // NewHandler creates an instance of the API handler.
 func NewHandler(configPath string, deviceStore *devices.DeviceStore, pairingManager *devices.PairingManager) *Handler {
 	mdnsClient := mdns.NewClient()
-	return &Handler{
+	h := &Handler{
 		configPath:   configPath,
 		serverPort:   launcherconfig.DefaultPort,
 		oauthFlows:   make(map[string]*oauthFlow),
@@ -42,6 +46,8 @@ func NewHandler(configPath string, deviceStore *devices.DeviceStore, pairingMana
 		auth:         NewAuthHandler(pairingManager, deviceStore),
 		dynamicTools: initDynamicTools(configPath),
 	}
+	h.chatHub = pkgapi.NewChatHub(nil)
+	return h
 }
 
 // SetServerOptions stores current backend listen options for fallback behavior.
@@ -55,6 +61,17 @@ func (h *Handler) SetServerOptions(port int, public bool, publicExplicit bool, a
 // SetProvisioningHandler sets the provisioning handler for device management.
 func (h *Handler) SetProvisioningHandler(handler *ProvisioningHandler) {
 	h.provisioning = handler
+}
+
+// SetAgentLoop sets the in-process agent loop for chat functionality.
+func (h *Handler) SetAgentLoop(loop *agent.AgentLoop) {
+	h.agentLoop = loop
+	h.chatHub.SetAgent(loop)
+}
+
+// AgentLoop returns the in-process agent loop (nil if not running single-process).
+func (h *Handler) AgentLoop() *agent.AgentLoop {
+	return h.agentLoop
 }
 
 // RegisterRoutes binds all API endpoint handlers to the ServeMux.
