@@ -6,10 +6,16 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/RealityLink-Tech/MoonHub/pkg/devices"
 	"github.com/google/uuid"
+)
+
+const (
+	maxPairAttempts     = 5
+	pairLockoutDuration = 5 * time.Minute
 )
 
 const maxAuthBodyBytes = 64 * 1024
@@ -18,6 +24,12 @@ const maxAuthBodyBytes = 64 * 1024
 type AuthHandler struct {
 	pairingManager *devices.PairingManager
 	deviceStore    *devices.DeviceStore
+
+	// Rate limiting
+	mu          sync.Mutex
+	attempts    int
+	lastAttempt time.Time
+	lockedUntil time.Time
 }
 
 // NewAuthHandler creates a new auth API handler.
@@ -127,6 +139,15 @@ func (h *AuthHandler) handleAuthPair(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Rate limit check
+	h.mu.Lock()
+	if !h.lockedUntil.IsZero() && time.Now().Before(h.lockedUntil) {
+		h.mu.Unlock()
+		writeAuthError(w, http.StatusTooManyRequests, "too many failed attempts, code regenerated")
+		return
+	}
+	h.mu.Unlock()
+
 	// Parse request
 	var req PairRequest
 	dec := json.NewDecoder(http.MaxBytesReader(w, r.Body, maxAuthBodyBytes))
@@ -173,9 +194,28 @@ func (h *AuthHandler) handleAuthPair(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !result.Success {
+		h.mu.Lock()
+		h.attempts++
+		h.lastAttempt = time.Now()
+		if h.attempts >= maxPairAttempts {
+			h.lockedUntil = time.Now().Add(pairLockoutDuration)
+			h.attempts = 0
+			// Auto-regenerate code after lockout
+			if h.pairingManager != nil {
+				if _, regenErr := h.pairingManager.RegenerateCode(); regenErr != nil {
+					log.Printf("failed to regenerate pairing code after lockout: %v", regenErr)
+				}
+			}
+		}
+		h.mu.Unlock()
 		writeAuthError(w, http.StatusBadRequest, result.Error)
 		return
 	}
+
+	// Reset attempts on successful pairing
+	h.mu.Lock()
+	h.attempts = 0
+	h.mu.Unlock()
 
 	// Return success with token
 	response := PairResponse{
