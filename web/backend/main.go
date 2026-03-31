@@ -23,7 +23,11 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/RealityLink-Tech/MoonHub/pkg/agent"
+	"github.com/RealityLink-Tech/MoonHub/pkg/bus"
+	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 	"github.com/RealityLink-Tech/MoonHub/pkg/devices"
+	"github.com/RealityLink-Tech/MoonHub/pkg/providers"
 	"github.com/RealityLink-Tech/MoonHub/pkg/provisioning"
 	"github.com/RealityLink-Tech/MoonHub/web/backend/api"
 	"github.com/RealityLink-Tech/MoonHub/web/backend/launcherconfig"
@@ -147,6 +151,28 @@ func main() {
 
 	apiHandler.RegisterRoutes(mux)
 
+	// Single-process: create agent loop in-process when model is configured.
+	cfg, err := config.LoadConfig(absPath)
+	if err != nil {
+		log.Printf("Warning: Failed to load config for agent loop: %v", err)
+	} else if cfg != nil && len(cfg.ModelList) > 0 {
+		provider, modelID, providerErr := providers.CreateProvider(cfg)
+		if providerErr != nil {
+			log.Printf("Warning: Failed to create provider for agent loop: %v", providerErr)
+		} else if provider != nil {
+			if modelID != "" {
+				cfg.Agents.Defaults.ModelName = modelID
+			}
+			msgBus := bus.NewMessageBus()
+			agentLoop := agent.NewAgentLoop(cfg, msgBus, provider)
+			apiHandler.SetAgentLoop(agentLoop)
+			go agentLoop.Run(context.Background())
+			log.Println("Agent loop started in-process")
+		} else {
+			log.Println("No primary provider available, agent loop not started")
+		}
+	}
+
 	// Frontend Embedded Assets
 	registerEmbedRoutes(mux)
 
@@ -192,11 +218,13 @@ func main() {
 		}()
 	}
 
-	// Auto-start gateway after backend starts listening.
-	go func() {
-		time.Sleep(1 * time.Second)
-		apiHandler.TryAutoStartGateway()
-	}()
+	// Auto-start gateway subprocess only if NOT running single-process.
+	if apiHandler.AgentLoop() == nil {
+		go func() {
+			time.Sleep(1 * time.Second)
+			apiHandler.TryAutoStartGateway()
+		}()
+	}
 
 	// Start the Server
 	if err := http.ListenAndServe(addr, handler); err != nil {
