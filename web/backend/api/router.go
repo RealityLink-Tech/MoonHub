@@ -10,6 +10,7 @@ import (
 	"github.com/RealityLink-Tech/MoonHub/pkg/mdns"
 	pkgapi "github.com/RealityLink-Tech/MoonHub/pkg/api"
 	"github.com/RealityLink-Tech/MoonHub/web/backend/launcherconfig"
+	"github.com/RealityLink-Tech/MoonHub/web/backend/middleware"
 )
 
 // Handler serves HTTP API requests.
@@ -22,6 +23,7 @@ type Handler struct {
 	oauthMu              sync.Mutex
 	oauthFlows           map[string]*oauthFlow
 	oauthState           map[string]string
+	deviceStore          *devices.DeviceStore
 	provisioning         *ProvisioningHandler
 	discovery            *DiscoveryHandler
 	discover             *DiscoverHandler
@@ -41,6 +43,7 @@ func NewHandler(configPath string, deviceStore *devices.DeviceStore, pairingMana
 		serverPort:   launcherconfig.DefaultPort,
 		oauthFlows:   make(map[string]*oauthFlow),
 		oauthState:   make(map[string]string),
+		deviceStore:  deviceStore,
 		discovery:    NewDiscoveryHandler(deviceStore),
 		discover:     NewDiscoverHandler(mdnsClient),
 		devices:      NewDevicesHandler(deviceStore),
@@ -128,6 +131,11 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	if h.dynamicTools != nil {
 		h.dynamicTools.RegisterRoutes(mux)
 	}
+}
+
+// registerProtectedRoute registers a route that requires Bearer token auth.
+func (h *Handler) registerProtectedRoute(mux *http.ServeMux, pattern string, handler http.HandlerFunc) {
+	mux.Handle(pattern, middleware.BearerTokenAuth(h.deviceStore, handler))
 }
 
 // initDynamicTools creates the DynamicToolsHandler. If initialisation fails

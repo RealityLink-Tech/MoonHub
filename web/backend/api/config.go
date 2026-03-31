@@ -11,9 +11,9 @@ import (
 
 // registerConfigRoutes binds configuration management endpoints to the ServeMux.
 func (h *Handler) registerConfigRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("GET /api/config", h.handleGetConfig)
-	mux.HandleFunc("PUT /api/config", h.handleUpdateConfig)
-	mux.HandleFunc("PATCH /api/config", h.handlePatchConfig)
+	h.registerProtectedRoute(mux, "GET /api/config", h.handleGetConfig)
+	h.registerProtectedRoute(mux, "PUT /api/config", h.handleUpdateConfig)
+	h.registerProtectedRoute(mux, "PATCH /api/config", h.handlePatchConfig)
 }
 
 // handleGetConfig returns the complete system configuration.

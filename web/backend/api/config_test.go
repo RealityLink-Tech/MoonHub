@@ -17,6 +17,8 @@ func TestHandleUpdateConfig_PreservesExecAllowRemoteDefaultWhenOmitted(t *testin
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
+	token := setupAuthenticatedDevice(t, deviceStore)
+
 	req := httptest.NewRequest(http.MethodPut, "/api/config", bytes.NewBufferString(`{
 		"agents": {
 			"defaults": {
@@ -32,6 +34,7 @@ func TestHandleUpdateConfig_PreservesExecAllowRemoteDefaultWhenOmitted(t *testin
 		]
 	}`))
 	req.Header.Set("Content-Type", "application/json")
+	withBearerToken(req, token)
 
 	rec := httptest.NewRecorder()
 	mux.ServeHTTP(rec, req)
@@ -56,6 +59,8 @@ func TestHandleUpdateConfig_DoesNotInheritDefaultModelFields(t *testing.T) {
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
+	token := setupAuthenticatedDevice(t, deviceStore)
+
 	req := httptest.NewRequest(http.MethodPut, "/api/config", bytes.NewBufferString(`{
 		"agents": {
 			"defaults": {
@@ -71,6 +76,7 @@ func TestHandleUpdateConfig_DoesNotInheritDefaultModelFields(t *testing.T) {
 		]
 	}`))
 	req.Header.Set("Content-Type", "application/json")
+	withBearerToken(req, token)
 
 	rec := httptest.NewRecorder()
 	mux.ServeHTTP(rec, req)

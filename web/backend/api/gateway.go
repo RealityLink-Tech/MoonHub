@@ -53,10 +53,10 @@ func (h *Handler) registerGatewayRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /api/gateway/status", h.handleGatewayStatus)
 	mux.HandleFunc("GET /api/gateway/events", h.handleGatewayEvents)
 	mux.HandleFunc("GET /api/gateway/logs", h.handleGatewayLogs)
-	mux.HandleFunc("POST /api/gateway/logs/clear", h.handleGatewayClearLogs)
-	mux.HandleFunc("POST /api/gateway/start", h.handleGatewayStart)
-	mux.HandleFunc("POST /api/gateway/stop", h.handleGatewayStop)
-	mux.HandleFunc("POST /api/gateway/restart", h.handleGatewayRestart)
+	h.registerProtectedRoute(mux, "POST /api/gateway/logs/clear", h.handleGatewayClearLogs)
+	h.registerProtectedRoute(mux, "POST /api/gateway/start", h.handleGatewayStart)
+	h.registerProtectedRoute(mux, "POST /api/gateway/stop", h.handleGatewayStop)
+	h.registerProtectedRoute(mux, "POST /api/gateway/restart", h.handleGatewayRestart)
 }
 
 // TryAutoStartGateway checks whether gateway start preconditions are met and

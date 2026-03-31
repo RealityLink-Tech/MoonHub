@@ -13,11 +13,11 @@ import (
 
 // registerModelRoutes binds model list management endpoints to the ServeMux.
 func (h *Handler) registerModelRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("GET /api/models", h.handleListModels)
-	mux.HandleFunc("POST /api/models", h.handleAddModel)
-	mux.HandleFunc("POST /api/models/default", h.handleSetDefaultModel)
-	mux.HandleFunc("PUT /api/models/{index}", h.handleUpdateModel)
-	mux.HandleFunc("DELETE /api/models/{index}", h.handleDeleteModel)
+	h.registerProtectedRoute(mux, "GET /api/models", h.handleListModels)
+	h.registerProtectedRoute(mux, "POST /api/models", h.handleAddModel)
+	h.registerProtectedRoute(mux, "POST /api/models/default", h.handleSetDefaultModel)
+	h.registerProtectedRoute(mux, "PUT /api/models/{index}", h.handleUpdateModel)
+	h.registerProtectedRoute(mux, "DELETE /api/models/{index}", h.handleDeleteModel)
 }
 
 // modelResponse is the JSON structure returned for each model in the list.

@@ -18,9 +18,9 @@ import (
 
 // registerSessionRoutes binds session list and detail endpoints to the ServeMux.
 func (h *Handler) registerSessionRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("GET /api/sessions", h.handleListSessions)
-	mux.HandleFunc("GET /api/sessions/{id}", h.handleGetSession)
-	mux.HandleFunc("DELETE /api/sessions/{id}", h.handleDeleteSession)
+	h.registerProtectedRoute(mux, "GET /api/sessions", h.handleListSessions)
+	h.registerProtectedRoute(mux, "GET /api/sessions/{id}", h.handleGetSession)
+	h.registerProtectedRoute(mux, "DELETE /api/sessions/{id}", h.handleDeleteSession)
 }
 
 // sessionFile mirrors the on-disk session JSON structure from pkg/session.

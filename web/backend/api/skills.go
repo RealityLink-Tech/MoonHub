@@ -33,10 +33,10 @@ var (
 )
 
 func (h *Handler) registerSkillRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("GET /api/skills", h.handleListSkills)
-	mux.HandleFunc("GET /api/skills/{name}", h.handleGetSkill)
-	mux.HandleFunc("POST /api/skills/import", h.handleImportSkill)
-	mux.HandleFunc("DELETE /api/skills/{name}", h.handleDeleteSkill)
+	h.registerProtectedRoute(mux, "GET /api/skills", h.handleListSkills)
+	h.registerProtectedRoute(mux, "GET /api/skills/{name}", h.handleGetSkill)
+	h.registerProtectedRoute(mux, "POST /api/skills/import", h.handleImportSkill)
+	h.registerProtectedRoute(mux, "DELETE /api/skills/{name}", h.handleDeleteSkill)
 }
 
 func (h *Handler) handleListSkills(w http.ResponseWriter, r *http.Request) {

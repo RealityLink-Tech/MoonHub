@@ -32,8 +32,8 @@ type autoStartResponse struct {
 var errAutoStartUnsupported = errors.New("autostart is not supported on this platform")
 
 func (h *Handler) registerStartupRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("GET /api/system/autostart", h.handleGetAutoStart)
-	mux.HandleFunc("PUT /api/system/autostart", h.handleSetAutoStart)
+	h.registerProtectedRoute(mux, "GET /api/system/autostart", h.handleGetAutoStart)
+	h.registerProtectedRoute(mux, "PUT /api/system/autostart", h.handleSetAutoStart)
 }
 
 func (h *Handler) handleGetAutoStart(w http.ResponseWriter, r *http.Request) {

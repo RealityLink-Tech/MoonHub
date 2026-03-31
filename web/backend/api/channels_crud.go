@@ -11,11 +11,11 @@ import (
 
 // registerChannelCRUDRoutes binds channel CRUD endpoints to the ServeMux.
 func (h *Handler) registerChannelCRUDRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("GET /api/channels", h.handleListChannels)
-	mux.HandleFunc("POST /api/channels", h.handleCreateChannel)
-	mux.HandleFunc("PATCH /api/channels/{id}", h.handleUpdateChannel)
-	mux.HandleFunc("DELETE /api/channels/{id}", h.handleDeleteChannel)
-	mux.HandleFunc("GET /api/channels/{id}/status", h.handleGetChannelStatus)
+	h.registerProtectedRoute(mux, "GET /api/channels", h.handleListChannels)
+	h.registerProtectedRoute(mux, "POST /api/channels", h.handleCreateChannel)
+	h.registerProtectedRoute(mux, "PATCH /api/channels/{id}", h.handleUpdateChannel)
+	h.registerProtectedRoute(mux, "DELETE /api/channels/{id}", h.handleDeleteChannel)
+	h.registerProtectedRoute(mux, "GET /api/channels/{id}/status", h.handleGetChannelStatus)
 }
 
 // channelInstance represents a configured channel instance with its status.
