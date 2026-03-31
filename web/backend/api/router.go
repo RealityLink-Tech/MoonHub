@@ -30,6 +30,7 @@ type Handler struct {
 	dynamicTools         *DynamicToolsHandler
 	agentLoop            *agent.AgentLoop
 	chatHub              *pkgapi.ChatHub
+	chat                 *ChatHandler
 }
 
 // NewHandler creates an instance of the API handler.
@@ -47,6 +48,7 @@ func NewHandler(configPath string, deviceStore *devices.DeviceStore, pairingMana
 		dynamicTools: initDynamicTools(configPath),
 	}
 	h.chatHub = pkgapi.NewChatHub(nil)
+	h.chat = NewChatHandler(deviceStore, h.chatHub)
 	return h
 }
 
@@ -67,6 +69,7 @@ func (h *Handler) SetProvisioningHandler(handler *ProvisioningHandler) {
 func (h *Handler) SetAgentLoop(loop *agent.AgentLoop) {
 	h.agentLoop = loop
 	h.chatHub.SetAgent(loop)
+	h.chat.SetAgentLoop(loop)
 }
 
 // AgentLoop returns the in-process agent loop (nil if not running single-process).
@@ -106,6 +109,9 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 
 	// Launcher service parameters (port/public)
 	h.registerLauncherConfigRoutes(mux)
+
+	// Chat routes (REST, SSE, WebSocket)
+	h.chat.RegisterRoutes(mux)
 
 	// Provisioning (device management)
 	if h.provisioning != nil {
