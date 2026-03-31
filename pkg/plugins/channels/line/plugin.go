@@ -1,4 +1,4 @@
-// MoonHub - Ultra-lightweight personal AI agent
+// MoonHub - Your ready-to-use AI assistant
 // Plugin Architecture - LINE Channel Plugin
 //
 // Copyright (c) 2026 MoonHub contributors

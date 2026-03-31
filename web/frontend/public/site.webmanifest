@@ -1,5 +1,5 @@
 {
-  "name": "MoonHub Device Setup",
+  "name": "MoonHub",
   "short_name": "MoonHub",
   "start_url": "/provisioning",
   "scope": "/provisioning",

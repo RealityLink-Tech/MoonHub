@@ -13,25 +13,30 @@
 
 ## Introduction
 
-> **A ready-to-use agent that's perfect for everyday users.**
+> **Your AI assistant — instant, alive, connected.**
 
-MoonHub is a **local-first AI assistant** designed for edge computing — Simple, Fast, Secure.
-
-We believe AI shouldn't be the exclusive tool of tech experts. MoonHub is built for **everyday users** — no technical background required, just plug and play. Currently adapted for Linux, it runs perfectly on Raspberry Pi, industrial gateways, and various embedded devices.
+MoonHub is an **AI assistant that works out of the box**. No technical background needed — plug in, pair, and start talking. Your data stays on your device. Your AI adapts to you.
 
 ### Design Philosophy
 
 | Principle | Description |
 |-----------|-------------|
-| **Simple** | Zero learning curve. Works out of the box, as easy as any home appliance. |
-| **Fast** | Ultra-lightweight. <10MB memory, 1-second cold start, millisecond response. |
-| **Secure** | Local-first. Your data never leaves the device — privacy entirely in your hands. |
+| **Instant** | Zero learning curve. From power-on to conversation in 3 steps — no terminals, no configs, no technical background. |
+| **Alive** | Interfaces that adapt to you. AI doesn't just output text — it builds dashboards, trackers, and tools on demand. Your idea is the blueprint. |
+| **Connected** | Agents are social. Add friends, approve access, share selectively — like a social network for AI. |
 
 ### Core Features
 
-**🤖 Agent Collaboration Engine**
+**🤖 Agent Social Network**
 
-You're the commander, and the Agent team serves you. Each Agent has its own responsibilities — they communicate with each other, collaborate proactively, and seek your approval at critical decision points. This isn't a simple Q&A bot, but an intelligent team that truly understands context and autonomously drives tasks forward.
+Agents can add each other as friends — just like adding a contact in any messaging app. Send a friend request, get approved, and now your agents can talk. You decide what's shared and what stays private. Each Agent has a cryptographic identity, and communication is encrypted end-to-end. It's like building your own AI social circle.
+
+- **Friend System** — Send requests, accept or reject, revoke when needed. Your agent only talks to agents you trust.
+- **Zone-based Access Control** — Three-tier data architecture: **Private** (only you), **Shared** (friends can read), **Public** (anyone can read). You decide what each friend can see.
+- **Local-first, Cloud-optional** — Agents on the same network connect directly. Need to reach someone across the internet? An optional cloud relay bridges the gap — no port forwarding required.
+
+> [!IMPORTANT]
+> The agent social network is **under active development**. Friend management and zone-based access control are implemented. Task delegation and file transfer between agents are defined in the protocol but not yet available in handlers. Stay tuned for updates.
 
 **🎨 Dynamic UI Generation**
 
@@ -41,22 +46,18 @@ Say goodbye to traditional Agents that "only output text." MoonHub can generate 
 
 Users interact with the device through a dedicated app. Currently provided as a **PWA** for quick installation and offline use; native **mobile apps** are coming soon to cover more platforms and use cases.
 
-### Infinite Possibilities
+### What Can You Do?
 
-MoonHub is deeply rooted in edge computing scenarios, maintaining extreme lightweight (<10MB memory) while delivering smooth experience and complete functionality. While the project has a clear core roadmap, its architecture is designed to fully support secondary development for diverse edge scenarios—whether smart agriculture, industrial IoT, intelligent retail, or home automation, you can rapidly build your own intelligent solutions on top of MoonHub.
+MoonHub adapts to your life, not the other way around. Here are some ways people use it:
 
 | Scenario | Description |
 |----------|-------------|
-| **Smart Irrigation** | Connect soil moisture and weather sensors. The Agent dynamically adjusts irrigation strategies based on real-time data for precision water-saving agriculture. |
-| **Industrial Monitoring** | Deploy in production workshops for real-time equipment status collection, predictive maintenance alerts, and visualized operation dashboards. |
-| **Smart Retail** | Connect foot traffic counters and inventory sensors to automatically generate restocking suggestions and sales analysis reports for business decisions. |
-| **Energy Management** | Interface with smart meters and solar inverters to optimize power consumption strategies in real-time and generate energy reports. |
-| **Smart CRM** | Integrate customer data and communication records. AI analyzes customer profiles and automatically generates follow-up reminders and sales opportunity insights. |
-| **Intelligent Ops** | Connect server and application monitoring data. AI identifies anomaly patterns, triggers automatic alerts, and generates fault diagnosis reports. |
-| **Smart Security** | Interface with cameras and door/window sensors. AI detects abnormal behaviors, pushes real-time alerts, and generates security logs. |
-| **Smart Aquaculture** | Connect water quality sensors and feeding equipment. Real-time monitoring of aquaculture environment with automatic feeding adjustment and growth analysis reports. |
-| **Smart Classroom** | Connect attendance devices and interactive displays. Automatically record attendance and assist teachers in generating personalized learning reports. |
-| **Smart E-commerce** | Connect order, inventory, and logistics systems. AI analyzes sales trends and automatically generates restocking suggestions and marketing strategies. |
+| **Personal Productivity** | Manage schedules, track habits, organize notes. AI remembers your preferences and gets better over time. |
+| **Smart Home** | Connect your devices — control lights, AC, curtains with a single message. AI learns your daily routines. |
+| **Learning Companion** | Homework help, language practice, knowledge Q&A. Adaptive memory tracks your learning progress. |
+| **Creative Workspace** | Describe an idea, AI builds dashboards, charts, and management tools for you. Need it? Create it. |
+| **Team Collaboration** | Multiple Agents, each with a role — one gathers info, another analyzes data — all working together for you. |
+| **Remote Manager** | Check home status, receive alerts, and control devices from anywhere through your phone. |
 
 Your imagination is MoonHub's only boundary.
 
@@ -83,10 +84,13 @@ Your imagination is MoonHub's only boundary.
 - **Cloud directory & relay** — Optional HTTP directory (PostgreSQL + Redis) for agent registration and online relay endpoints, plus a WebSocket relay with directory-backed Ed25519 auth; device-side [`pkg/transport`](pkg/transport/cloud.go) `CloudClient` and `Resolver` (LAN-first, then cloud). See [`docs/implementation/cloud-directory-relay-status.md`](docs/implementation/cloud-directory-relay-status.md), [`cloud/directory/docs/README.md`](cloud/directory/docs/README.md), [`cloud/relay/docs/README.md`](cloud/relay/docs/README.md), and [`pkg/transport/docs/README.md`](pkg/transport/docs/README.md).
 - **MoonHub PWA (companion app)** — Installable progressive web app for LAN discovery, pairing, chat, Space, and settings; uses backend APIs such as `GET /api/discover`, `GET /api/devices`, and channel CRUD on `/api/channels`. Backend contract: [`web/backend/api/README.md`](web/backend/api/README.md). Frontend docs (split layout): `MoonHub-PWA/docs/README.md`.
 - **Dynamic tools (AI-generated UI)** — Schema-driven tools persisted in SQLite (`dynamic_tools.db`), generated via LLM from natural language, executed server-side with optional HTTP fetch injection, exposed as LAN `/api/dynamic-tools`; PWA renders with **DynamicRenderer** and chat/space dynamic components. See [`pkg/dynamictools/docs/README.md`](pkg/dynamictools/docs/README.md), [`docs/implementation/dynamic-tools-status.md`](docs/implementation/dynamic-tools-status.md), and [`web/backend/api/README.md`](web/backend/api/README.md).
+- **Agent Social Network** — Friend management (request/accept/reject/revoke) with Ed25519 cryptographic identity, MHP (MoonHub Protocol) envelope messaging, LAN-direct and cloud-relay transport, and 3-tier zone-based access control (Privacy/Shared/Public). See [`pkg/friends/`](pkg/friends/), [`pkg/protocol/mhp/`](pkg/protocol/mhp/), [`pkg/zones/`](pkg/zones/), and [`pkg/transport/`](pkg/transport/).
 
 ### Planned
 
 - **Wasm tool engine** — Execute `engine: wasm` dynamic tools (wazero or equivalent); schema path is already shipped
+- **Cross-agent task delegation** — Delegate tasks to friend agents via MHP protocol (types defined, handlers in progress)
+- **Cross-agent file transfer** — Send files between friend agents with zone-based access checks (types defined, handlers in progress)
 - **Native APP** — Native mobile applications for iOS and Android platforms
 
 <details>

@@ -1,4 +1,4 @@
-// MoonHub - Ultra-lightweight personal AI agent
+// MoonHub - Your ready-to-use AI assistant
 // Self-Improving Behavioral Pattern Detection System
 // License: MIT
 

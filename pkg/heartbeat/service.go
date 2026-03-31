@@ -1,4 +1,4 @@
-// MoonHub - Ultra-lightweight personal AI agent
+// MoonHub - Your ready-to-use AI assistant
 // Inspired by and based on nanobot: https://github.com/HKUDS/nanobot
 // License: MIT
 //

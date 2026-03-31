@@ -1,4 +1,4 @@
-// MoonHub - Ultra-lightweight personal AI agent
+// MoonHub - Your ready-to-use AI assistant
 // Adaptive Memory System - Migration from MEMORY.md
 // License: MIT
 
