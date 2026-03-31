@@ -2,8 +2,10 @@ package api
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -108,6 +110,92 @@ func TestDevicesHandler_Success(t *testing.T) {
 
 	if firstDevice["name"] != "Living Room Hub" {
 		t.Errorf("expected device name Living Room Hub, got %v", firstDevice["name"])
+	}
+
+	// Verify sensitive fields are stripped
+	if _, exists := firstDevice["token"]; exists {
+		t.Error("token field should not be present in response")
+	}
+	if _, exists := firstDevice["tokenExpiresAt"]; exists {
+		t.Error("tokenExpiresAt field should not be present in response")
+	}
+}
+
+// TestDevicesHandler_TokenStripped verifies that the token and tokenExpiresAt
+// fields are never exposed in the /api/devices JSON response.
+func TestDevicesHandler_TokenStripped(t *testing.T) {
+	devices := []*devices.PairedDevice{
+		{
+			ID:             "device-secret",
+			Name:           "Secret Device",
+			Token:          "super-secret-token-value",
+			TokenExpiresAt: time.Now().Add(24 * time.Hour),
+			PairedAt:       time.Now(),
+			LastSeenAt:     time.Now(),
+			IPAddress:      "192.168.1.50",
+			UserAgent:      "Test/1.0",
+		},
+	}
+
+	handler := newTestDevicesHandler(devices)
+
+	req := httptest.NewRequest("GET", "/api/devices", nil)
+	req.RemoteAddr = "192.168.1.50:12345"
+	w := httptest.NewRecorder()
+
+	handler.handleListDevices(w, req)
+
+	res := w.Result()
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", res.StatusCode)
+	}
+
+	// Read raw body to check for token presence in the JSON string
+	bodyBytes, err := io.ReadAll(res.Body)
+	if err != nil {
+		t.Fatalf("failed to read response body: %v", err)
+	}
+	bodyStr := string(bodyBytes)
+
+	if strings.Contains(bodyStr, `"token"`) {
+		t.Errorf("response JSON must not contain a token field, got: %s", bodyStr)
+	}
+	if strings.Contains(bodyStr, `"tokenExpiresAt"`) {
+		t.Errorf("response JSON must not contain a tokenExpiresAt field, got: %s", bodyStr)
+	}
+	if strings.Contains(bodyStr, "super-secret-token-value") {
+		t.Errorf("response JSON must not contain the raw token value, got: %s", bodyStr)
+	}
+
+	// Also verify via typed decode that the public fields are correct
+	var response struct {
+		Success bool                   `json:"success"`
+		Data    []PublicPairedDevice   `json:"data"`
+	}
+	if err := json.Unmarshal(bodyBytes, &response); err != nil {
+		t.Fatalf("failed to decode response: %v", err)
+	}
+
+	if !response.Success {
+		t.Error("expected success=true")
+	}
+	if len(response.Data) != 1 {
+		t.Fatalf("expected 1 device, got %d", len(response.Data))
+	}
+	d := response.Data[0]
+	if d.ID != "device-secret" {
+		t.Errorf("expected id device-secret, got %s", d.ID)
+	}
+	if d.Name != "Secret Device" {
+		t.Errorf("expected name Secret Device, got %s", d.Name)
+	}
+	if d.IPAddress != "192.168.1.50" {
+		t.Errorf("expected ipAddress 192.168.1.50, got %s", d.IPAddress)
+	}
+	if d.UserAgent != "Test/1.0" {
+		t.Errorf("expected userAgent Test/1.0, got %s", d.UserAgent)
 	}
 }
 
