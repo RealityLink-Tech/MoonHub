@@ -30,6 +30,8 @@ var gateway = struct {
 	startupDeadline  time.Time
 	logs             *LogBuffer
 	events           *EventBroadcaster
+	cachedHealth     string
+	cachedHealthAt   time.Time
 }{
 	runtimeStatus: "stopped",
 	logs:          NewLogBuffer(200),
@@ -46,6 +48,25 @@ var (
 var gatewayHealthGet = func(url string, timeout time.Duration) (*http.Response, error) {
 	client := http.Client{Timeout: timeout}
 	return client.Get(url)
+}
+
+// probeGatewayHealth probes the gateway health endpoint and returns a status string.
+func probeGatewayHealth(url string) string {
+	resp, err := gatewayHealthGet(url, 2*time.Second)
+	if err != nil {
+		return "unreachable"
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return "error"
+	}
+	var healthData map[string]any
+	if err := json.NewDecoder(resp.Body).Decode(&healthData); err != nil {
+		return "error"
+	}
+	// Return "running" on success; healthData is discarded here since we
+	// only cache the status string. The next fresh probe will populate it.
+	return "running"
 }
 
 // registerGatewayRoutes binds gateway lifecycle endpoints to the ServeMux.
@@ -492,6 +513,7 @@ func (h *Handler) handleGatewayRestart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Hold the mutex through the entire stop-then-start to prevent races.
 	gateway.mu.Lock()
 	previousCmd := gateway.cmd
 	setGatewayRuntimeStatusLocked("restarting")
@@ -499,10 +521,9 @@ func (h *Handler) handleGatewayRestart(w http.ResponseWriter, r *http.Request) {
 		Status:          "restarting",
 		RestartRequired: false,
 	})
-	gateway.mu.Unlock()
 
-	if err = stopGatewayProcessForRestart(previousCmd); err != nil {
-		gateway.mu.Lock()
+	// Stop the old process while holding the lock (may block up to ~8s).
+	if stopErr := stopGatewayProcessForRestart(previousCmd); stopErr != nil {
 		if gateway.cmd == previousCmd {
 			if isCmdProcessAliveLocked(previousCmd) {
 				setGatewayRuntimeStatusLocked("running")
@@ -513,11 +534,10 @@ func (h *Handler) handleGatewayRestart(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		gateway.mu.Unlock()
-		http.Error(w, fmt.Sprintf("Failed to restart gateway: %v", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Failed to restart gateway: %v", stopErr), http.StatusInternalServerError)
 		return
 	}
 
-	gateway.mu.Lock()
 	if gateway.cmd == previousCmd {
 		gateway.cmd = nil
 		gateway.bootDefaultModel = ""
@@ -527,12 +547,11 @@ func (h *Handler) handleGatewayRestart(w http.ResponseWriter, r *http.Request) {
 		gateway.cmd = nil
 		gateway.bootDefaultModel = ""
 		setGatewayRuntimeStatusLocked("error")
-	}
-	gateway.mu.Unlock()
-	if err != nil {
+		gateway.mu.Unlock()
 		http.Error(w, fmt.Sprintf("Failed to restart gateway: %v", err), http.StatusInternalServerError)
 		return
 	}
+	gateway.mu.Unlock()
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]any{
@@ -603,38 +622,36 @@ func (h *Handler) gatewayStatusData() map[string]any {
 			}
 		}
 
-		url := fmt.Sprintf("http://%s/health", net.JoinHostPort(host, strconv.Itoa(port)))
-		resp, err := gatewayHealthGet(url, 2*time.Second)
+		healthURL := fmt.Sprintf("http://%s/health", net.JoinHostPort(host, strconv.Itoa(port)))
 
-		if err != nil {
+		// Use cached health if fresh (< 2s), otherwise probe async
+		gateway.mu.Lock()
+		health := gateway.cachedHealth
+		if time.Since(gateway.cachedHealthAt) > 2*time.Second {
+			// Async probe — don't block this request
+			go func() {
+				gateway.mu.Lock()
+				gateway.cachedHealth = probeGatewayHealth(healthURL)
+				gateway.cachedHealthAt = time.Now()
+				gateway.mu.Unlock()
+			}()
+		}
+		gateway.mu.Unlock()
+
+		if health == "" || health == "unreachable" {
 			gateway.mu.Lock()
 			data["gateway_status"] = currentGatewayStatusLocked(true)
 			gateway.mu.Unlock()
+		} else if health == "error" {
+			gateway.mu.Lock()
+			setGatewayRuntimeStatusLocked("error")
+			gateway.mu.Unlock()
+			data["gateway_status"] = "error"
 		} else {
-			defer resp.Body.Close()
-			if resp.StatusCode != http.StatusOK {
-				gateway.mu.Lock()
-				setGatewayRuntimeStatusLocked("error")
-				gateway.mu.Unlock()
-				data["gateway_status"] = "error"
-				data["status_code"] = resp.StatusCode
-			} else {
-				var healthData map[string]any
-				if decErr := json.NewDecoder(resp.Body).Decode(&healthData); decErr != nil {
-					gateway.mu.Lock()
-					setGatewayRuntimeStatusLocked("error")
-					gateway.mu.Unlock()
-					data["gateway_status"] = "error"
-				} else {
-					gateway.mu.Lock()
-					setGatewayRuntimeStatusLocked("running")
-					gateway.mu.Unlock()
-					for k, v := range healthData {
-						data[k] = v
-					}
-					data["gateway_status"] = "running"
-				}
-			}
+			gateway.mu.Lock()
+			setGatewayRuntimeStatusLocked("running")
+			gateway.mu.Unlock()
+			data["gateway_status"] = "running"
 		}
 	}
 
@@ -761,7 +778,7 @@ func (h *Handler) currentGatewayStatus() string {
 // scanPipe reads lines from r and appends them to buf. Returns when r reaches EOF.
 func scanPipe(r io.Reader, buf *LogBuffer) {
 	scanner := bufio.NewScanner(r)
-	scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
+	scanner.Buffer(make([]byte, 0, 64*1024), 64*1024) // max 64KB per line
 	for scanner.Scan() {
 		buf.Append(scanner.Text())
 	}
