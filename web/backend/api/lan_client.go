@@ -86,6 +86,6 @@ func requireLANClientLANAPI(w http.ResponseWriter, r *http.Request) bool {
 	if IsLANScopeIP(ClientIPFromRequest(r)) {
 		return true
 	}
-	writeLANError(w, http.StatusForbidden, "access denied")
+	writeAuthError(w, http.StatusForbidden, "access denied")
 	return false
 }

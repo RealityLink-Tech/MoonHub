@@ -32,7 +32,7 @@ func (h *Handler) handleGetConfig(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) handlePatchConfig(w http.ResponseWriter, r *http.Request) {
 	patchBody, err := io.ReadAll(io.LimitReader(r.Body, 1<<20))
 	if err != nil {
-		writeJSONError(w, http.StatusBadRequest, "Failed to read request body")
+		WriteJSONError(w, http.StatusBadRequest, "Failed to read request body")
 		return
 	}
 	defer r.Body.Close()
@@ -40,7 +40,7 @@ func (h *Handler) handlePatchConfig(w http.ResponseWriter, r *http.Request) {
 	// Validate the patch is valid JSON
 	var patch map[string]any
 	if err = json.Unmarshal(patchBody, &patch); err != nil {
-		writeJSONError(w, http.StatusBadRequest, fmt.Sprintf("Invalid JSON: %v", err))
+		WriteJSONError(w, http.StatusBadRequest, fmt.Sprintf("Invalid JSON: %v", err))
 		return
 	}
 
@@ -51,7 +51,7 @@ func (h *Handler) handlePatchConfig(w http.ResponseWriter, r *http.Request) {
 		// Only fall back to defaults if the file doesn't exist yet (initial setup).
 		// For corrupted/unreadable files, return an error.
 		if !os.IsNotExist(err) {
-			writeJSONError(w, http.StatusInternalServerError, "Failed to load config")
+			WriteJSONError(w, http.StatusInternalServerError, "Failed to load config")
 			return
 		}
 		cfg = config.DefaultConfig()
@@ -59,13 +59,13 @@ func (h *Handler) handlePatchConfig(w http.ResponseWriter, r *http.Request) {
 
 	existing, err := json.Marshal(cfg)
 	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, "Failed to serialize current config")
+		WriteJSONError(w, http.StatusInternalServerError, "Failed to serialize current config")
 		return
 	}
 
 	var base map[string]any
 	if err = json.Unmarshal(existing, &base); err != nil {
-		writeJSONError(w, http.StatusInternalServerError, "Failed to parse current config")
+		WriteJSONError(w, http.StatusInternalServerError, "Failed to parse current config")
 		return
 	}
 
@@ -75,13 +75,13 @@ func (h *Handler) handlePatchConfig(w http.ResponseWriter, r *http.Request) {
 	// Convert merged map back to Config struct
 	merged, err := json.Marshal(base)
 	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, "Failed to serialize merged config")
+		WriteJSONError(w, http.StatusInternalServerError, "Failed to serialize merged config")
 		return
 	}
 
 	var newCfg config.Config
 	if err := json.Unmarshal(merged, &newCfg); err != nil {
-		writeJSONError(w, http.StatusBadRequest, fmt.Sprintf("Merged config is invalid: %v", err))
+		WriteJSONError(w, http.StatusBadRequest, fmt.Sprintf("Merged config is invalid: %v", err))
 		return
 	}
 
@@ -96,7 +96,7 @@ func (h *Handler) handlePatchConfig(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := config.SaveConfig(h.configPath, &newCfg); err != nil {
-		writeJSONError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to save config: %v", err))
+		WriteJSONError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to save config: %v", err))
 		return
 	}
 

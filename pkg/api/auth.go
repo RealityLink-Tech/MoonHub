@@ -86,19 +86,19 @@ type bindResponse struct {
 func (h *Handler) handleBind(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(io.LimitReader(r.Body, 1<<10))
 	if err != nil {
-		writeJSONError(w, http.StatusBadRequest, "Bad request")
+		WriteJSONError(w, http.StatusBadRequest, "Bad request")
 		return
 	}
 	defer r.Body.Close()
 
 	var req bindRequest
 	if err := json.Unmarshal(body, &req); err != nil {
-		writeJSONError(w, http.StatusBadRequest, "Invalid JSON")
+		WriteJSONError(w, http.StatusBadRequest, "Invalid JSON")
 		return
 	}
 
 	if len(req.Code) != 6 {
-		writeJSONError(w, http.StatusBadRequest, "code must be 6 digits")
+		WriteJSONError(w, http.StatusBadRequest, "code must be 6 digits")
 		return
 	}
 
@@ -106,7 +106,7 @@ func (h *Handler) handleBind(w http.ResponseWriter, r *http.Request) {
 	provPath := filepath.Join(h.configDir(), "provisioning.json")
 	provStore, err := provisioning.NewJSONConfigStore(provPath)
 	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, "failed to load provisioning config")
+		WriteJSONError(w, http.StatusInternalServerError, "failed to load provisioning config")
 		return
 	}
 
@@ -117,7 +117,7 @@ func (h *Handler) handleBind(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if storedCode == "" || storedCode != req.Code {
-		writeJSONError(w, http.StatusUnauthorized, "invalid auth code")
+		WriteJSONError(w, http.StatusUnauthorized, "invalid auth code")
 		return
 	}
 
@@ -131,7 +131,7 @@ func (h *Handler) handleBind(w http.ResponseWriter, r *http.Request) {
 	// Invalidate the auth code after successful bind (single-use)
 	provStore.Delete(provisioning.KeyAuthCode)
 	if err := provStore.Save(); err != nil {
-		writeJSONError(w, http.StatusInternalServerError, "failed to persist auth code invalidation")
+		WriteJSONError(w, http.StatusInternalServerError, "failed to persist auth code invalidation")
 		return
 	}
 
@@ -149,13 +149,13 @@ func (h *Handler) handleBind(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) handleRefresh(w http.ResponseWriter, r *http.Request) {
 	deviceID := r.Header.Get("X-Device-Id")
 	if deviceID == "" {
-		writeJSONError(w, http.StatusBadRequest, "X-Device-Id header required")
+		WriteJSONError(w, http.StatusBadRequest, "X-Device-Id header required")
 		return
 	}
 
 	token, ok := h.tokenStore.Refresh(deviceID)
 	if !ok {
-		writeJSONError(w, http.StatusUnauthorized, "no binding found")
+		WriteJSONError(w, http.StatusUnauthorized, "no binding found")
 		return
 	}
 
@@ -176,14 +176,14 @@ func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		auth := r.Header.Get("Authorization")
 		if len(auth) < 8 || auth[:7] != "Bearer " {
-			writeJSONError(w, http.StatusUnauthorized, "missing or invalid token")
+			WriteJSONError(w, http.StatusUnauthorized, "missing or invalid token")
 			return
 		}
 		token := auth[7:]
 
 		deviceID, ok := h.tokenStore.Validate(token)
 		if !ok {
-			writeJSONError(w, http.StatusUnauthorized, "invalid token")
+			WriteJSONError(w, http.StatusUnauthorized, "invalid token")
 			return
 		}
 
@@ -209,8 +209,8 @@ func generateToken() string {
 	return hex.EncodeToString(b)
 }
 
-// writeJSONError writes a JSON-encoded error response with the given HTTP status.
-func writeJSONError(w http.ResponseWriter, status int, msg string) {
+// WriteJSONError writes a JSON-encoded error response.
+func WriteJSONError(w http.ResponseWriter, status int, msg string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(map[string]string{"error": msg})

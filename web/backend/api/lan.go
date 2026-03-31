@@ -1,306 +1,216 @@
 package api
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"net/url"
 	"strings"
-	"time"
 
 	"github.com/RealityLink-Tech/MoonHub/pkg/agent"
-	"github.com/RealityLink-Tech/MoonHub/pkg/config"
 	"github.com/RealityLink-Tech/MoonHub/pkg/devices"
-	"github.com/RealityLink-Tech/MoonHub/pkg/social"
+	pkgapi "github.com/RealityLink-Tech/MoonHub/pkg/api"
 	"github.com/google/uuid"
 )
 
-// LANHandler handles LAN API requests for chat functionality.
-type LANHandler struct {
+const maxChatBodyBytes = 1 << 20 // 1MB
+
+// ChatHandler handles chat API requests (REST and SSE).
+type ChatHandler struct {
 	deviceStore *devices.DeviceStore
 	agentLoop   *agent.AgentLoop
-	sessions    *social.SessionManager
-	deviceID    string
-	deviceName  string
-	version     string
+	chatHub     *pkgapi.ChatHub
 }
 
-// NewLANHandler creates a new LAN API handler.
-func NewLANHandler(
-	deviceStore *devices.DeviceStore,
-	agentLoop *agent.AgentLoop,
-	deviceID, deviceName, version string,
-) *LANHandler {
-	return &LANHandler{
+// NewChatHandler creates a chat handler.
+func NewChatHandler(deviceStore *devices.DeviceStore, chatHub *pkgapi.ChatHub) *ChatHandler {
+	return &ChatHandler{
 		deviceStore: deviceStore,
-		agentLoop:   agentLoop,
-		sessions:    social.NewSessionManager(),
-		deviceID:    deviceID,
-		deviceName:  deviceName,
-		version:     version,
+		chatHub:     chatHub,
 	}
 }
 
-// RegisterRoutes registers LAN API routes with the mux.
-func (h *LANHandler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("GET /api/lan/info", h.authMiddleware(h.handleInfo))
-	mux.HandleFunc("POST /api/lan/chat", h.authMiddleware(h.handleChat))
-	mux.HandleFunc("GET /api/lan/chat/stream", h.authMiddleware(h.handleChatStream))
+// SetAgentLoop updates the agent loop reference.
+func (h *ChatHandler) SetAgentLoop(loop *agent.AgentLoop) {
+	h.agentLoop = loop
 }
 
-// authContextKey is the context key for auth info.
-type authContextKey string
+// RegisterRoutes registers chat routes.
+func (h *ChatHandler) RegisterRoutes(mux *http.ServeMux) {
+	mux.HandleFunc("POST /api/chat", h.authMiddleware(h.handleChat))
+	mux.HandleFunc("POST /api/chat/stream", h.authMiddleware(h.handleChatStream))
+	mux.HandleFunc("GET /api/chat/ws", h.handleChatWS)
+}
 
-const authDeviceIDKey authContextKey = "deviceId"
+// chatRequest is the JSON body for POST /api/chat and POST /api/chat/stream.
+type chatRequest struct {
+	Content   string `json:"content"`
+	SessionID string `json:"session_id,omitempty"`
+}
 
-// authMiddleware validates Bearer token and injects device ID into context.
-func (h *LANHandler) authMiddleware(next http.HandlerFunc) http.HandlerFunc {
+// chatResponse is the JSON response for POST /api/chat.
+type chatResponse struct {
+	Success bool `json:"success"`
+	Data    struct {
+		Content   string `json:"content"`
+		SessionID string `json:"session_id"`
+	} `json:"data,omitempty"`
+	Error *chatError `json:"error,omitempty"`
+}
+
+type chatError struct {
+	Message string `json:"message"`
+	Code    string `json:"code"`
+}
+
+func writeChatError(w http.ResponseWriter, status int, message, code string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(chatResponse{
+		Success: false,
+		Error:   &chatError{Message: message, Code: code},
+	})
+}
+
+// authMiddleware validates Bearer token via DeviceStore.
+func (h *ChatHandler) authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !requireLANClientLANAPI(w, r) {
+		auth := r.Header.Get("Authorization")
+		if len(auth) < 8 || auth[:7] != "Bearer " {
+			writeChatError(w, http.StatusUnauthorized, "missing or invalid token", "TOKEN_INVALID")
 			return
 		}
+		token := strings.TrimSpace(auth[7:])
 
-		// Extract token from Authorization header
-		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" {
-			writeLANError(w, http.StatusUnauthorized, "authorization header required")
-			return
-		}
-
-		// Check Bearer format
-		parts := strings.SplitN(authHeader, " ", 2)
-		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
-			writeLANError(w, http.StatusUnauthorized, "invalid authorization format")
-			return
-		}
-
-		token := parts[1]
-
-		// Validate token
 		validation := h.deviceStore.ValidateToken(token)
 		if !validation.Valid {
-			writeLANError(w, http.StatusUnauthorized, validation.Error)
+			writeChatError(w, http.StatusUnauthorized, "invalid or expired token", "TOKEN_INVALID")
 			return
 		}
-
-		// Update last seen
-		_ = h.deviceStore.UpdateLastSeen(validation.DeviceID, getClientIP(r))
-
-		// Inject device ID into context
-		ctx := context.WithValue(r.Context(), authDeviceIDKey, validation.DeviceID)
-		next.ServeHTTP(w, r.WithContext(ctx))
+		_ = h.deviceStore.UpdateLastSeen(validation.DeviceID, "")
+		next.ServeHTTP(w, r)
 	}
 }
 
-// getDeviceID extracts device ID from context.
-func getDeviceID(ctx context.Context) string {
-	if deviceID, ok := ctx.Value(authDeviceIDKey).(string); ok {
-		return deviceID
-	}
-	return ""
-}
-
-// handleInfo handles GET /api/lan/info - returns device information.
-func (h *LANHandler) handleInfo(w http.ResponseWriter, r *http.Request) {
-	response := struct {
-		Success bool               `json:"success"`
-		Data    *social.DeviceInfo `json:"data"`
-	}{
-		Success: true,
-		Data: &social.DeviceInfo{
-			ID:      h.deviceID,
-			Name:    h.deviceName,
-			Status:  "online",
-			Version: h.version,
-		},
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
-}
-
-// handleChat handles POST /api/lan/chat - synchronous chat endpoint.
-func (h *LANHandler) handleChat(w http.ResponseWriter, r *http.Request) {
-	deviceID := getDeviceID(r.Context())
-	if deviceID == "" {
-		writeLANError(w, http.StatusUnauthorized, "device ID not found in context")
+// handleChat handles POST /api/chat — synchronous chat.
+func (h *ChatHandler) handleChat(w http.ResponseWriter, r *http.Request) {
+	if h.agentLoop == nil {
+		writeChatError(w, http.StatusServiceUnavailable, "agent not available", "AGENT_UNAVAILABLE")
 		return
 	}
 
-	// Parse request
-	var req social.ChatRequest
-	dec := json.NewDecoder(http.MaxBytesReader(w, r.Body, maxAuthBodyBytes))
-	if err := dec.Decode(&req); err != nil {
-		writeLANError(w, http.StatusBadRequest, "invalid request body")
+	var req chatRequest
+	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, maxChatBodyBytes)).Decode(&req); err != nil {
+		writeChatError(w, http.StatusBadRequest, "invalid request body", "INVALID_REQUEST")
 		return
 	}
 
-	// Validate content
 	if strings.TrimSpace(req.Content) == "" {
-		writeLANError(w, http.StatusBadRequest, "content is required")
+		writeChatError(w, http.StatusBadRequest, "content is required", "INVALID_REQUEST")
 		return
 	}
 
-	// Default to text type
-	if req.Type == "" {
-		req.Type = social.MessageTypeText
+	sessionID := req.SessionID
+	if sessionID == "" {
+		sessionID = uuid.New().String()
 	}
 
-	// Get or create session
-	session := h.sessions.GetOrCreateSession(deviceID)
-
-	// Process message
-	ctx, cancel := context.WithTimeout(r.Context(), 60*time.Second)
-	defer cancel()
-
-	response, err := h.agentLoop.ProcessDirectWithChannel(
-		ctx,
-		req.Content,
-		session.SessionKey,
-		"lan",
-		deviceID,
-	)
+	sessionKey := "lan:" + sessionID
+	result, err := h.agentLoop.ProcessDirectWithChannel(r.Context(), req.Content, sessionKey, "lan", sessionID)
 	if err != nil {
-		log.Printf("LAN chat error: %v", err)
-		writeLANError(w, http.StatusInternalServerError, fmt.Sprintf("failed to process message: %v", err))
+		writeChatError(w, http.StatusInternalServerError, "agent processing failed", "AGENT_ERROR")
 		return
 	}
 
-	// Build response
-	chatResponse := struct {
-		Success bool                 `json:"success"`
-		Data    *social.ChatResponse `json:"data"`
-	}{
-		Success: true,
-		Data: &social.ChatResponse{
-			ID:        uuid.New().String(),
-			Content:   response,
-			Timestamp: time.Now(),
-		},
-	}
+	resp := chatResponse{Success: true}
+	resp.Data.Content = result
+	resp.Data.SessionID = sessionID
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(chatResponse)
+	json.NewEncoder(w).Encode(resp)
 }
 
-// handleChatStream handles GET /api/lan/chat/stream - SSE streaming chat endpoint.
-func (h *LANHandler) handleChatStream(w http.ResponseWriter, r *http.Request) {
-	deviceID := getDeviceID(r.Context())
-	if deviceID == "" {
-		writeLANError(w, http.StatusUnauthorized, "device ID not found in context")
+// handleChatStream handles POST /api/chat/stream — SSE streaming.
+func (h *ChatHandler) handleChatStream(w http.ResponseWriter, r *http.Request) {
+	if h.agentLoop == nil {
+		writeChatError(w, http.StatusServiceUnavailable, "agent not available", "AGENT_UNAVAILABLE")
 		return
 	}
 
-	// Get content from query parameter
-	content := r.URL.Query().Get("content")
-	if content == "" {
-		writeLANError(w, http.StatusBadRequest, "content query parameter is required")
+	var req chatRequest
+	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, maxChatBodyBytes)).Decode(&req); err != nil {
+		writeChatError(w, http.StatusBadRequest, "invalid request body", "INVALID_REQUEST")
 		return
 	}
 
-	// Decode URL-encoded content
-	decodedContent, err := url.QueryUnescape(content)
-	if err != nil {
-		writeLANError(w, http.StatusBadRequest, "invalid content encoding")
+	if strings.TrimSpace(req.Content) == "" {
+		writeChatError(w, http.StatusBadRequest, "content is required", "INVALID_REQUEST")
 		return
 	}
 
-	if strings.TrimSpace(decodedContent) == "" {
-		writeLANError(w, http.StatusBadRequest, "content cannot be empty")
-		return
+	sessionID := req.SessionID
+	if sessionID == "" {
+		sessionID = uuid.New().String()
 	}
 
-	// Check if client supports SSE
-	flusher, ok := w.(http.Flusher)
-	if !ok {
-		writeLANError(w, http.StatusInternalServerError, "SSE not supported")
-		return
-	}
-
-	// Set SSE headers
+	// SSE headers
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 
-	// Get or create session
-	session := h.sessions.GetOrCreateSession(deviceID)
+	flusher, canFlush := w.(http.Flusher)
 
-	// Generate message ID
-	messageID := uuid.New().String()
+	// Send content_start
+	fmt.Fprintf(w, "event: content_start\ndata: {\"session_id\":%q}\n\n", sessionID)
+	if canFlush {
+		flusher.Flush()
+	}
 
-	// Send start event
-	h.sendSSEEvent(w, flusher, "start", social.SSEStartData{ID: messageID})
-
-	// Process message
-	ctx, cancel := context.WithTimeout(r.Context(), 120*time.Second)
-	defer cancel()
-
-	response, err := h.agentLoop.ProcessDirectWithChannel(
-		ctx,
-		decodedContent,
-		session.SessionKey,
-		"lan",
-		deviceID,
-	)
+	// Process (currently returns complete response; V2 will stream token-by-token)
+	sessionKey := "lan:" + sessionID
+	result, err := h.agentLoop.ProcessDirectWithChannel(r.Context(), req.Content, sessionKey, "lan", sessionID)
 	if err != nil {
-		log.Printf("LAN chat stream error: %v", err)
-		h.sendSSEEvent(w, flusher, "error", social.SSEErrorData{Error: err.Error()})
+		fmt.Fprintf(w, "event: error\ndata: {\"message\":%q}\n\n", err.Error())
+		if canFlush {
+			flusher.Flush()
+		}
 		return
 	}
 
-	// For now, send the complete response as a single chunk
-	// In a future implementation, this could be enhanced to stream token by token
-	h.sendSSEEvent(w, flusher, "chunk", social.SSEChunkData{Content: response})
+	// Send content_chunk
+	fmt.Fprintf(w, "event: content_chunk\ndata: {\"content\":%q,\"done\":false}\n\n", result)
+	if canFlush {
+		flusher.Flush()
+	}
 
-	// Send end event
-	h.sendSSEEvent(w, flusher, "end", social.SSEEndData{
-		Content:   response,
-		Timestamp: time.Now(),
-	})
+	// Send done
+	fmt.Fprintf(w, "event: done\ndata: {\"content\":%q,\"done\":true}\n\n", result)
+	if canFlush {
+		flusher.Flush()
+	}
 }
 
-// sendSSEEvent sends a Server-Sent Event to the client.
-func (h *LANHandler) sendSSEEvent(w http.ResponseWriter, flusher http.Flusher, eventType string, data interface{}) {
-	dataJSON, err := json.Marshal(data)
-	if err != nil {
-		log.Printf("Failed to marshal SSE data: %v", err)
+// handleChatWS handles GET /api/chat/ws — WebSocket chat.
+// Delegates to pkg/api ChatHub which handles the WebSocket lifecycle.
+func (h *ChatHandler) handleChatWS(w http.ResponseWriter, r *http.Request) {
+	// Validate token from query param
+	token := r.URL.Query().Get("token")
+	if token == "" {
+		pkgapi.WriteJSONError(w, http.StatusUnauthorized, "missing token")
 		return
 	}
 
-	fmt.Fprintf(w, "event: %s\n", eventType)
-	fmt.Fprintf(w, "data: %s\n\n", dataJSON)
-	flusher.Flush()
-}
+	validation := h.deviceStore.ValidateToken(token)
+	if !validation.Valid {
+		pkgapi.WriteJSONError(w, http.StatusUnauthorized, "invalid token")
+		return
+	}
 
-// writeLANError writes an error response for LAN API.
-func writeLANError(w http.ResponseWriter, status int, message string) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": false,
-		"error":   message,
-	})
-}
+	if h.chatHub == nil {
+		http.Error(w, "chat not available", http.StatusServiceUnavailable)
+		return
+	}
 
-// SetAgentLoop updates the agent loop reference.
-// This is useful when the agent is initialized after the handler is created.
-func (h *LANHandler) SetAgentLoop(loop *agent.AgentLoop) {
-	h.agentLoop = loop
-}
-
-// GetSessionManager returns the session manager for testing purposes.
-func (h *LANHandler) GetSessionManager() *social.SessionManager {
-	return h.sessions
-}
-
-// NewLANHandlerWithConfig creates a LAN handler with config-based version.
-func NewLANHandlerWithConfig(
-	deviceStore *devices.DeviceStore,
-	agentLoop *agent.AgentLoop,
-	deviceID, deviceName string,
-) *LANHandler {
-	return NewLANHandler(deviceStore, agentLoop, deviceID, deviceName, config.GetVersion())
+	// Delegate to the shared WebSocket handler from pkg/api
+	h.chatHub.HandleWebSocket(w, r)
 }

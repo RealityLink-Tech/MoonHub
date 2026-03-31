@@ -137,7 +137,7 @@ func (h *Handler) handleUpdateModel(w http.ResponseWriter, r *http.Request) {
 	indexStr := r.PathValue("index")
 	index, err := strconv.Atoi(indexStr)
 	if err != nil || index < 0 {
-		writeJSONError(w, http.StatusBadRequest, "Invalid model index")
+		WriteJSONError(w, http.StatusBadRequest, "Invalid model index")
 		return
 	}
 
@@ -149,21 +149,21 @@ func (h *Handler) handleUpdateModel(w http.ResponseWriter, r *http.Request) {
 		ThinkingLevel *string `json:"thinking_level"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&patch); err != nil {
-		writeJSONError(w, http.StatusBadRequest, "Invalid JSON")
+		WriteJSONError(w, http.StatusBadRequest, "Invalid JSON")
 		return
 	}
 
 	cfg, err := config.LoadConfig(h.configPath)
 	if err != nil {
 		if !os.IsNotExist(err) {
-			writeJSONError(w, http.StatusInternalServerError, "Failed to load config")
+			WriteJSONError(w, http.StatusInternalServerError, "Failed to load config")
 			return
 		}
 		cfg = config.DefaultConfig()
 	}
 
 	if index >= len(cfg.ModelList) {
-		writeJSONError(w, http.StatusNotFound, fmt.Sprintf("Model index %d out of range", index))
+		WriteJSONError(w, http.StatusNotFound, fmt.Sprintf("Model index %d out of range", index))
 		return
 	}
 
@@ -189,12 +189,12 @@ func (h *Handler) handleUpdateModel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := cfg.ValidateModelList(); err != nil {
-		writeJSONError(w, http.StatusBadRequest, err.Error())
+		WriteJSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	if err := config.SaveConfig(h.configPath, cfg); err != nil {
-		writeJSONError(w, http.StatusInternalServerError, "Failed to save config")
+		WriteJSONError(w, http.StatusInternalServerError, "Failed to save config")
 		return
 	}
 
@@ -211,18 +211,18 @@ func (h *Handler) handleSetDefaultModel(w http.ResponseWriter, r *http.Request) 
 		ModelName string `json:"model_name"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		writeJSONError(w, http.StatusBadRequest, "Invalid JSON")
+		WriteJSONError(w, http.StatusBadRequest, "Invalid JSON")
 		return
 	}
 	if req.ModelName == "" {
-		writeJSONError(w, http.StatusBadRequest, "model_name is required")
+		WriteJSONError(w, http.StatusBadRequest, "model_name is required")
 		return
 	}
 
 	cfg, err := config.LoadConfig(h.configPath)
 	if err != nil {
 		if !os.IsNotExist(err) {
-			writeJSONError(w, http.StatusInternalServerError, "Failed to load config")
+			WriteJSONError(w, http.StatusInternalServerError, "Failed to load config")
 			return
 		}
 		cfg = config.DefaultConfig()
@@ -237,14 +237,14 @@ func (h *Handler) handleSetDefaultModel(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 	if !found {
-		writeJSONError(w, http.StatusNotFound, fmt.Sprintf("Model %q not found in model_list", req.ModelName))
+		WriteJSONError(w, http.StatusNotFound, fmt.Sprintf("Model %q not found in model_list", req.ModelName))
 		return
 	}
 
 	cfg.Agents.Defaults.ModelName = req.ModelName
 
 	if err := config.SaveConfig(h.configPath, cfg); err != nil {
-		writeJSONError(w, http.StatusInternalServerError, "Failed to save config")
+		WriteJSONError(w, http.StatusInternalServerError, "Failed to save config")
 		return
 	}
 
@@ -261,26 +261,26 @@ func (h *Handler) handleSetDefaultModel(w http.ResponseWriter, r *http.Request) 
 func (h *Handler) handleAddModel(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(io.LimitReader(r.Body, 1<<20))
 	if err != nil {
-		writeJSONError(w, http.StatusBadRequest, "Failed to read request body")
+		WriteJSONError(w, http.StatusBadRequest, "Failed to read request body")
 		return
 	}
 	defer r.Body.Close()
 
 	var mc config.ModelConfig
 	if err = json.Unmarshal(body, &mc); err != nil {
-		writeJSONError(w, http.StatusBadRequest, "Invalid JSON")
+		WriteJSONError(w, http.StatusBadRequest, "Invalid JSON")
 		return
 	}
 
 	if err = mc.Validate(); err != nil {
-		writeJSONError(w, http.StatusBadRequest, err.Error())
+		WriteJSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	cfg, err := config.LoadConfig(h.configPath)
 	if err != nil {
 		if !os.IsNotExist(err) {
-			writeJSONError(w, http.StatusInternalServerError, "Failed to load config")
+			WriteJSONError(w, http.StatusInternalServerError, "Failed to load config")
 			return
 		}
 		cfg = config.DefaultConfig()
@@ -289,7 +289,7 @@ func (h *Handler) handleAddModel(w http.ResponseWriter, r *http.Request) {
 	// Check for duplicate model_name
 	for _, existing := range cfg.ModelList {
 		if existing.ModelName == mc.ModelName {
-			writeJSONError(w, http.StatusConflict, fmt.Sprintf("Model %q already exists", mc.ModelName))
+			WriteJSONError(w, http.StatusConflict, fmt.Sprintf("Model %q already exists", mc.ModelName))
 			return
 		}
 	}
@@ -297,7 +297,7 @@ func (h *Handler) handleAddModel(w http.ResponseWriter, r *http.Request) {
 	cfg.ModelList = append(cfg.ModelList, mc)
 
 	if err := config.SaveConfig(h.configPath, cfg); err != nil {
-		writeJSONError(w, http.StatusInternalServerError, "Failed to save config")
+		WriteJSONError(w, http.StatusInternalServerError, "Failed to save config")
 		return
 	}
 
@@ -315,21 +315,21 @@ func (h *Handler) handleDeleteModel(w http.ResponseWriter, r *http.Request) {
 	indexStr := r.PathValue("index")
 	index, err := strconv.Atoi(indexStr)
 	if err != nil || index < 0 {
-		writeJSONError(w, http.StatusBadRequest, "Invalid model index")
+		WriteJSONError(w, http.StatusBadRequest, "Invalid model index")
 		return
 	}
 
 	cfg, err := config.LoadConfig(h.configPath)
 	if err != nil {
 		if !os.IsNotExist(err) {
-			writeJSONError(w, http.StatusInternalServerError, "Failed to load config")
+			WriteJSONError(w, http.StatusInternalServerError, "Failed to load config")
 			return
 		}
 		cfg = config.DefaultConfig()
 	}
 
 	if index >= len(cfg.ModelList) {
-		writeJSONError(w, http.StatusNotFound, fmt.Sprintf("Model index %d out of range", index))
+		WriteJSONError(w, http.StatusNotFound, fmt.Sprintf("Model index %d out of range", index))
 		return
 	}
 
@@ -346,7 +346,7 @@ func (h *Handler) handleDeleteModel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := config.SaveConfig(h.configPath, cfg); err != nil {
-		writeJSONError(w, http.StatusInternalServerError, "Failed to save config")
+		WriteJSONError(w, http.StatusInternalServerError, "Failed to save config")
 		return
 	}
 

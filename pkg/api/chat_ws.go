@@ -203,23 +203,9 @@ func (h *ChatHub) HandleMessage(sessionID, content string) {
 	}()
 }
 
-// ==================== HTTP Handler ====================
-
-func (h *Handler) handleChatWS(w http.ResponseWriter, r *http.Request) {
-	// Validate token from query param
-	token := r.URL.Query().Get("token")
-	if token == "" {
-		writeJSONError(w, http.StatusUnauthorized, "missing token")
-		return
-	}
-
-	deviceID, ok := h.tokenStore.Validate(token)
-	if !ok {
-		writeJSONError(w, http.StatusUnauthorized, "invalid token")
-		return
-	}
-	_ = deviceID // available for future multi-device management
-
+// HandleWebSocket upgrades an HTTP connection to WebSocket and manages the client.
+// This is used by both gateway and launcher processes.
+func (h *ChatHub) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Printf("[api] WebSocket upgrade failed: %v", err)
@@ -231,18 +217,9 @@ func (h *Handler) handleChatWS(w http.ResponseWriter, r *http.Request) {
 		sessionID = "default"
 	}
 
-	hub := h.chatHub
-	if hub == nil {
-		conn.Close()
-		return
-	}
+	h.AddClient(sessionID, conn)
 
-	hub.AddClient(sessionID, conn)
-
-	// Read pump -- handle incoming messages
-	defer func() {
-		hub.RemoveClient(sessionID)
-	}()
+	defer h.RemoveClient(sessionID)
 
 	conn.SetReadLimit(1 << 20) // 1 MB max message size
 	for {
@@ -260,7 +237,33 @@ func (h *Handler) handleChatWS(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if msg.Type == "message.send" && msg.Content != "" {
-			hub.HandleMessage(sessionID, msg.Content)
+			h.HandleMessage(sessionID, msg.Content)
 		}
 	}
+}
+
+// ==================== HTTP Handler ====================
+
+func (h *Handler) handleChatWS(w http.ResponseWriter, r *http.Request) {
+	// Validate token from query param
+	token := r.URL.Query().Get("token")
+	if token == "" {
+		WriteJSONError(w, http.StatusUnauthorized, "missing token")
+		return
+	}
+
+	deviceID, ok := h.tokenStore.Validate(token)
+	if !ok {
+		WriteJSONError(w, http.StatusUnauthorized, "invalid token")
+		return
+	}
+	_ = deviceID // available for future multi-device management
+
+	if h.chatHub == nil {
+		WriteJSONError(w, http.StatusServiceUnavailable, "chat not available")
+		return
+	}
+
+	// Delegate to the shared WebSocket handler on ChatHub
+	h.chatHub.HandleWebSocket(w, r)
 }
