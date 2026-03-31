@@ -90,6 +90,8 @@ func (h *DynamicToolsHandler) handleGenerate(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	r.Body = http.MaxBytesReader(w, r.Body, 1<<20) // 1MB limit
+
 	var req dynamictools.GenerateRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeDynamicError(w, http.StatusBadRequest, "invalid request body: "+err.Error())
