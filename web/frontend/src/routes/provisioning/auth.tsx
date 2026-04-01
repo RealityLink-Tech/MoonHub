@@ -95,36 +95,13 @@ function ProvisioningAuth() {
             </div>
           </div>
         ) : (
-          <AuthCode code={authCode || "------"} />
+          <AuthCode code={authCode || "------"} onRegenerate={handleRegenerate} isRegenerating={isRegenerating} />
         )}
 
         <div className="space-y-6">
           <p className="text-[#586064] font-light text-sm leading-relaxed px-8">
             请妥善保存此授权码，用于连接 PWA
           </p>
-
-          {/* Action Buttons */}
-          <div className="flex items-center justify-center gap-3">
-            <button
-              onClick={handleCopy}
-              className="inline-flex items-center space-x-2 px-6 py-3 rounded-full bg-[#e3e9ec] text-[#506070] text-sm font-medium hover:bg-[#dbe4e7] transition-colors active:scale-95 duration-200"
-            >
-              <span className="material-symbols-outlined text-sm">
-                {copied ? "check" : "content_copy"}
-              </span>
-              <span>{copied ? "已复制" : "复制授权码"}</span>
-            </button>
-
-            <button
-              onClick={handleRegenerate}
-              disabled={isRegenerating}
-              className="inline-flex items-center space-x-2 px-4 py-3 rounded-full border border-[#abb3b7] text-[#586064] text-sm hover:bg-[#f1f4f6] transition-colors active:scale-95 duration-200 disabled:opacity-50"
-            >
-              <span className={`material-symbols-outlined text-sm ${isRegenerating ? "animate-spin" : ""}`}>
-                refresh
-              </span>
-            </button>
-          </div>
         </div>
       </div>
 
