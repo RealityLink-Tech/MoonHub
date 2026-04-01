@@ -9,6 +9,8 @@
 
 **Changelog**: [`CHANGELOG.md`](CHANGELOG.md) — Project updates and release notes
 
+**Companion App**: [`../MoonHub-PWA/README.md`](../MoonHub-PWA/README.md) — installable PWA for pairing, chat, Space, and settings
+
 **[中文文档](README_CN.md)**
 
 ## Introduction
@@ -44,7 +46,7 @@ Say goodbye to traditional Agents that "only output text." MoonHub can generate 
 
 **📱 Dedicated Application**
 
-Users interact with the device through a dedicated app. Currently provided as a **PWA** for quick installation and offline use; native **mobile apps** are coming soon to cover more platforms and use cases.
+Users interact with the device through a dedicated app. Currently provided as a **PWA** for quick installation and offline use; native **mobile apps** are coming soon to cover more platforms and use cases. Frontend repo: [`../MoonHub-PWA/README.md`](../MoonHub-PWA/README.md).
 
 ### What Can You Do?
 

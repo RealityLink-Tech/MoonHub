@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MoonHub is an AI assistant that works out of the box — instant, alive, connected. Written in Go as a single binary for easy deployment. It's a multi-channel AI assistant framework supporting Telegram, Discord, Slack, Matrix, QQ, WeChat, and more, with dynamic UI generation and a global agent network.
+MoonHub is an AI assistant that works out of the box — instant, alive, connected. No technical background needed: plug in, pair, and start talking. Your data stays on your device, interfaces adapt to you through dynamic UI generation, and agents connect through a local-first, cloud-optional social network.
 
 ## Build Commands
 

@@ -57,3 +57,4 @@ web/backend/dist/*
 
 # MCP local config (may contain API keys)
 .mcp.json
+.gstack/
