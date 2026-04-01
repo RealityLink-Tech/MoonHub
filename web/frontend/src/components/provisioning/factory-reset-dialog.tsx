@@ -44,7 +44,7 @@ export function FactoryResetDialog({ onReset, trigger }: FactoryResetDialogProps
         {trigger || (
           <Button variant="destructive" size="sm">
             <Trash2 className="size-4" />
-            Factory Reset
+            恢复出厂设置
           </Button>
         )}
       </AlertDialogTrigger>
@@ -54,26 +54,26 @@ export function FactoryResetDialog({ onReset, trigger }: FactoryResetDialogProps
             <div className="flex size-10 items-center justify-center rounded-full bg-destructive/10">
               <AlertTriangle className="size-5 text-destructive" />
             </div>
-            <AlertDialogTitle>Factory Reset</AlertDialogTitle>
+            <AlertDialogTitle>恢复出厂设置</AlertDialogTitle>
           </div>
           <AlertDialogDescription className="text-left">
-            This will <strong>permanently reset</strong> the device to its initial state:
+            此操作将<strong>永久重置</strong>设备到初始状态：
           </AlertDialogDescription>
           <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1 mt-2">
-            <li>All saved WiFi networks will be forgotten</li>
-            <li>All device configuration will be cleared</li>
-            <li>The device will return to provisioning mode</li>
-            <li>You will need to set up the device again</li>
+            <li>所有已保存的 WiFi 网络将被清除</li>
+            <li>所有设备配置将被重置</li>
+            <li>设备将返回配网模式</li>
+            <li>您需要重新设置设备</li>
           </ul>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isLoading}>取消</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleReset}
             disabled={isLoading}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isLoading ? "Resetting..." : "Reset Device"}
+            {isLoading ? "重置中..." : "确认重置"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
