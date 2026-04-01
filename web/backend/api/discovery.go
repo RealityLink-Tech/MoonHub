@@ -45,7 +45,7 @@ func (h *DiscoveryHandler) handlePing(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	writeCORSHeaders(w, r)
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -72,6 +72,6 @@ func (h *DiscoveryHandler) handleSystemInfo(w http.ResponseWriter, r *http.Reque
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	writeCORSHeaders(w, r)
 	json.NewEncoder(w).Encode(response)
 }

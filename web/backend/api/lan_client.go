@@ -3,6 +3,7 @@ package api
 import (
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 )
@@ -88,4 +89,49 @@ func requireLANClientLANAPI(w http.ResponseWriter, r *http.Request) bool {
 	}
 	writeAuthError(w, http.StatusForbidden, "access denied")
 	return false
+}
+
+// isLANOrigin checks whether an Origin header value refers to a LAN or
+// loopback address. It parses the host from the URL and resolves it to an
+// IP, then uses IsLANScopeIP. If the origin is empty (e.g. non-browser
+// clients), it returns true so existing behaviour is preserved.
+func isLANOrigin(origin string) bool {
+	if origin == "" {
+		return true
+	}
+	u, err := url.Parse(origin)
+	if err != nil {
+		return false
+	}
+	host := u.Hostname()
+	// Fast-path for common textual forms.
+	if host == "localhost" || host == "127.0.0.1" || host == "[::1]" || host == "0.0.0.0" {
+		return true
+	}
+	// Try to parse as an IP directly.
+	if ip := net.ParseIP(host); ip != nil {
+		return IsLANScopeIP(ip)
+	}
+	// Resolve hostname (e.g. "my-pi.local").
+	addrs, err := net.LookupHost(host)
+	if err != nil {
+		return false
+	}
+	for _, addr := range addrs {
+		if ip := net.ParseIP(addr); ip != nil && IsLANScopeIP(ip) {
+			return true
+		}
+	}
+	return false
+}
+
+// writeCORSHeaders sets Access-Control-Allow-Origin to the requesting origin
+// only when the origin is a LAN address. If the origin is not LAN-scoped the
+// header is omitted, effectively blocking cross-origin access from public
+// origins.
+func writeCORSHeaders(w http.ResponseWriter, r *http.Request) {
+	origin := r.Header.Get("Origin")
+	if isLANOrigin(origin) {
+		w.Header().Set("Access-Control-Allow-Origin", origin)
+	}
 }
