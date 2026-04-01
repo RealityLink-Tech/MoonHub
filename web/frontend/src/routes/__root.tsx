@@ -1,4 +1,4 @@
-import { Outlet, createRootRoute, useNavigate } from "@tanstack/react-router"
+import { Outlet, createRootRoute, redirect, useNavigate } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
 
 function NotFound() {
@@ -29,4 +29,9 @@ const RootLayout = () => {
 export const Route = createRootRoute({
   component: RootLayout,
   notFoundComponent: NotFound,
+  beforeLoad: ({ location }) => {
+    if (location.pathname === "/") {
+      throw redirect({ to: "/provisioning/" })
+    }
+  },
 })
