@@ -1,9 +1,4 @@
-import {
-  Navigate,
-  Outlet,
-  createFileRoute,
-  useRouterState,
-} from "@tanstack/react-router"
+import { Outlet, createFileRoute, useRouterState } from "@tanstack/react-router"
 
 import { ProvisioningLayout } from "@/components/provisioning/layout"
 
@@ -37,11 +32,6 @@ function ProvisioningRouteLayout() {
       default:
         return "设备配对"
     }
-  }
-
-  // Redirect to WiFi page if accessing /provisioning directly
-  if (pathname === "/provisioning") {
-    return <Navigate to="/provisioning/" />
   }
 
   return (
