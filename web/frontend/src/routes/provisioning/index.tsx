@@ -21,6 +21,7 @@ function ProvisioningIndex() {
   const [isManualMode, setIsManualMode] = useState(false)
   const [isScanning, setIsScanning] = useState(true)
   const [isConnecting, setIsConnecting] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   // Initial scan
@@ -129,7 +130,7 @@ function ProvisioningIndex() {
             </Label>
             <div className="relative">
               <Input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="请输入密码"
@@ -137,9 +138,10 @@ function ProvisioningIndex() {
               />
               <button
                 type="button"
+                onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-[#abb3b7] hover:text-[#506070] transition-colors"
               >
-                <span className="material-symbols-outlined">visibility_off</span>
+                <span className="material-symbols-outlined">{showPassword ? "visibility" : "visibility_off"}</span>
               </button>
             </div>
           </div>
