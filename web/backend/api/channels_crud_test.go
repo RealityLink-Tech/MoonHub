@@ -14,7 +14,8 @@ import (
 )
 
 // setupChannelTestEnv creates a test environment with config and handler.
-func setupChannelTestEnv(t *testing.T) (string, *Handler, func()) {
+// Returns (configPath, handler, bearerToken, cleanup).
+func setupChannelTestEnv(t *testing.T) (string, *Handler, string, func()) {
 	t.Helper()
 
 	tmpDir := t.TempDir()
@@ -31,6 +32,7 @@ func setupChannelTestEnv(t *testing.T) (string, *Handler, func()) {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
@@ -40,7 +42,7 @@ func setupChannelTestEnv(t *testing.T) (string, *Handler, func()) {
 		// tmpDir will be cleaned up automatically by t.TempDir()
 	}
 
-	return configPath, h, cleanup
+	return configPath, h, token, cleanup
 }
 
 // newLocalRequest creates a request with localhost IP to pass LAN restriction.
@@ -56,7 +58,7 @@ func newLocalRequest(method, url string, body *bytes.Reader) *http.Request {
 
 // TestHandleListChannels_Success tests listing channels when some are configured.
 func TestHandleListChannels_Success(t *testing.T) {
-	configPath, h, cleanup := setupChannelTestEnv(t)
+	configPath, h, _, cleanup := setupChannelTestEnv(t)
 	defer cleanup()
 
 	// Configure a telegram channel
@@ -122,7 +124,7 @@ func TestHandleListChannels_Success(t *testing.T) {
 
 // TestHandleListChannels_Empty tests listing channels when none are configured.
 func TestHandleListChannels_Empty(t *testing.T) {
-	_, h, cleanup := setupChannelTestEnv(t)
+	_, h, _, cleanup := setupChannelTestEnv(t)
 	defer cleanup()
 
 	rec := httptest.NewRecorder()
@@ -152,7 +154,7 @@ func TestHandleListChannels_Empty(t *testing.T) {
 
 // TestHandleListChannels_LANRestriction tests that listing channels requires LAN access.
 func TestHandleListChannels_LANRestriction(t *testing.T) {
-	_, h, cleanup := setupChannelTestEnv(t)
+	_, h, _, cleanup := setupChannelTestEnv(t)
 	defer cleanup()
 
 	rec := httptest.NewRecorder()
@@ -168,7 +170,7 @@ func TestHandleListChannels_LANRestriction(t *testing.T) {
 
 // TestHandleCreateChannel_Success tests creating a new channel configuration.
 func TestHandleCreateChannel_Success(t *testing.T) {
-	configPath, h, cleanup := setupChannelTestEnv(t)
+	configPath, h, _, cleanup := setupChannelTestEnv(t)
 	defer cleanup()
 
 	createReq := channelCreateRequest{
@@ -225,7 +227,7 @@ func TestHandleCreateChannel_Success(t *testing.T) {
 
 // TestHandleCreateChannel_TypeFieldAlias tests PWA-style body: type + name + config (no id).
 func TestHandleCreateChannel_TypeFieldAlias(t *testing.T) {
-	configPath, h, cleanup := setupChannelTestEnv(t)
+	configPath, h, _, cleanup := setupChannelTestEnv(t)
 	defer cleanup()
 
 	body := []byte(`{"type":"discord","name":"Team Discord","config":{"token":"discord-token-xyz"}}`)
@@ -252,7 +254,7 @@ func TestHandleCreateChannel_TypeFieldAlias(t *testing.T) {
 
 // TestHandleCreateChannel_MissingIDAndType rejects empty id and type.
 func TestHandleCreateChannel_MissingIDAndType(t *testing.T) {
-	_, h, cleanup := setupChannelTestEnv(t)
+	_, h, _, cleanup := setupChannelTestEnv(t)
 	defer cleanup()
 
 	body := []byte(`{"name":"x","config":{"token":"t"}}`)
@@ -268,7 +270,7 @@ func TestHandleCreateChannel_MissingIDAndType(t *testing.T) {
 
 // TestHandleCreateChannel_InvalidType tests creating a channel with invalid type.
 func TestHandleCreateChannel_InvalidType(t *testing.T) {
-	_, h, cleanup := setupChannelTestEnv(t)
+	_, h, _, cleanup := setupChannelTestEnv(t)
 	defer cleanup()
 
 	createReq := channelCreateRequest{
@@ -307,7 +309,7 @@ func TestHandleCreateChannel_InvalidType(t *testing.T) {
 
 // TestHandleCreateChannel_AlreadyExists tests creating a channel that already exists.
 func TestHandleCreateChannel_AlreadyExists(t *testing.T) {
-	configPath, h, cleanup := setupChannelTestEnv(t)
+	configPath, h, _, cleanup := setupChannelTestEnv(t)
 	defer cleanup()
 
 	// First, create a telegram channel
@@ -354,7 +356,7 @@ func TestHandleCreateChannel_AlreadyExists(t *testing.T) {
 
 // TestHandleUpdateChannel_Success tests updating an existing channel.
 func TestHandleUpdateChannel_Success(t *testing.T) {
-	configPath, h, cleanup := setupChannelTestEnv(t)
+	configPath, h, token, cleanup := setupChannelTestEnv(t)
 	defer cleanup()
 
 	// First, create a telegram channel
@@ -381,6 +383,7 @@ func TestHandleUpdateChannel_Success(t *testing.T) {
 	rec := httptest.NewRecorder()
 	req := newLocalRequest(http.MethodPatch, "/api/channels/telegram", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
+	withBearerToken(req, token)
 
 	// Register routes and use mux to handle path parameters
 	mux := http.NewServeMux()
@@ -423,7 +426,7 @@ func TestHandleUpdateChannel_Success(t *testing.T) {
 
 // TestHandleUpdateChannel_NotFound tests updating a channel that doesn't exist.
 func TestHandleUpdateChannel_NotFound(t *testing.T) {
-	_, h, cleanup := setupChannelTestEnv(t)
+	_, h, token, cleanup := setupChannelTestEnv(t)
 	defer cleanup()
 
 	updateReq := channelUpdateRequest{
@@ -436,6 +439,7 @@ func TestHandleUpdateChannel_NotFound(t *testing.T) {
 	rec := httptest.NewRecorder()
 	req := newLocalRequest(http.MethodPatch, "/api/channels/telegram", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
+	withBearerToken(req, token)
 
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
@@ -460,7 +464,7 @@ func TestHandleUpdateChannel_NotFound(t *testing.T) {
 
 // TestHandleDeleteChannel_Success tests deleting a channel.
 func TestHandleDeleteChannel_Success(t *testing.T) {
-	configPath, h, cleanup := setupChannelTestEnv(t)
+	configPath, h, token, cleanup := setupChannelTestEnv(t)
 	defer cleanup()
 
 	// First, create a telegram channel
@@ -477,6 +481,7 @@ func TestHandleDeleteChannel_Success(t *testing.T) {
 	// Delete the channel
 	rec := httptest.NewRecorder()
 	req := newLocalRequest(http.MethodDelete, "/api/channels/telegram", nil)
+	withBearerToken(req, token)
 
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
@@ -514,11 +519,12 @@ func TestHandleDeleteChannel_Success(t *testing.T) {
 
 // TestHandleDeleteChannel_NotFound tests deleting a channel that doesn't exist.
 func TestHandleDeleteChannel_NotFound(t *testing.T) {
-	_, h, cleanup := setupChannelTestEnv(t)
+	_, h, token, cleanup := setupChannelTestEnv(t)
 	defer cleanup()
 
 	rec := httptest.NewRecorder()
 	req := newLocalRequest(http.MethodDelete, "/api/channels/telegram", nil)
+	withBearerToken(req, token)
 
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
@@ -543,7 +549,7 @@ func TestHandleDeleteChannel_NotFound(t *testing.T) {
 
 // TestHandleGetChannelStatus_Success tests getting status of a channel.
 func TestHandleGetChannelStatus_Success(t *testing.T) {
-	configPath, h, cleanup := setupChannelTestEnv(t)
+	configPath, h, token, cleanup := setupChannelTestEnv(t)
 	defer cleanup()
 
 	// Create a telegram channel
@@ -560,6 +566,7 @@ func TestHandleGetChannelStatus_Success(t *testing.T) {
 	// Get channel status
 	rec := httptest.NewRecorder()
 	req := newLocalRequest(http.MethodGet, "/api/channels/telegram/status", nil)
+	withBearerToken(req, token)
 
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
@@ -602,11 +609,12 @@ func TestHandleGetChannelStatus_Success(t *testing.T) {
 
 // TestHandleGetChannelStatus_NotFound tests getting status of a non-existent channel.
 func TestHandleGetChannelStatus_NotFound(t *testing.T) {
-	_, h, cleanup := setupChannelTestEnv(t)
+	_, h, token, cleanup := setupChannelTestEnv(t)
 	defer cleanup()
 
 	rec := httptest.NewRecorder()
 	req := newLocalRequest(http.MethodGet, "/api/channels/telegram/status", nil)
+	withBearerToken(req, token)
 
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
@@ -631,7 +639,7 @@ func TestHandleGetChannelStatus_NotFound(t *testing.T) {
 
 // TestChannelCRUDRoutesRegistered verifies that all channel CRUD routes are registered.
 func TestChannelCRUDRoutesRegistered(t *testing.T) {
-	_, h, cleanup := setupChannelTestEnv(t)
+	_, h, _, cleanup := setupChannelTestEnv(t)
 	defer cleanup()
 
 	mux := http.NewServeMux()
@@ -692,7 +700,7 @@ func TestChannelCRUDRoutesRegistered(t *testing.T) {
 
 // TestHandleCreateChannel_MissingFields tests creating a channel with missing required fields.
 func TestHandleCreateChannel_MissingFields(t *testing.T) {
-	_, h, cleanup := setupChannelTestEnv(t)
+	_, h, _, cleanup := setupChannelTestEnv(t)
 	defer cleanup()
 
 	// Test with empty config (missing required fields)
@@ -716,7 +724,7 @@ func TestHandleCreateChannel_MissingFields(t *testing.T) {
 
 // TestHandleUpdateChannel_MultipleChannels tests updating different channel types.
 func TestHandleUpdateChannel_MultipleChannels(t *testing.T) {
-	configPath, h, cleanup := setupChannelTestEnv(t)
+	configPath, h, token, cleanup := setupChannelTestEnv(t)
 	defer cleanup()
 
 	// Test updating discord channel
@@ -740,6 +748,7 @@ func TestHandleUpdateChannel_MultipleChannels(t *testing.T) {
 	rec := httptest.NewRecorder()
 	req := newLocalRequest(http.MethodPatch, "/api/channels/discord", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
+	withBearerToken(req, token)
 
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)

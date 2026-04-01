@@ -3,12 +3,14 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
+	"sync"
 
 	"github.com/RealityLink-Tech/MoonHub/pkg/agent"
-	"github.com/RealityLink-Tech/MoonHub/pkg/devices"
 	pkgapi "github.com/RealityLink-Tech/MoonHub/pkg/api"
+	"github.com/RealityLink-Tech/MoonHub/pkg/devices"
 	"github.com/google/uuid"
 )
 
@@ -17,8 +19,10 @@ const maxChatBodyBytes = 1 << 20 // 1MB
 // ChatHandler handles chat API requests (REST and SSE).
 type ChatHandler struct {
 	deviceStore *devices.DeviceStore
-	agentLoop   *agent.AgentLoop
 	chatHub     *pkgapi.ChatHub
+
+	mu        sync.Mutex
+	agentLoop *agent.AgentLoop
 }
 
 // NewChatHandler creates a chat handler.
@@ -29,9 +33,18 @@ func NewChatHandler(deviceStore *devices.DeviceStore, chatHub *pkgapi.ChatHub) *
 	}
 }
 
-// SetAgentLoop updates the agent loop reference.
+// SetAgentLoop updates the agent loop reference (thread-safe).
 func (h *ChatHandler) SetAgentLoop(loop *agent.AgentLoop) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
 	h.agentLoop = loop
+}
+
+// getAgentLoop returns the current agent loop (thread-safe).
+func (h *ChatHandler) getAgentLoop() *agent.AgentLoop {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return h.agentLoop
 }
 
 // RegisterRoutes registers chat routes.
@@ -86,14 +99,15 @@ func (h *ChatHandler) authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			writeChatError(w, http.StatusUnauthorized, "invalid or expired token", "TOKEN_INVALID")
 			return
 		}
-		_ = h.deviceStore.UpdateLastSeen(validation.DeviceID, "")
+		_ = h.deviceStore.UpdateLastSeen(validation.DeviceID, getClientIP(r))
 		next.ServeHTTP(w, r)
 	}
 }
 
 // handleChat handles POST /api/chat — synchronous chat.
 func (h *ChatHandler) handleChat(w http.ResponseWriter, r *http.Request) {
-	if h.agentLoop == nil {
+	loop := h.getAgentLoop()
+	if loop == nil {
 		writeChatError(w, http.StatusServiceUnavailable, "agent not available", "AGENT_UNAVAILABLE")
 		return
 	}
@@ -115,7 +129,7 @@ func (h *ChatHandler) handleChat(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sessionKey := "lan:" + sessionID
-	result, err := h.agentLoop.ProcessDirectWithChannel(r.Context(), req.Content, sessionKey, "lan", sessionID)
+	result, err := loop.ProcessDirectWithChannel(r.Context(), req.Content, sessionKey, "lan", sessionID)
 	if err != nil {
 		writeChatError(w, http.StatusInternalServerError, "agent processing failed", "AGENT_ERROR")
 		return
@@ -131,7 +145,8 @@ func (h *ChatHandler) handleChat(w http.ResponseWriter, r *http.Request) {
 
 // handleChatStream handles POST /api/chat/stream — SSE streaming.
 func (h *ChatHandler) handleChatStream(w http.ResponseWriter, r *http.Request) {
-	if h.agentLoop == nil {
+	loop := h.getAgentLoop()
+	if loop == nil {
 		writeChatError(w, http.StatusServiceUnavailable, "agent not available", "AGENT_UNAVAILABLE")
 		return
 	}
@@ -161,16 +176,17 @@ func (h *ChatHandler) handleChatStream(w http.ResponseWriter, r *http.Request) {
 	flusher, canFlush := w.(http.Flusher)
 
 	// Send content_start
-	fmt.Fprintf(w, "event: content_start\ndata: {\"session_id\":%q}\n\n", sessionID)
+	writeSSE(w, "content_start", map[string]string{"session_id": sessionID})
 	if canFlush {
 		flusher.Flush()
 	}
 
 	// Process (currently returns complete response; V2 will stream token-by-token)
 	sessionKey := "lan:" + sessionID
-	result, err := h.agentLoop.ProcessDirectWithChannel(r.Context(), req.Content, sessionKey, "lan", sessionID)
+	result, err := loop.ProcessDirectWithChannel(r.Context(), req.Content, sessionKey, "lan", sessionID)
 	if err != nil {
-		fmt.Fprintf(w, "event: error\ndata: {\"message\":%q}\n\n", err.Error())
+		log.Printf("chat stream error: %v", err)
+		writeSSE(w, "error", map[string]string{"message": "agent processing failed"})
 		if canFlush {
 			flusher.Flush()
 		}
@@ -178,13 +194,13 @@ func (h *ChatHandler) handleChatStream(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Send content_chunk
-	fmt.Fprintf(w, "event: content_chunk\ndata: {\"content\":%q,\"done\":false}\n\n", result)
+	writeSSE(w, "content_chunk", map[string]any{"content": result, "done": false})
 	if canFlush {
 		flusher.Flush()
 	}
 
 	// Send done
-	fmt.Fprintf(w, "event: done\ndata: {\"content\":%q,\"done\":true}\n\n", result)
+	writeSSE(w, "done", map[string]any{"content": result, "done": true})
 	if canFlush {
 		flusher.Flush()
 	}
@@ -193,6 +209,10 @@ func (h *ChatHandler) handleChatStream(w http.ResponseWriter, r *http.Request) {
 // handleChatWS handles GET /api/chat/ws — WebSocket chat.
 // Delegates to pkg/api ChatHub which handles the WebSocket lifecycle.
 func (h *ChatHandler) handleChatWS(w http.ResponseWriter, r *http.Request) {
+	if !requireLANClient(w, r) {
+		return
+	}
+
 	// Validate token from query param
 	token := r.URL.Query().Get("token")
 	if token == "" {
@@ -213,4 +233,14 @@ func (h *ChatHandler) handleChatWS(w http.ResponseWriter, r *http.Request) {
 
 	// Delegate to the shared WebSocket handler from pkg/api
 	h.chatHub.HandleWebSocket(w, r)
+}
+
+// writeSSE writes a Server-Sent Event to w using proper JSON encoding.
+func writeSSE(w http.ResponseWriter, event string, data any) {
+	payload, err := json.Marshal(data)
+	if err != nil {
+		log.Printf("SSE marshal error: %v", err)
+		return
+	}
+	fmt.Fprintf(w, "event: %s\ndata: %s\n\n", event, payload)
 }

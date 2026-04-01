@@ -30,6 +30,7 @@ func TestHandleListModels_ConfiguredStatusUsesRuntimeProbesForLocalModels(t *tes
 	defer cleanup()
 	resetOAuthHooks(t)
 	resetModelProbeHooks(t)
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	var mu sync.Mutex
 	var openAIProbes []string
@@ -98,6 +99,7 @@ func TestHandleListModels_ConfiguredStatusUsesRuntimeProbesForLocalModels(t *tes
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/models", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -147,6 +149,7 @@ func TestHandleListModels_ConfiguredStatusForOAuthModelWithCredential(t *testing
 	defer cleanup()
 	resetOAuthHooks(t)
 	resetModelProbeHooks(t)
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	cfg, err := config.LoadConfig(configPath)
 	if err != nil {
@@ -176,6 +179,7 @@ func TestHandleListModels_ConfiguredStatusForOAuthModelWithCredential(t *testing
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/models", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -201,6 +205,7 @@ func TestHandleListModels_ProbesLocalModelsConcurrently(t *testing.T) {
 	defer cleanup()
 	resetOAuthHooks(t)
 	resetModelProbeHooks(t)
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	started := make(chan string, 2)
 	release := make(chan struct{})
@@ -239,6 +244,7 @@ func TestHandleListModels_ProbesLocalModelsConcurrently(t *testing.T) {
 	go func() {
 		rec := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodGet, "/api/models", nil)
+		withBearerToken(req, token)
 		mux.ServeHTTP(rec, req)
 		recCh <- rec
 	}()
@@ -263,6 +269,7 @@ func TestHandleListModels_NormalizesWildcardLocalAPIBaseForProbe(t *testing.T) {
 	defer cleanup()
 	resetOAuthHooks(t)
 	resetModelProbeHooks(t)
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	var gotProbe string
 	probeOpenAICompatibleModelFunc = func(apiBase, modelID string) bool {
@@ -289,6 +296,7 @@ func TestHandleListModels_NormalizesWildcardLocalAPIBaseForProbe(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/models", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {

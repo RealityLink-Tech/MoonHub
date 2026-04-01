@@ -371,12 +371,14 @@ func TestGatewayStatusIncludesStartConditionWhenNotReady(t *testing.T) {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
+	token := setupAuthenticatedDevice(t, deviceStore)
 	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/gateway/status", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -409,6 +411,7 @@ func TestGatewayStatusKeepsRunningWhenHealthProbeFailsAfterRunning(t *testing.T)
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
+	token := setupAuthenticatedDevice(t, deviceStore)
 	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
@@ -434,6 +437,7 @@ func TestGatewayStatusKeepsRunningWhenHealthProbeFailsAfterRunning(t *testing.T)
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/gateway/status", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -459,6 +463,7 @@ func TestGatewayStatusReturnsErrorAfterStartupWindowExpires(t *testing.T) {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
+	token := setupAuthenticatedDevice(t, deviceStore)
 	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
@@ -484,6 +489,7 @@ func TestGatewayStatusReturnsErrorAfterStartupWindowExpires(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/gateway/status", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -509,6 +515,7 @@ func TestGatewayStatusReturnsRestartingDuringRestartGap(t *testing.T) {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
+	token := setupAuthenticatedDevice(t, deviceStore)
 	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
@@ -519,6 +526,7 @@ func TestGatewayStatusReturnsRestartingDuringRestartGap(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/gateway/status", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -544,6 +552,7 @@ func TestGatewayStatusIncludesRestartRequiredWhenModelsDiffer(t *testing.T) {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
+	token := setupAuthenticatedDevice(t, deviceStore)
 	cfg := config.DefaultConfig()
 	cfg.Agents.Defaults.ModelName = cfg.ModelList[0].ModelName
 	cfg.ModelList[0].APIKey = "test-key"
@@ -578,6 +587,7 @@ func TestGatewayStatusIncludesRestartRequiredWhenModelsDiffer(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/gateway/status", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -601,6 +611,7 @@ func TestGatewayRestartKeepsRunningProcessWhenPreconditionsFail(t *testing.T) {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
+	token := setupAuthenticatedDevice(t, deviceStore)
 	cfg := config.DefaultConfig()
 	cfg.Agents.Defaults.ModelName = cfg.ModelList[0].ModelName
 	cfg.ModelList[0].APIKey = ""
@@ -635,6 +646,7 @@ func TestGatewayRestartKeepsRunningProcessWhenPreconditionsFail(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/api/gateway/restart", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusBadRequest {
@@ -659,6 +671,7 @@ func TestGatewayRestartKeepsOldProcessWhenItDoesNotExitInTime(t *testing.T) {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
+	token := setupAuthenticatedDevice(t, deviceStore)
 	cfg := config.DefaultConfig()
 	cfg.Agents.Defaults.ModelName = cfg.ModelList[0].ModelName
 	cfg.ModelList[0].APIKey = "test-key"
@@ -697,6 +710,7 @@ func TestGatewayRestartKeepsOldProcessWhenItDoesNotExitInTime(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/api/gateway/restart", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusInternalServerError {
@@ -725,6 +739,7 @@ func TestGatewayRestartReturnsErrorStatusWhenReplacementFailsToStart(t *testing.
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
+	token := setupAuthenticatedDevice(t, deviceStore)
 	cfg := config.DefaultConfig()
 	cfg.Agents.Defaults.ModelName = cfg.ModelList[0].ModelName
 	cfg.ModelList[0].APIKey = "test-key"
@@ -744,6 +759,7 @@ func TestGatewayRestartReturnsErrorStatusWhenReplacementFailsToStart(t *testing.
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/api/gateway/restart", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusInternalServerError {
@@ -752,6 +768,7 @@ func TestGatewayRestartReturnsErrorStatusWhenReplacementFailsToStart(t *testing.
 
 	statusRec := httptest.NewRecorder()
 	statusReq := httptest.NewRequest(http.MethodGet, "/api/gateway/status", nil)
+	withBearerToken(statusReq, token)
 	mux.ServeHTTP(statusRec, statusReq)
 
 	if statusRec.Code != http.StatusOK {
@@ -775,12 +792,14 @@ func TestGatewayStatusExcludesLogsFields(t *testing.T) {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
+	token := setupAuthenticatedDevice(t, deviceStore)
 	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/gateway/status", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -810,6 +829,7 @@ func TestGatewayLogsReturnsIncrementalHistory(t *testing.T) {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
+	token := setupAuthenticatedDevice(t, deviceStore)
 	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
@@ -825,6 +845,7 @@ func TestGatewayLogsReturnsIncrementalHistory(t *testing.T) {
 		"/api/gateway/logs?log_offset=1&log_run_id="+strconv.Itoa(runID),
 		nil,
 	)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -858,6 +879,7 @@ func TestGatewayClearLogsResetsBufferedHistory(t *testing.T) {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
+	token := setupAuthenticatedDevice(t, deviceStore)
 	h := NewHandler(configPath, deviceStore, pairingManager)
 	mux := http.NewServeMux()
 	h.RegisterRoutes(mux)
@@ -869,6 +891,7 @@ func TestGatewayClearLogsResetsBufferedHistory(t *testing.T) {
 
 	clearRec := httptest.NewRecorder()
 	clearReq := httptest.NewRequest(http.MethodPost, "/api/gateway/logs/clear", nil)
+	withBearerToken(clearReq, token)
 	mux.ServeHTTP(clearRec, clearReq)
 
 	if clearRec.Code != http.StatusOK {
@@ -898,6 +921,7 @@ func TestGatewayClearLogsResetsBufferedHistory(t *testing.T) {
 		"/api/gateway/logs?log_offset=0&log_run_id="+strconv.Itoa(previousRunID),
 		nil,
 	)
+	withBearerToken(logsReq, token)
 	mux.ServeHTTP(logsRec, logsReq)
 
 	if logsRec.Code != http.StatusOK {

@@ -20,6 +20,7 @@ func TestGetLauncherConfigUsesRuntimeFallback(t *testing.T) {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
+	token := setupAuthenticatedDevice(t, deviceStore)
 	h := NewHandler(configPath, deviceStore, pairingManager)
 	h.SetServerOptions(19999, true, false, []string{"192.168.1.0/24"})
 
@@ -28,6 +29,7 @@ func TestGetLauncherConfigUsesRuntimeFallback(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/system/launcher-config", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -54,6 +56,7 @@ func TestPutLauncherConfigPersists(t *testing.T) {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
+	token := setupAuthenticatedDevice(t, deviceStore)
 	h := NewHandler(configPath, deviceStore, pairingManager)
 
 	mux := http.NewServeMux()
@@ -66,6 +69,7 @@ func TestPutLauncherConfigPersists(t *testing.T) {
 		strings.NewReader(`{"port":18080,"public":true,"allowed_cidrs":["192.168.1.0/24"]}`),
 	)
 	req.Header.Set("Content-Type", "application/json")
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -93,6 +97,7 @@ func TestPutLauncherConfigRejectsInvalidPort(t *testing.T) {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
+	token := setupAuthenticatedDevice(t, deviceStore)
 	h := NewHandler(configPath, deviceStore, pairingManager)
 
 	mux := http.NewServeMux()
@@ -105,6 +110,7 @@ func TestPutLauncherConfigRejectsInvalidPort(t *testing.T) {
 		strings.NewReader(`{"port":70000,"public":false}`),
 	)
 	req.Header.Set("Content-Type", "application/json")
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusBadRequest {
@@ -120,6 +126,7 @@ func TestPutLauncherConfigRejectsInvalidCIDR(t *testing.T) {
 		t.Fatalf("NewDeviceStore() error = %v", err)
 	}
 	pairingManager := devices.NewPairingManager(deviceStore)
+	token := setupAuthenticatedDevice(t, deviceStore)
 	h := NewHandler(configPath, deviceStore, pairingManager)
 
 	mux := http.NewServeMux()
@@ -132,6 +139,7 @@ func TestPutLauncherConfigRejectsInvalidCIDR(t *testing.T) {
 		strings.NewReader(`{"port":18080,"public":false,"allowed_cidrs":["bad-cidr"]}`),
 	)
 	req.Header.Set("Content-Type", "application/json")
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusBadRequest {

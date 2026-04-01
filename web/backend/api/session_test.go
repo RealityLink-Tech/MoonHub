@@ -32,6 +32,7 @@ func sessionsTestDir(t *testing.T, configPath string) string {
 func TestHandleListSessions_JSONLStorage(t *testing.T) {
 	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	dir := sessionsTestDir(t, configPath)
 	store, err := memory.NewJSONLStore(dir)
@@ -68,6 +69,7 @@ func TestHandleListSessions_JSONLStorage(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/sessions", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -98,6 +100,7 @@ func TestHandleListSessions_JSONLStorage(t *testing.T) {
 func TestHandleListSessions_TitleUsesTrimmedSummary(t *testing.T) {
 	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	dir := sessionsTestDir(t, configPath)
 	store, err := memory.NewJSONLStore(dir)
@@ -126,6 +129,7 @@ func TestHandleListSessions_TitleUsesTrimmedSummary(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/sessions", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -154,6 +158,7 @@ func TestHandleListSessions_TitleUsesTrimmedSummary(t *testing.T) {
 func TestHandleGetSession_JSONLStorage(t *testing.T) {
 	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	dir := sessionsTestDir(t, configPath)
 	store, err := memory.NewJSONLStore(dir)
@@ -181,6 +186,7 @@ func TestHandleGetSession_JSONLStorage(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/sessions/detail-jsonl", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -218,6 +224,7 @@ func TestHandleGetSession_JSONLStorage(t *testing.T) {
 func TestHandleDeleteSession_JSONLStorage(t *testing.T) {
 	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	dir := sessionsTestDir(t, configPath)
 	store, err := memory.NewJSONLStore(dir)
@@ -242,6 +249,7 @@ func TestHandleDeleteSession_JSONLStorage(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodDelete, "/api/sessions/delete-jsonl", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusNoContent {
@@ -259,6 +267,7 @@ func TestHandleDeleteSession_JSONLStorage(t *testing.T) {
 func TestHandleGetSession_LegacyJSONFallback(t *testing.T) {
 	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	dir := sessionsTestDir(t, configPath)
 	manager := session.NewSessionManager(dir)
@@ -275,6 +284,7 @@ func TestHandleGetSession_LegacyJSONFallback(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/sessions/legacy-json", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -285,6 +295,7 @@ func TestHandleGetSession_LegacyJSONFallback(t *testing.T) {
 func TestHandleSessions_FiltersEmptyJSONLFiles(t *testing.T) {
 	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	dir := sessionsTestDir(t, configPath)
 	base := filepath.Join(dir, sanitizeSessionKey(moonhubSessionPrefix+"empty-jsonl"))
@@ -298,6 +309,7 @@ func TestHandleSessions_FiltersEmptyJSONLFiles(t *testing.T) {
 
 	listRec := httptest.NewRecorder()
 	listReq := httptest.NewRequest(http.MethodGet, "/api/sessions", nil)
+	withBearerToken(listReq, token)
 	mux.ServeHTTP(listRec, listReq)
 
 	if listRec.Code != http.StatusOK {
@@ -314,6 +326,7 @@ func TestHandleSessions_FiltersEmptyJSONLFiles(t *testing.T) {
 
 	detailRec := httptest.NewRecorder()
 	detailReq := httptest.NewRequest(http.MethodGet, "/api/sessions/empty-jsonl", nil)
+	withBearerToken(detailReq, token)
 	mux.ServeHTTP(detailRec, detailReq)
 
 	if detailRec.Code != http.StatusNotFound {

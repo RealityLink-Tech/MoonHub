@@ -17,6 +17,7 @@ import (
 func TestHandleListSkills(t *testing.T) {
 	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	cfg, err := config.LoadConfig(configPath)
 	if err != nil {
@@ -84,6 +85,7 @@ func TestHandleListSkills(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/skills", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -116,6 +118,7 @@ func TestHandleListSkills(t *testing.T) {
 func TestHandleGetSkill(t *testing.T) {
 	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	cfg, err := config.LoadConfig(configPath)
 	if err != nil {
@@ -149,6 +152,7 @@ func TestHandleGetSkill(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/skills/viewer-skill", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -170,6 +174,7 @@ func TestHandleGetSkill(t *testing.T) {
 func TestHandleGetSkillUsesResolvedPath(t *testing.T) {
 	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	cfg, err := config.LoadConfig(configPath)
 	if err != nil {
@@ -201,6 +206,7 @@ func TestHandleGetSkillUsesResolvedPath(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/skills/display-name", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -222,6 +228,7 @@ func TestHandleGetSkillUsesResolvedPath(t *testing.T) {
 func TestHandleImportSkill(t *testing.T) {
 	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	cfg, err := config.LoadConfig(configPath)
 	if err != nil {
@@ -256,6 +263,7 @@ func TestHandleImportSkill(t *testing.T) {
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/api/skills/import", &body)
 	req.Header.Set("Content-Type", writer.FormDataContentType())
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -274,6 +282,7 @@ func TestHandleImportSkill(t *testing.T) {
 
 	rec2 := httptest.NewRecorder()
 	req2 := httptest.NewRequest(http.MethodGet, "/api/skills", nil)
+	withBearerToken(req2, token)
 	mux.ServeHTTP(rec2, req2)
 	if rec2.Code != http.StatusOK {
 		t.Fatalf("list status = %d, want %d, body=%s", rec2.Code, http.StatusOK, rec2.Body.String())
@@ -296,6 +305,7 @@ func TestHandleImportSkill(t *testing.T) {
 func TestHandleDeleteSkill(t *testing.T) {
 	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	cfg, err := config.LoadConfig(configPath)
 	if err != nil {
@@ -325,6 +335,7 @@ func TestHandleDeleteSkill(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodDelete, "/api/skills/delete-me", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {

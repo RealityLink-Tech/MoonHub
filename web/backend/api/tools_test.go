@@ -14,6 +14,7 @@ import (
 func TestHandleListTools(t *testing.T) {
 	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	cfg, err := config.LoadConfig(configPath)
 	if err != nil {
@@ -41,6 +42,7 @@ func TestHandleListTools(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/tools", nil)
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -101,6 +103,7 @@ func TestHandleListTools(t *testing.T) {
 
 		rec = httptest.NewRecorder()
 		req = httptest.NewRequest(http.MethodGet, "/api/tools", nil)
+		withBearerToken(req, token)
 		mux.ServeHTTP(rec, req)
 		if rec.Code != http.StatusOK {
 			t.Fatalf("status = %d, want %d, body=%s", rec.Code, http.StatusOK, rec.Body.String())
@@ -126,6 +129,7 @@ func TestHandleListTools(t *testing.T) {
 func TestHandleUpdateToolState(t *testing.T) {
 	configPath, deviceStore, pairingManager, cleanup := setupOAuthTestEnv(t)
 	defer cleanup()
+	token := setupAuthenticatedDevice(t, deviceStore)
 
 	cfg, err := config.LoadConfig(configPath)
 	if err != nil {
@@ -153,6 +157,7 @@ func TestHandleUpdateToolState(t *testing.T) {
 		bytes.NewBufferString(`{"enabled":true}`),
 	)
 	req.Header.Set("Content-Type", "application/json")
+	withBearerToken(req, token)
 	mux.ServeHTTP(rec, req)
 	if rec.Code != http.StatusOK {
 		t.Fatalf("spawn status = %d, want %d, body=%s", rec.Code, http.StatusOK, rec.Body.String())
@@ -165,6 +170,7 @@ func TestHandleUpdateToolState(t *testing.T) {
 		bytes.NewBufferString(`{"enabled":true}`),
 	)
 	req2.Header.Set("Content-Type", "application/json")
+	withBearerToken(req2, token)
 	mux.ServeHTTP(rec2, req2)
 	if rec2.Code != http.StatusOK {
 		t.Fatalf("regex status = %d, want %d, body=%s", rec2.Code, http.StatusOK, rec2.Body.String())
@@ -177,6 +183,7 @@ func TestHandleUpdateToolState(t *testing.T) {
 		bytes.NewBufferString(`{"enabled":true}`),
 	)
 	req3.Header.Set("Content-Type", "application/json")
+	withBearerToken(req3, token)
 	mux.ServeHTTP(rec3, req3)
 	if rec3.Code != http.StatusOK {
 		t.Fatalf("cron status = %d, want %d, body=%s", rec3.Code, http.StatusOK, rec3.Body.String())

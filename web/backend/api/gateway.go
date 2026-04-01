@@ -50,30 +50,33 @@ var gatewayHealthGet = func(url string, timeout time.Duration) (*http.Response, 
 	return client.Get(url)
 }
 
+const healthCacheTTL = 2 * time.Second
+
 // probeGatewayHealth probes the gateway health endpoint and returns a status string.
+// Response body is drained to ensure connection reuse but the payload is not used.
 func probeGatewayHealth(url string) string {
-	resp, err := gatewayHealthGet(url, 2*time.Second)
+	resp, err := gatewayHealthGet(url, healthCacheTTL)
 	if err != nil {
 		return "unreachable"
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
+		_, _ = io.Copy(io.Discard, resp.Body)
 		return "error"
 	}
-	var healthData map[string]any
-	if err := json.NewDecoder(resp.Body).Decode(&healthData); err != nil {
+	// Drain body to verify it's valid JSON and allow connection reuse.
+	var discard map[string]any
+	if err := json.NewDecoder(resp.Body).Decode(&discard); err != nil {
 		return "error"
 	}
-	// Return "running" on success; healthData is discarded here since we
-	// only cache the status string. The next fresh probe will populate it.
 	return "running"
 }
 
 // registerGatewayRoutes binds gateway lifecycle endpoints to the ServeMux.
 func (h *Handler) registerGatewayRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("GET /api/gateway/status", h.handleGatewayStatus)
-	mux.HandleFunc("GET /api/gateway/events", h.handleGatewayEvents)
-	mux.HandleFunc("GET /api/gateway/logs", h.handleGatewayLogs)
+	h.registerProtectedRoute(mux, "GET /api/gateway/status", h.handleGatewayStatus)
+	h.registerProtectedRoute(mux, "GET /api/gateway/events", h.handleGatewayEvents)
+	h.registerProtectedRoute(mux, "GET /api/gateway/logs", h.handleGatewayLogs)
 	h.registerProtectedRoute(mux, "POST /api/gateway/logs/clear", h.handleGatewayClearLogs)
 	h.registerProtectedRoute(mux, "POST /api/gateway/start", h.handleGatewayStart)
 	h.registerProtectedRoute(mux, "POST /api/gateway/stop", h.handleGatewayStop)
@@ -627,7 +630,7 @@ func (h *Handler) gatewayStatusData() map[string]any {
 		// Use cached health if fresh (< 2s), otherwise probe async
 		gateway.mu.Lock()
 		health := gateway.cachedHealth
-		if time.Since(gateway.cachedHealthAt) > 2*time.Second {
+		if time.Since(gateway.cachedHealthAt) > healthCacheTTL {
 			// Async probe — don't block this request
 			go func() {
 				gateway.mu.Lock()

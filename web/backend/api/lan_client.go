@@ -83,13 +83,6 @@ func requireLANClient(w http.ResponseWriter, r *http.Request) bool {
 	return false
 }
 
-func requireLANClientLANAPI(w http.ResponseWriter, r *http.Request) bool {
-	if IsLANScopeIP(ClientIPFromRequest(r)) {
-		return true
-	}
-	writeAuthError(w, http.StatusForbidden, "access denied")
-	return false
-}
 
 // isLANOrigin checks whether an Origin header value refers to a LAN or
 // loopback address. It parses the host from the URL and resolves it to an

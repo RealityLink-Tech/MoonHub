@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"encoding/json"
+	"net"
 	"net/http"
 	"strings"
 
@@ -23,7 +24,7 @@ func BearerTokenAuth(deviceStore *devices.DeviceStore, next http.Handler) http.H
 			writeAPIError(w, http.StatusUnauthorized, "invalid or expired token", "TOKEN_INVALID")
 			return
 		}
-		_ = deviceStore.UpdateLastSeen(validation.DeviceID, "")
+		_ = deviceStore.UpdateLastSeen(validation.DeviceID, clientIP(r))
 		next.ServeHTTP(w, r)
 	})
 }
@@ -38,4 +39,13 @@ func writeAPIError(w http.ResponseWriter, status int, message, code string) {
 			"code":    code,
 		},
 	})
+}
+
+// clientIP extracts the client IP from the request, stripping the port.
+func clientIP(r *http.Request) string {
+	host := r.RemoteAddr
+	if h, _, err := net.SplitHostPort(host); err == nil {
+		host = h
+	}
+	return host
 }
