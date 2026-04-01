@@ -41,7 +41,7 @@ function ProvisioningRouteLayout() {
 
   // Redirect to WiFi page if accessing /provisioning directly
   if (pathname === "/provisioning") {
-    return <Navigate to="/provisioning" />
+    return <Navigate to="/provisioning/" />
   }
 
   return (

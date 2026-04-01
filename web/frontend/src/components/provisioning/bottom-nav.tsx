@@ -8,7 +8,7 @@ interface BottomNavProps {
 
 export function BottomNav({ currentStep }: BottomNavProps) {
   const steps: { key: NavStep; path: string; icon: string; label: string }[] = [
-    { key: "connect", path: "/provisioning", icon: "wifi", label: "连接" },
+    { key: "connect", path: "/provisioning/", icon: "wifi", label: "连接" },
     { key: "authorize", path: "/provisioning/auth", icon: "vpn_key", label: "授权" },
     { key: "install", path: "/provisioning/install", icon: "install_mobile", label: "安装" },
     { key: "settings", path: "/provisioning/settings", icon: "settings", label: "设置" },
