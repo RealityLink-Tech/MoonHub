@@ -17,7 +17,7 @@ function ProvisioningSettings() {
   const { data: statusData, isLoading, refetch } = useQuery({
     queryKey: ["provisioning", "status"],
     queryFn: getStatus,
-    refetchInterval: 5000,
+    refetchInterval: (query) => query.state.error ? false : 5000,
   })
 
   const status = statusData?.status
