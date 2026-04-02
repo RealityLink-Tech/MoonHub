@@ -83,11 +83,10 @@ func requireLANClient(w http.ResponseWriter, r *http.Request) bool {
 	return false
 }
 
-
 // isLANOrigin checks whether an Origin header value refers to a LAN or
 // loopback address. It parses the host from the URL and resolves it to an
 // IP, then uses IsLANScopeIP. If the origin is empty (e.g. non-browser
-// clients), it returns true so existing behaviour is preserved.
+// clients), it returns true so existing behavior is preserved.
 func isLANOrigin(origin string) bool {
 	if origin == "" {
 		return true
